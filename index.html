@@ -831,13 +831,14 @@ function renderSentiment(s) {
   return card('sec-sentiment','😨 市場情緒', `
     <div class="sentiment-grid">
       <div class="fg-card">
-        <div class="fg-label">台股貪婪指數</div>
+        <div class="fg-label">台灣市場情緒</div>
         <div class="fg-value ${fgClass(tw_g.label)}">${tw_g.value??'N/A'}</div>
         <div class="fg-text ${fgClass(tw_g.label)}">${tw_g.label||'—'}</div>
         <div class="linear-gauge-wrap">
           <div class="linear-gauge-bg"></div>
           <div class="linear-gauge-marker" style="left:${tw_g.value!=null?tw_g.value:50}%"></div>
         </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--muted);text-align:center;">台灣籌碼情緒 / 貪婪恐懼</div>
       </div>
       <div class="fg-card">
         <div class="fg-label">CNN 恐懼貪婪</div>
