@@ -747,10 +747,14 @@ function render(d) {
   // ── Market Index Banner (TAIEX)
   if (d.sentiment && d.sentiment.tw_index && d.sentiment.tw_index.price) {
     const idx = d.sentiment.tw_index;
-    const isUp = idx.change >= 0;
+    const changeVal = Number(idx.change ?? 0);
+    const changePctVal = idx.change_pct != null ? Number(idx.change_pct) : null;
+    const isUp = changeVal >= 0;
     const arrow = isUp ? '▲' : '▼';
     const cls = isUp ? 'up' : 'dn';
-    const chgStr = `${arrow} ${Math.abs(idx.change).toFixed(2)}%`;
+    const pointText = `${arrow} ${Math.abs(changeVal).toFixed(2)} 點`;
+    const pctText = changePctVal != null ? ` (${changePctVal >= 0 ? '+' : '-'}${Math.abs(changePctVal).toFixed(2)}%)` : '';
+    const chgStr = `${pointText}${pctText}`;
     const formatPrice = new Intl.NumberFormat('en-US').format(idx.price);
     html += `
       <div class="taiex-banner ${cls}">
