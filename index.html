@@ -1,24 +1,1057 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Anya 每日市場分析</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet" />
+  <title>Anya 每日投資分析報告</title>
+  <meta name="description" content="Anya AI 每日自動生成的台美股投資分析報告，包含宏觀指標、三大法人、板塊資金流向與 AI 深度分析。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <style>
-    body { margin: 0; font-family: 'Noto Sans TC', sans-serif; background: #f5f7fa; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-    .card { background: #fff; border-radius: 20px; padding: 48px; box-shadow: 0 4px 32px rgba(0,0,0,0.1); text-align: center; max-width: 480px; }
-    h1 { font-size: 28px; font-weight: 900; color: #1a237e; margin-bottom: 12px; }
-    p { color: #64748b; line-height: 1.7; }
-    .badge { display: inline-block; background: #e8eaf6; color: #3f51b5; border-radius: 999px; padding: 6px 18px; font-weight: 700; font-size: 13px; margin-top: 20px; }
+    /* ── Design Tokens ─────────────────────────────────────────── */
+    :root {
+      --bg:         #0a0e17;
+      --surface:    #141922;
+      --surface-2:  #1a2133;
+      --surface-3:  #202a3d;
+      --border:     #2a3448;
+      --text:       #e2e8f5;
+      --muted:      #7a8ba8;
+      --accent:     #4f9eff;
+      --accent-glow:rgba(79,158,255,.15);
+      --green:      #34d058;
+      --red:        #f25e5e;
+      --yellow:     #f0c34a;
+      --purple:     #a37cff;
+      --teal:       #38d9c0;
+      --radius:     14px;
+      --radius-sm:  8px;
+      --shadow:     0 8px 32px rgba(0,0,0,.45);
+      --glow-green: 0 0 16px rgba(52,208,88,.25);
+      --glow-red:   0 0 16px rgba(242,94,94,.25);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── Header ─────────────────────────────────────────────────── */
+    header {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(10,14,23,.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner {
+      max-width: 1380px; margin: 0 auto;
+      padding: 0 24px; height: 58px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .logo {
+      font-size: 17px; font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+    }
+    .market-status {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; color: var(--muted);
+    }
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green);
+    }
+    .status-dot.closed { background: var(--muted); }
+    .header-spacer { flex: 1; }
+    select {
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--text); padding: 6px 12px;
+      border-radius: var(--radius-sm); font-size: 13px;
+      cursor: pointer; outline: none; transition: border-color .2s;
+      min-width: 200px;
+    }
+    select:hover { border-color: var(--accent); }
+    .tts-btn {
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--muted); padding: 6px 12px;
+      border-radius: var(--radius-sm); font-size: 13px;
+      cursor: pointer; transition: all .2s; white-space: nowrap;
+    }
+    .tts-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Anchor Nav ─────────────────────────────────────────────── */
+    .anchor-nav {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      overflow-x: auto; white-space: nowrap;
+    }
+    .anchor-nav::-webkit-scrollbar { height: 0; }
+    .anchor-nav-inner {
+      max-width: 1380px; margin: 0 auto;
+      padding: 0 24px;
+      display: inline-flex; gap: 0;
+    }
+    .anchor-nav a {
+      display: inline-block; padding: 10px 16px;
+      font-size: 13px; color: var(--muted); text-decoration: none;
+      border-bottom: 2px solid transparent;
+      transition: all .2s;
+    }
+    .anchor-nav a:hover, .anchor-nav a.active {
+      color: var(--accent); border-bottom-color: var(--accent);
+    }
+
+    /* ── Main layout ─────────────────────────────────────────────── */
+    main { max-width: 1380px; margin: 0 auto; padding: 28px 24px 80px; }
+
+    /* ── Hero signal banner ──────────────────────────────────────── */
+    #hero {
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 32px; margin-bottom: 24px;
+      display: flex; align-items: center; gap: 20px;
+      position: relative; overflow: hidden;
+    }
+    #hero::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--purple), var(--teal));
+    }
+    .signal-orb {
+      width: 52px; height: 52px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .signal-bullish { background: rgba(52,208,88,.15); box-shadow: var(--glow-green); }
+    .signal-bearish { background: rgba(242,94,94,.15); box-shadow: var(--glow-red); }
+    .signal-neutral  { background: rgba(240,195,74,.12); }
+    .hero-content { flex: 1; }
+    .hero-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+    .hero-date { font-size: 12px; color: var(--muted); }
+    .type-badge {
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; letter-spacing: .5px;
+    }
+    .type-morning        { background:#1c3b6e; color:#4f9eff; }
+    .type-evening        { background:#1b3322; color:#34d058; }
+    .type-weekend_morning{ background:#2e1c4a; color:#a37cff; }
+    .type-weekend_evening{ background:#2e2a1c; color:#f0c34a; }
+    .type-weekly_review  { background:#1c2e2e; color:#38d9c0; }
+    .signal-label {
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    }
+    .label-bullish { background:rgba(52,208,88,.12); color:var(--green); }
+    .label-bearish { background:rgba(242,94,94,.12); color:var(--red); }
+    .label-neutral  { background:rgba(240,195,74,.12); color:var(--yellow); }
+    .action-badge {
+      padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase; margin-left: auto;
+      border: 1px solid transparent;
+    }
+    .action-bullish { background: rgba(52,208,88,.15); color: var(--green); border-color: rgba(52,208,88,.3); }
+    .action-bearish { background: rgba(242,94,94,.15); color: var(--red); border-color: rgba(242,94,94,.3); }
+    .action-neutral { background: rgba(240,195,74,.15); color: var(--yellow); border-color: rgba(240,195,74,.3); }
+    #hero-teaser { font-size: 15px; color: var(--text); line-height: 1.7; font-weight: 500; }
+
+    /* ── Section card ────────────────────────────────────────────── */
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px; margin-bottom: 20px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .section-card:hover { transform:translateY(-2px); box-shadow: var(--shadow); }
+    /* ── TAIEX Banner ───────────────────────────────────────────── */
+    .taiex-banner {
+      padding: 24px 32px; margin-bottom: 24px; display: flex; 
+      justify-content: space-between; align-items: center; 
+      background: linear-gradient(90deg, var(--surface), var(--surface-2));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position: relative; overflow: hidden;
+    }
+    .taiex-banner::after {
+      content: ""; position: absolute; top: 0; left: 0; bottom: 0; width: 6px;
+    }
+    .taiex-banner.up::after { background: var(--green); }
+    .taiex-banner.dn::after { background: var(--red); }
+    .taiex-label { font-size: 13px; color: var(--muted); margin-bottom: 8px; font-weight: 600; letter-spacing: 1.5px; }
+    .taiex-price { font-size: 44px; font-weight: 900; color: var(--text); line-height: 1; font-family: 'Outfit', sans-serif; }
+    .taiex-chg   { font-size: 28px; font-weight: 800; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 8px; }
+
+    .section-title {
+      font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 1.2px;
+      color: var(--muted); margin-bottom: 18px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ── US Macro grid ───────────────────────────────────────────── */
+    .macro-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+      gap: 10px;
+    }
+    .macro-chip {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 14px 16px;
+      transition: background .2s, border-color .2s;
+      cursor: default;
+    }
+    .macro-chip:hover { background: var(--surface-3); border-color: var(--accent); }
+    .chip-name  { font-size: 10px; color: var(--muted); margin-bottom: 4px; letter-spacing: .5px; }
+    .chip-value { font-size: 19px; font-weight: 700; letter-spacing: -.5px; }
+    .chip-chg   { font-size: 12px; margin-top: 3px; display: flex; align-items: center; gap: 3px; }
+    .up   { color: var(--green); }
+    .dn   { color: var(--red); }
+    .flat { color: var(--muted); }
+
+    /* ── Two-col layout for charts ───────────────────────────────── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media(max-width:900px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── Sentiment ───────────────────────────────────────────────── */
+    .sentiment-grid {
+      display: grid; 
+      grid-template-columns: repeat(4, 1fr); 
+      gap: 16px;
+    }
+    @media(max-width:1100px) { .sentiment-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media(max-width:600px) { .sentiment-grid { grid-template-columns: 1fr; } }
+    .fg-card {
+      background: linear-gradient(145deg, var(--surface-2), var(--surface)); 
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px 16px; text-align: center; position: relative;
+      display: flex; flex-direction: column; justify-content: space-between;
+      min-height: 140px;
+    }
+    .fg-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; font-weight: 500; letter-spacing: 0.5px; }
+    .fg-value { font-size: 42px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; }
+    .fg-text  { font-size: 12px; margin-top: 8px; font-weight: 700; }
+    .fg-fear   { color: var(--green); } /* Contra-indicator: Fear is Green/Buy */
+    .fg-neutral{ color: var(--yellow); }
+    .fg-greed  { color: var(--red); }   /* Contra-indicator: Greed is Red/Sell */
+    
+    .linear-gauge-wrap { margin-top: 14px; position: relative; height: 18px; }
+    .linear-gauge-bg {
+      height: 6px; border-radius: 3px; width: 100%; position: absolute; top: 6px;
+      background: linear-gradient(90deg, var(--green) 0%, var(--yellow) 50%, var(--red) 100%);
+      opacity: 0.8;
+    }
+    .linear-gauge-marker {
+      position: absolute; top: 0; width: 4px; height: 18px; background: white;
+      border-radius: 2px; box-shadow: 0 0 4px rgba(0,0,0,0.5);
+      transition: left 0.5s cubic-bezier(.2,1,.2,1);
+      transform: translateX(-50%);
+    }
+
+    .breadth-bar-wrap {
+      background: var(--surface-3); border-radius: 6px; height: 8px;
+      overflow: hidden; margin: 10px 0 6px;
+    }
+    .breadth-bar-bull { height: 100%; background: var(--green); border-radius: 6px 0 0 6px; transition: width .5s; }
+    .breadth-nums { display: flex; justify-content: space-between; font-size: 12px; }
+
+    /* ── TW premarket ────────────────────────────────────────────── */
+    .premarket-grid {
+      display: grid; grid-template-columns: repeat(auto-fill,minmax(155px,1fr)); gap: 10px;
+    }
+    .pm-chip {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 14px 16px;
+    }
+    .pm-label { font-size: 10px; color: var(--muted); margin-bottom: 4px; letter-spacing: .5px; }
+    .pm-value { font-size: 19px; font-weight: 700; }
+    .regime-pill {
+      display: inline-block; padding: 4px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 600; margin-top: 4px;
+    }
+    .rp-bullish { background: rgba(52,208,88,.12); color: var(--green); }
+    .rp-bearish { background: rgba(242,94,94,.12); color: var(--red); }
+    .rp-neutral  { background: rgba(240,195,74,.1); color: var(--yellow); }
+
+    /* ── TAIEX History Table ─────────────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      text-align: right; padding: 8px 12px;
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .8px;
+      color: var(--muted); border-bottom: 1px solid var(--border);
+    }
+    th:first-child { text-align: left; }
+    td { text-align: right; padding: 10px 12px; border-bottom: 1px solid rgba(42,52,72,.5); }
+    td:first-child { text-align: left; color: var(--muted); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface-2); }
+
+    /* ── Institutional ───────────────────────────────────────────── */
+    .inst-row {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px;
+    }
+    .inst-card {
+      background: var(--surface-2); border-radius: var(--radius-sm);
+      padding: 16px; text-align: center;
+    }
+    .inst-name  { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+    .inst-value { font-size: 24px; font-weight: 800; letter-spacing: -1px; }
+    .inst-unit  { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Sector flow ─────────────────────────────────────────────── */
+    .sector-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media(max-width:640px) { .sector-cols { grid-template-columns: 1fr; } }
+    .sector-col-title { font-size: 12px; font-weight: 600; margin-bottom: 12px; }
+    .sector-item { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .sector-name { font-size: 13px; min-width: 72px; }
+    .bar-wrap { flex:1; background: var(--surface-3); border-radius: 4px; height: 6px; overflow: hidden; }
+    .bar { height: 100%; border-radius: 4px; transition: width .6s cubic-bezier(.2,1,.2,1); }
+    .bar-str { background: var(--green); }
+    .bar-wk  { background: var(--red); }
+    .sector-pct { font-size: 12px; min-width: 48px; text-align: right; }
+
+    /* ── Social pulse ────────────────────────────────────────────── */
+    .kol-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+    .kol-bar-bg { flex:1; height: 14px; background: var(--red); border-radius: 7px; overflow: hidden; min-width: 200px; }
+    .kol-bar-bull { height: 100%; background: var(--green); border-radius: 7px 0 0 7px; transition: width .5s; }
+    .theme-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .theme-pill {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px 12px; font-size: 12px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .theme-score { color: var(--accent); font-weight: 700; }
+    
+    .observation-box {
+      border: 1px solid rgba(240,195,74,.4); border-radius: var(--radius-sm);
+      background: rgba(240,195,74,.05); padding: 16px; margin-top: 16px;
+    }
+    .obs-title { font-size: 12px; font-weight: 700; color: var(--yellow); margin-bottom: 8px; letter-spacing: 1px; }
+    .obs-content { font-size: 13px; color: var(--text); line-height: 1.6; }
+    .obs-content ul { margin: 8px 0 0 20px; }
+    .obs-content li { margin-bottom: 4px; }
+
+    /* ── Persona AI tabs ─────────────────────────────────────────── */
+    .persona-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; overflow-x: auto; }
+    .persona-tab {
+      padding: 10px 18px; font-size: 13px; cursor: pointer;
+      border-bottom: 2px solid transparent; color: var(--muted);
+      white-space: nowrap; transition: all .2s; user-select: none;
+    }
+    .persona-tab:hover { color: var(--text); }
+    .persona-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .persona-panel { display: none; }
+    .persona-panel.active { display: block; }
+    /* markdown */
+    .md-content { font-size: 14px; line-height: 1.85; color: var(--text); }
+    .md-content h1,.md-content h2,.md-content h3 {
+      color: var(--text); margin: 18px 0 10px; font-weight: 600;
+    }
+    .md-content h2 { font-size: 16px; color: var(--accent); }
+    .md-content h3 { font-size: 14px; }
+    .md-content p  { margin-bottom: 12px; }
+    .md-content ul,.md-content ol { margin: 8px 0 12px 20px; }
+    .md-content li { margin-bottom: 4px; }
+    .md-content strong { color: var(--accent); font-weight: 600; }
+    .md-content hr { border-color: var(--border); margin: 16px 0; }
+    .md-content blockquote {
+      border-left: 3px solid var(--accent); padding-left: 14px;
+      color: var(--muted); margin: 12px 0;
+    }
+    .md-content code {
+      background: var(--surface-2); padding: 2px 6px;
+      border-radius: 4px; font-size: 12px;
+    }
+    .md-content table { margin: 12px 0; }
+
+    /* ── Chart containers ────────────────────────────────────────── */
+    .chart-wrap { position: relative; height: 200px; }
+    .chart-wrap-sm { position: relative; height: 160px; }
+
+    /* ── Loading / error ─────────────────────────────────────────── */
+    .loader {
+      text-align: center; padding: 80px 20px; color: var(--muted); font-size: 15px;
+    }
+    .spinner {
+      display: inline-block; width: 22px; height: 22px;
+      border: 2px solid var(--border); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin .8s linear infinite;
+      vertical-align: middle; margin-left: 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Back-to-top ─────────────────────────────────────────────── */
+    #back-top {
+      position: fixed; right: 24px; bottom: 32px;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--muted); font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .3s, background .2s;
+      z-index: 100;
+    }
+    #back-top.visible { opacity: 1; }
+    #back-top:hover { background: var(--surface-3); color: var(--accent); }
+
+    /* ── Footer ──────────────────────────────────────────────────── */
+    footer {
+      text-align: center; padding: 24px;
+      font-size: 12px; color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    @media(max-width:640px) {
+      main { padding: 16px 14px 60px; }
+      .macro-grid { grid-template-columns: repeat(2,1fr); }
+      .inst-row { grid-template-columns: repeat(3,1fr); }
+      #hero { flex-direction: column; align-items: flex-start; }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div style="font-size:48px;margin-bottom:16px;">🤖</div>
-    <h1>Anya 每日市場分析</h1>
-    <p>每日盤前晨報自動生成中，請稍候。<br/>報告將於每個交易日早上 08:35 更新。</p>
-    <div class="badge">📅 系統啟動中...</div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">📊 Anya 投資報告</div>
+    <div class="market-status">
+      <span class="status-dot" id="market-dot"></span>
+      <span id="market-label">—</span>
+    </div>
+    <div class="header-spacer"></div>
+    <select id="date-select" title="選擇報告日期"></select>
+    <button class="tts-btn" id="tts-btn" onclick="toggleTTS()" title="朗讀 AI 分析">🔊 朗讀</button>
   </div>
+</header>
+
+<nav class="anchor-nav">
+  <div class="anchor-nav-inner">
+    <a href="#sec-hero">概覽</a>
+    <a href="#sec-macro">美股指標</a>
+    <a href="#sec-sentiment">市場情緒</a>
+    <a href="#sec-tw">台股盤前</a>
+    <a href="#sec-history">歷史走勢</a>
+    <a href="#sec-inst">三大法人</a>
+    <a href="#sec-sector">板塊流向</a>
+    <a href="#sec-kol">KOL 情緒</a>
+    <a href="#sec-ai">AI 分析</a>
+  </div>
+</nav>
+
+<main>
+  <div id="app"><div class="loader">載入報告中<span class="spinner"></span></div></div>
+</main>
+
+<button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<footer>
+  由 <a href="https://github.com/ss1111119/anya-investment-reports" target="_blank">Anya AI Bot</a> 自動生成 ·
+  資料僅供參考，不構成投資建議
+</footer>
+
+<script>
+// ── Globals ─────────────────────────────────────────────────────────────────
+let _charts = {};
+let _ttsUtterance = null;
+let _ttsPlaying = false;
+let _currentData = null;
+
+// Type labels
+const TYPE_LABELS = {
+  morning:'晨報 🌅', evening:'晚報 🌙',
+  weekend_morning:'週末晨報 🌄', weekend_evening:'週末晚報 🌃',
+  weekly_review:'週報 📋',
+};
+const REPORTER_EMOJIS = {
+  morning:'🌅', evening:'🌙', weekend_morning:'🌄', weekend_evening:'🌃', weekly_review:'📋'
+};
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+const fmt  = (n,d=2)  => n==null ? 'N/A' : (+n).toLocaleString('zh-TW',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtK = n => n==null ? 'N/A' : (+n).toLocaleString('zh-TW',{minimumFractionDigits:0,maximumFractionDigits:0});
+const fmtPct = n => n==null ? 'N/A' : (n>0?'+':'')+fmt(n)+'%';
+const cls  = n => n==null?'flat':n>0?'up':n<0?'dn':'flat';
+const arr  = n => n==null?'—':n>0?'▲':n<0?'▼':'—';
+const abs  = n => n==null ? null : Math.abs(n);
+const fgClass = lbl => {
+  if(!lbl) return 'fg-neutral';
+  const l = lbl.toLowerCase();
+  return l.includes('greed') ? 'fg-greed' : l.includes('fear') ? 'fg-fear' : 'fg-neutral';
+};
+
+// ── Market status ────────────────────────────────────────────────────────────
+function updateMarketStatus() {
+  const now = new Date();
+  const tw_hour = now.toLocaleString('en-US',{hour:'numeric',hour12:false,timeZone:'Asia/Taipei'});
+  const h = parseInt(tw_hour);
+  const wd = new Date(now.toLocaleString('en-US',{timeZone:'Asia/Taipei'})).getDay();
+  const isWeekday = wd >= 1 && wd <= 5;
+  const isOpen = isWeekday && h >= 9 && h < 14;
+  const dot = document.getElementById('market-dot');
+  const lbl = document.getElementById('market-label');
+  if(dot && lbl) {
+    dot.className = 'status-dot' + (isOpen ? '' : ' closed');
+    lbl.textContent = isOpen ? '台股交易中' : '台股收盤';
+  }
+}
+
+// ── TTS ──────────────────────────────────────────────────────────────────────
+function toggleTTS() {
+  const btn = document.getElementById('tts-btn');
+  if(_ttsPlaying) {
+    speechSynthesis.cancel();
+    _ttsPlaying = false;
+    btn.textContent = '🔊 朗讀';
+    return;
+  }
+  const el = document.getElementById('ai-full-text');
+  if(!el) return;
+  const text = el.textContent.replace(/\n+/g,' ').trim().slice(0,2000);
+  _ttsUtterance = new SpeechSynthesisUtterance(text);
+  _ttsUtterance.lang = 'zh-TW';
+  _ttsUtterance.rate = 1.1;
+  _ttsUtterance.onend = () => { _ttsPlaying = false; btn.textContent = '🔊 朗讀'; };
+  speechSynthesis.speak(_ttsUtterance);
+  _ttsPlaying = true;
+  btn.textContent = '⏹ 停止';
+}
+
+// ── Destroy old charts ───────────────────────────────────────────────────────
+function destroyCharts() {
+  Object.values(_charts).forEach(c => c && c.destroy && c.destroy());
+  _charts = {};
+}
+
+// ── Load index.json ──────────────────────────────────────────────────────────
+async function loadIndex() {
+  try {
+    const res = await fetch(`data/index.json?_=${Date.now()}`);
+    if(!res.ok) throw new Error('index.json not found');
+    const index = await res.json();
+    const sel = document.getElementById('date-select');
+    sel.innerHTML = '';
+    index.forEach(e => {
+      const opt = document.createElement('option');
+      opt.value = e.file;
+      opt.textContent = `${e.date} ${TYPE_LABELS[e.type]||e.type}`;
+      sel.appendChild(opt);
+    });
+    if(index.length) loadReport(index[0].file);
+    sel.addEventListener('change', () => loadReport(sel.value));
+  } catch(e) {
+    document.getElementById('app').innerHTML =
+      `<div class="loader" style="color:var(--red)">⚠️ 無法載入報告清單：${e.message}</div>`;
+  }
+}
+
+// ── Load report JSON ─────────────────────────────────────────────────────────
+async function loadReport(file) {
+  document.getElementById('app').innerHTML = '<div class="loader">載入資料中<span class="spinner"></span></div>';
+  destroyCharts();
+  try {
+    const res = await fetch(`${file}?_=${Date.now()}`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    _currentData = await res.json();
+    render(_currentData);
+  } catch(e) {
+    document.getElementById('app').innerHTML =
+      `<div class="loader" style="color:var(--red)">⚠️ 載入失敗：${e.message}</div>`;
+  }
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function render(d) {
+  const sig   = d.headline?.signal || 'neutral';
+  const emoji = sig==='bullish'?'📈':sig==='bearish'?'📉':'📊';
+  const typeClass = d.report_type?.replace('_','-') || 'morning';
+
+  let html = '';
+
+  // ── Hero
+  html += `
+  <div id="sec-hero" class="section-card" style="padding:28px 32px;position:relative;overflow:hidden;margin-bottom:20px">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--purple),var(--teal))"></div>
+    <div style="display:flex;align-items:center;gap:20px">
+      <div class="signal-orb signal-${sig}">${emoji}</div>
+      <div style="flex:1">
+        <div class="hero-meta">
+          <span class="hero-date">${d.date||''}</span>
+          <span class="type-badge type-${(d.report_type||'').replace('_','_')}">${TYPE_LABELS[d.report_type]||d.report_type}</span>
+          <span class="signal-label label-${sig}">${sig==='bullish'?'偏多':sig==='bearish'?'偏空':'中性'}</span>
+          ${d.headline?.action ? `<span class="action-badge action-${sig}">${d.headline.action}</span>` : ''}
+        </div>
+        <div id="hero-teaser">${d.headline?.teaser||'—'}</div>
+    </div>
+  </div>`;
+
+  // ── Market Index Banner (TAIEX)
+  if (d.sentiment && d.sentiment.tw_index && d.sentiment.tw_index.price) {
+    const idx = d.sentiment.tw_index;
+    const isUp = idx.change >= 0;
+    const arrow = isUp ? '▲' : '▼';
+    const cls = isUp ? 'up' : 'dn';
+    const chgStr = `${arrow} ${Math.abs(idx.change).toFixed(2)}%`;
+    const formatPrice = new Intl.NumberFormat('en-US').format(idx.price);
+    html += `
+      <div class="taiex-banner ${cls}">
+        <div>
+          <div class="taiex-label">加權指數 TAIEX</div>
+          <div class="taiex-price">${formatPrice}</div>
+        </div>
+        <div class="taiex-chg ${cls}">${chgStr}</div>
+      </div>
+    `;
+  }
+
+  // ── US Macro
+  if(d.us_macro?.length) html += renderUsMacro(d.us_macro);
+
+  // ── Sentiment + TAIEX Trend  (2-col on wide screens)
+  html += `<div class="two-col">`;
+  if(d.sentiment) html += renderSentiment(d.sentiment);
+  if(d.tw_premarket) html += renderTwHistoryChart(d);
+  html += `</div>`;
+
+  // ── TW Premarket
+  if(d.tw_premarket) html += renderTwPremarket(d.tw_premarket);
+
+  // ── History table
+  if(d.taiex_history?.length) html += renderHistoryTable(d.taiex_history);
+
+  // ── Institutional
+  if(d.institutional) html += renderInstitutional(d.institutional);
+
+  // ── Sector flow (2-col: table + donut)
+  if(d.sector_flow) html += renderSectorFlow(d.sector_flow);
+
+  // ── Market News & Themes
+  if(d.market_news && (d.market_news.news_list?.length || d.market_news.themes?.length)) {
+    html += renderMarketNews(d.market_news);
+  }
+
+  // ── KOL
+  if(d.social_pulse) html += renderKol(d.social_pulse);
+
+  // ── AI Analysis (persona tabs)
+  if(d.ai_analysis) html += renderAI(d.ai_analysis);
+
+  document.getElementById('app').innerHTML = html;
+
+  // post-render: charts & markdown
+  requestAnimationFrame(() => {
+    if(d.us_macro?.length) buildMacroMiniCharts(d.us_macro);
+    if(d.sentiment) buildSentimentCharts(d.sentiment);
+    if(d.sector_flow) buildSectorChart(d.sector_flow);
+    if(d.ai_analysis) renderMarkdown(d.ai_analysis);
+    updateAnchors();
+  });
+}
+
+// ── US Macro ─────────────────────────────────────────────────────────────────
+function renderUsMacro(rows) {
+  const chips = rows.map(r => `
+    <div class="macro-chip">
+      <div class="chip-name">${r.name}</div>
+      <div class="chip-value">${fmt(r.value, r.value>1000?0:2)}</div>
+      <div class="chip-chg ${cls(r.change_pct)}">
+        ${arr(r.change_pct)} ${fmtPct(r.change_pct)}
+      </div>
+    </div>`).join('');
+  return card('sec-macro','🌐 美股宏觀指標', `<div class="macro-grid">${chips}</div>`);
+}
+
+// ── Sentiment ─────────────────────────────────────────────────────────────────
+function renderSentiment(s) {
+  const cnn    = s.cnn    || {};
+  const crypto = s.crypto || {};
+  const tw_g   = s.tw_greed || {};
+  const tw     = s.tw_market || {};
+  const tot    = tw.total || 0;
+  const bullPct= tot ? Math.round((tw.gainers||0)/tot*100) : 50;
+  return card('sec-sentiment','😨 市場情緒', `
+    <div class="sentiment-grid">
+      <div class="fg-card">
+        <div class="fg-label">台股貪婪指數</div>
+        <div class="fg-value ${fgClass(tw_g.label)}">${tw_g.value??'N/A'}</div>
+        <div class="fg-text ${fgClass(tw_g.label)}">${tw_g.label||'—'}</div>
+        <div class="linear-gauge-wrap">
+          <div class="linear-gauge-bg"></div>
+          <div class="linear-gauge-marker" style="left:${tw_g.value!=null?tw_g.value:50}%"></div>
+        </div>
+      </div>
+      <div class="fg-card">
+        <div class="fg-label">CNN 恐懼貪婪</div>
+        <div class="fg-value ${fgClass(cnn.label)}">${cnn.value??'N/A'}</div>
+        <div class="fg-text ${fgClass(cnn.label)}">${cnn.label||'—'}</div>
+        <div class="linear-gauge-wrap">
+          <div class="linear-gauge-bg"></div>
+          <div class="linear-gauge-marker" style="left:${cnn.value!=null?cnn.value:50}%"></div>
+        </div>
+      </div>
+      <div class="fg-card">
+        <div class="fg-label">加密貨幣情緒</div>
+        <div class="fg-value ${fgClass(crypto.label)}">${crypto.value??'N/A'}</div>
+        <div class="fg-text ${fgClass(crypto.label)}">${crypto.label||'—'}</div>
+        <div class="linear-gauge-wrap">
+          <div class="linear-gauge-bg"></div>
+          <div class="linear-gauge-marker" style="left:${crypto.value!=null?crypto.value:50}%"></div>
+        </div>
+      </div>
+      <div class="fg-card" style="justify-content:center">
+        <div class="fg-label">台股市場廣度</div>
+        <div style="font-size:32px; font-weight:800; margin:10px 0; line-height:1;">
+          <span class="up">${tw.gainers??'—'}</span>
+          <span style="color:var(--muted); font-size:18px; font-weight:400; margin:0 4px;">/</span>
+          <span class="dn">${tw.losers??'—'}</span>
+        </div>
+        <div class="breadth-bar-wrap" style="margin:12px 0 8px;">
+          <div class="breadth-bar-bull" style="width:${bullPct}%"></div>
+        </div>
+        <div class="breadth-nums">
+          <span class="up" style="font-weight:700;">漲 ${bullPct}%</span>
+          <span class="dn" style="font-weight:700;">跌 ${100-bullPct}%</span>
+        </div>
+      </div>
+    </div>`);
+}
+
+// ── TW History area chart ─────────────────────────────────────────────────────
+function renderTwHistoryChart(d) {
+  return card('','📈 盤前指數走勢', `
+    <div class="chart-wrap"><canvas id="taiex-chart"></canvas></div>`);
+}
+
+// ── TW Premarket ─────────────────────────────────────────────────────────────
+function renderTwPremarket(p) {
+  const regime = p.regime || p.trend_state || '—';
+  const regClass = regime.includes('bull')||regime.includes('上漲')?'bullish':
+                   regime.includes('bear')||regime.includes('下跌')?'bearish':'neutral';
+  const maint = p.maintenance_ratio;
+  const maintClass = maint!=null ? (maint<150?'dn':maint<160?'flat':'up') : 'flat';
+  return card('sec-tw','🇹🇼 台股盤前', `
+    <div class="premarket-grid">
+      <div class="pm-chip">
+        <div class="pm-label">富台 SGX 夜盤</div>
+        <div class="pm-value ${cls(p.sgx_fut?.change_pct)}">${p.sgx_fut?.value!=null?fmtK(p.sgx_fut.value):'N/A'}</div>
+        <div class="chip-chg ${cls(p.sgx_fut?.change_pct)}">${arr(p.sgx_fut?.change_pct)} ${fmtPct(p.sgx_fut?.change_pct)}</div>
+      </div>
+      <div class="pm-chip">
+        <div class="pm-label">台指期夜盤</div>
+        <div class="pm-value ${cls(p.rich_fut?.change_pct)}">${p.rich_fut?.value!=null?fmtK(p.rich_fut.value):'N/A'}</div>
+        <div class="chip-chg ${cls(p.rich_fut?.change_pct)}">${arr(p.rich_fut?.change_pct)} ${fmtPct(p.rich_fut?.change_pct)}</div>
+      </div>
+      <div class="pm-chip">
+        <div class="pm-label">市場趨勢</div>
+        <div class="pm-value" style="font-size:14px;margin-top:4px">
+          <span class="regime-pill rp-${regClass}">${regime}</span>
+        </div>
+      </div>
+      <div class="pm-chip">
+        <div class="pm-label">PC Ratio</div>
+        <div class="pm-value">${p.pc_ratio!=null?fmt(p.pc_ratio):'N/A'}</div>
+      </div>
+      <div class="pm-chip">
+        <div class="pm-label">融資維持率</div>
+        <div class="pm-value ${maintClass}">${maint!=null?fmt(maint)+'%':'N/A'}</div>
+      </div>
+      ${p.vol_state ? `<div class="pm-chip"><div class="pm-label">波動狀態</div><div class="pm-value" style="font-size:13px;margin-top:4px">${p.vol_state}</div></div>` : ''}
+    </div>`);
+}
+
+// ── TAIEX History Table ───────────────────────────────────────────────────────
+function renderHistoryTable(rows) {
+  const header = `<tr><th>日期</th><th>收盤點數</th><th>漲跌</th><th>漲跌幅</th><th>外資(億)</th><th>投信(億)</th><th>自營(億)</th></tr>`;
+  const body = rows.map(r => `
+    <tr>
+      <td>${r.date||'—'}</td>
+      <td>${fmtK(r.close)}</td>
+      <td class="${cls(r.change)}">${r.change!=null?(r.change>0?'+':'')+fmt(r.change,0):'—'}</td>
+      <td class="${cls(r.change_pct)}">${fmtPct(r.change_pct)}</td>
+      <td class="${cls(r.foreign_net)}">${r.foreign_net!=null?(r.foreign_net>0?'+':'')+fmt(r.foreign_net):'—'}</td>
+      <td class="${cls(r.trust_net)}">${r.trust_net!=null?(r.trust_net>0?'+':'')+fmt(r.trust_net):'—'}</td>
+      <td class="${cls(r.dealer_net)}">${r.dealer_net!=null?(r.dealer_net>0?'+':'')+fmt(r.dealer_net):'—'}</td>
+    </tr>`).join('');
+  return card('sec-history','📅 近期歷史走勢', `<table><thead>${header}</thead><tbody>${body}</tbody></table>`);
+}
+
+// ── Institutional ─────────────────────────────────────────────────────────────
+function renderInstitutional(inst) {
+  const items=[{n:'外資',v:inst.foreign_net},{n:'投信',v:inst.trust_net},{n:'自營商',v:inst.dealer_net}];
+  return card('sec-inst',`🏛️ 三大法人 ${inst.date?`<span style="font-size:11px;color:var(--muted);font-weight:400">(${inst.date})</span>`:''}`, `
+    <div class="inst-row">
+      ${items.map(i=>`
+        <div class="inst-card">
+          <div class="inst-name">${i.n}</div>
+          <div class="inst-value ${cls(i.v)}">${i.v==null?'N/A':(i.v>0?'+':'')+fmt(i.v)}</div>
+          <div class="inst-unit">億元</div>
+        </div>`).join('')}
+    </div>
+    <div style="margin-top:4px"><canvas id="inst-chart" height="70"></canvas></div>`);
+}
+
+// ── Sector Flow ───────────────────────────────────────────────────────────────
+function renderSectorFlow(sf) {
+  const maxS = Math.max(...(sf.top5_strong||[]).map(s=>abs(s.avg_change)||0),1);
+  const maxW = Math.max(...(sf.top5_weak||[]).map(s=>abs(s.avg_change)||0),1);
+  const strList = (sf.top5_strong||[]).map(s=>`
+    <div class="sector-item">
+      <div class="sector-name">${s.sector}</div>
+      <div class="bar-wrap"><div class="bar bar-str" style="width:${Math.min(100,abs(s.avg_change)/maxS*100)}%"></div></div>
+      <div class="sector-pct up">+${fmt(s.avg_change)}%</div>
+    </div>`).join('');
+  const wkList = (sf.top5_weak||[]).map(s=>`
+    <div class="sector-item">
+      <div class="sector-name">${s.sector}</div>
+      <div class="bar-wrap"><div class="bar bar-wk" style="width:${Math.min(100,abs(s.avg_change)/maxW*100)}%"></div></div>
+      <div class="sector-pct dn">${fmt(s.avg_change)}%</div>
+    </div>`).join('');
+  return card('sec-sector','📊 板塊資金流向', `
+    <div class="sector-cols">
+      <div>
+        <div class="sector-col-title" style="color:var(--green)">▲ 強勢板塊 Top 5</div>
+        ${strList||'<span style="color:var(--muted)">無資料</span>'}
+      </div>
+      <div>
+        <div class="sector-col-title" style="color:var(--red)">▼ 弱勢板塊 Top 5</div>
+        ${wkList||'<span style="color:var(--muted)">無資料</span>'}
+      </div>
+    </div>
+    <div style="margin-top:18px"><canvas id="sector-chart" height="160"></canvas></div>`);
+}
+
+// ── KOL ──────────────────────────────────────────────────────────────────────
+function renderKol(sp) {
+  const bull = sp.bullish_pct||0;
+  return card('sec-kol','📰 KOL 市場情緒', `
+    <div class="kol-row">
+      <span class="up" style="font-weight:600">${bull}% 多</span>
+      <div class="kol-bar-bg"><div class="kol-bar-bull" style="width:${bull}%"></div></div>
+      <span class="dn" style="font-weight:600">${sp.bearish_pct||100-bull}% 空</span>
+      <span style="color:var(--muted);font-size:12px">${sp.total_kols||0} 位 KOL 統計</span>
+    </div>
+    <div class="theme-row">
+      ${(sp.top_themes||[]).map(t=>`
+        <div class="theme-pill">${t.theme}<span class="theme-score">${t.score}</span></div>`).join('')}
+    </div>
+    ${sp.retail_narrative ? `
+      <div class="observation-box">
+        <div class="obs-title">散戶觀點與觀察重點</div>
+        <div class="obs-content">${sp.retail_narrative.replace(/\n/g,'<br>')}</div>
+      </div>
+    ` : ''}`);
+}
+
+// ── AI Analysis (persona tabs) ────────────────────────────────────────────────
+function renderAI(ai) {
+  const ts = ai.generated_at||'';
+  // Detect if we have persona-based content or single full_text
+  const hasPersonas = ai.macro || ai.fundamental || ai.technical || ai.flow;
+  const personas = hasPersonas ? [
+    {id:'macro',     label:'🌍 Atlas  宏觀',    content: ai.macro},
+    {id:'fundamental',label:'📈 Sophia 基本面',  content: ai.fundamental},
+    {id:'technical', label:'📐 Kenji  技術面',   content: ai.technical},
+    {id:'flow',      label:'🌊 Crow   籌碼情緒', content: ai.flow},
+    {id:'summary',   label:'🎯 綜合結論',        content: ai.summary || ai.full_text},
+  ].filter(p=>p.content) : [
+    {id:'full', label:'🤖 AI 深度分析', content: ai.full_text}
+  ];
+
+  const tabs = personas.map((p,i)=>
+    `<div class="persona-tab${i===0?' active':''}" onclick="switchTab('${p.id}')" id="tab-${p.id}">${p.label}</div>`
+  ).join('');
+  const panels = personas.map((p,i)=>
+    `<div id="panel-${p.id}" class="persona-panel${i===0?' active':''} md-content" data-raw="${encodeURIComponent(p.content||'')}"></div>`
+  ).join('');
+
+  return card('sec-ai',
+    `🤖 AI 深度分析 <span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:8px">${ts}</span>`,
+    `<div class="persona-tabs">${tabs}</div>${panels}
+     <div id="ai-full-text" style="display:none">${(ai.full_text||'').replace(/</g,'&lt;')}</div>`);
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.persona-tab').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.persona-panel').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+id)?.classList.add('active');
+  document.getElementById('panel-'+id)?.classList.add('active');
+}
+
+// ── Markdown rendering ────────────────────────────────────────────────────────
+function renderMarkdown(ai) {
+  document.querySelectorAll('.persona-panel').forEach(el=>{
+    const raw = decodeURIComponent(el.dataset.raw||'');
+    if(raw) el.innerHTML = marked.parse(raw);
+  });
+}
+
+// ── Market News & Themes ─────────────────────────────────────────────────────
+function renderMarketNews(n) {
+  let html = '<div class="market-news-container" style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:24px;">';
+  
+  // Left: News
+  if(n.news_list && n.news_list.length) {
+    let listHtml = n.news_list.map(item => `
+      <div style="margin-bottom:12px;display:flex;align-items:flex-start;gap:10px;">
+        <span style="color:var(--accent);font-size:18px;line-height:1;">•</span>
+        <div>
+          <a href="${item.url}" target="_blank" style="color:var(--text);text-decoration:none;font-size:15px;line-height:1.4;display:block;margin-bottom:2px;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text)'">${item.title}</a>
+          <span style="font-size:12px;color:var(--muted);">${item.source} ${item.date||''}</span>
+        </div>
+      </div>
+    `).join('');
+    html += `
+      <div style="flex:1;min-width:300px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:24px;">
+        <h3 style="margin-top:0;margin-bottom:20px;font-size:16px;color:var(--text);display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">📰</span> 重點新聞總覽</h3>
+        ${listHtml}
+      </div>`;
+  }
+  
+  // Right: Themes
+  if(n.themes && n.themes.length) {
+    let themesHtml = n.themes.map(t => `
+      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:16px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong style="color:var(--primary);font-size:15px;">${t.name}</strong>
+          <span style="font-size:12px;background:var(--accent);color:var(--bg);padding:2px 8px;border-radius:12px;font-weight:600;">熱度 ${t.score}</span>
+        </div>
+        <div style="font-size:14px;color:var(--text);line-height:1.5;">${t.insight}</div>
+      </div>
+    `).join('');
+    html += `
+      <div style="flex:1;min-width:300px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:24px;">
+        <h3 style="margin-top:0;margin-bottom:20px;font-size:16px;color:var(--primary);display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">🎯</span> AI 盤前題材解析</h3>
+        ${themesHtml}
+      </div>`;
+  }
+  
+  html += '</div>';
+  return html;
+}
+
+// ── Chart helpers ─────────────────────────────────────────────────────────────
+const dark = 'rgba(42,52,72,0.5)';
+const chartDefaults = {
+  plugins:{ legend:{ display:false }, tooltip:{ bodyFont:{ size:11 } } },
+  scales:{ x:{ ticks:{ color:'#7a8ba8', font:{size:11} }, grid:{color:dark} },
+           y:{ ticks:{ color:'#7a8ba8', font:{size:11} }, grid:{color:dark} } },
+  elements:{ point:{ radius:3 } },
+  maintainAspectRatio: false,
+};
+
+function buildMacroMiniCharts(rows) {
+  // Show 5/10 year bond yield trend (if available) or skip
+  // Mini trend lines are embedded in chips later if history exists
+}
+
+function buildSentimentCharts(s) {
+  const drawGauge = (id, val, color) => {
+    const el = document.getElementById(id);
+    if(!el||val==null) return;
+    const v = Math.min(100, Math.max(0, val));
+    _charts[id] = new Chart(el, {
+      type:'doughnut',
+      data:{
+        datasets:[{
+          data:[v, 100-v],
+          backgroundColor:[color,'rgba(42,52,72,0.4)'],
+          borderWidth:0,
+          circumference:180,
+          rotation:270,
+        }]
+      },
+      options:{
+        ...chartDefaults,
+        cutout:'70%',
+        plugins:{ legend:{display:false}, tooltip:{enabled:false} },
+        scales:{}, maintainAspectRatio:false,
+      }
+    });
+  };
+  const cnnColor = (s.cnn?.value||50)<40?'#f25e5e':(s.cnn?.value||50)>60?'#34d058':'#f0c34a';
+  const crColor  = (s.crypto?.value||50)<40?'#f25e5e':(s.crypto?.value||50)>60?'#34d058':'#f0c34a';
+  drawGauge('cnn-gauge',    s.cnn?.value,    cnnColor);
+  drawGauge('crypto-gauge', s.crypto?.value, crColor);
+}
+
+function buildSectorChart(sf) {
+  const el = document.getElementById('sector-chart');
+  if(!el) return;
+  const strong = (sf.top5_strong||[]).slice(0,5);
+  const weak   = (sf.top5_weak  ||[]).slice(0,5);
+  const labels  = [...strong.map(s=>s.sector), ...weak.map(s=>s.sector)];
+  const values  = [...strong.map(s=>s.avg_change||0), ...weak.map(s=>s.avg_change||0)];
+  const colors  = values.map(v=>v>=0?'rgba(52,208,88,0.7)':'rgba(242,94,94,0.7)');
+  _charts['sector'] = new Chart(el, {
+    type:'bar',
+    data:{ labels, datasets:[{ data:values, backgroundColor:colors, borderRadius:4 }] },
+    options:{
+      ...chartDefaults,
+      indexAxis:'y',
+      plugins:{ legend:{display:false}, tooltip:{
+        callbacks:{ label: ctx=>`${ctx.raw>0?'+':''}${ctx.raw.toFixed(2)}%` }
+      }},
+      scales:{
+        x:{ ticks:{color:'#7a8ba8',font:{size:10},callback:v=>`${v>0?'+':''}${v}%`}, grid:{color:dark} },
+        y:{ ticks:{color:'#e2e8f5',font:{size:11}}, grid:{color:'transparent'} }
+      },
+      maintainAspectRatio: false,
+    }
+  });
+}
+
+function buildInstChart(d) {
+  // Inline inst chart if called later
+}
+
+// ── Anchor active on scroll ───────────────────────────────────────────────────
+function updateAnchors() {
+  const links = document.querySelectorAll('.anchor-nav a');
+  const observer = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting) {
+        links.forEach(l=>l.classList.remove('active'));
+        const target = document.querySelector(`.anchor-nav a[href="#${e.target.id}"]`);
+        if(target) target.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-20% 0px -60% 0px'});
+  document.querySelectorAll('[id^="sec-"]').forEach(el=>observer.observe(el));
+
+  // Back-to-top
+  window.addEventListener('scroll',()=>{
+    document.getElementById('back-top')?.classList.toggle('visible', window.scrollY>400);
+  });
+}
+
+// ── Card builder ──────────────────────────────────────────────────────────────
+function card(id, title, body) {
+  const idAttr = id ? `id="${id}"` : '';
+  return `<div ${idAttr} class="section-card">
+    <div class="section-title">${title}</div>
+    ${body}
+  </div>`;
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+updateMarketStatus();
+setInterval(updateMarketStatus, 60000);
+loadIndex();
+</script>
 </body>
 </html>
