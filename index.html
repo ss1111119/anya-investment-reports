@@ -681,7 +681,12 @@ async function loadIndex() {
   try {
     const res = await fetch(`data/index.json?_=${Date.now()}`);
     if(!res.ok) throw new Error('index.json not found');
-    const index = await res.json();
+    const index = (await res.json()).slice().sort((a, b) => {
+      const rank = { evening: 3, morning: 2, weekend_evening: 1, weekend_morning: 0, weekly_review: -1 };
+      const ad = (a.date || '').localeCompare(b.date || '');
+      if (ad !== 0) return -ad;
+      return (rank[b.type] ?? -2) - (rank[a.type] ?? -2);
+    });
     const sel = document.getElementById('date-select');
     sel.innerHTML = '';
     index.forEach(e => {
