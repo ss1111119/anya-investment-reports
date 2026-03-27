@@ -235,6 +235,15 @@
       border-radius: 10px;
       padding: 14px;
     }
+    .news-empty-state {
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
     .news-theme-name { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:8px; }
     .news-theme-score {
       font-size: 12px;
@@ -1140,78 +1149,14 @@ function renderMarketNews(n) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-  const safeUrl = (value = '') => {
-    try {
-      const parsed = new URL(value, window.location.href);
-      return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '#';
-    } catch {
-      return '#';
-    }
-  };
-  const groups = n.source_groups || [];
-  const summaries = n.source_summary || [];
-  const highlights = n.highlights || [];
-  const themes = n.themes || [];
+  const curatedThemeOrder = [
+    'AI時代的新成長動能',
+    '地緣政治與通膨疑慮',
+    '中東局勢與通膨疑慮',
+  ];
+  const themeMap = new Map((n.themes || []).map(t => [String(t?.name || '').trim(), t]));
+  const themes = curatedThemeOrder.map(name => themeMap.get(name)).filter(Boolean);
   let html = '<div class="news-integrated">';
-
-  if(summaries.length) {
-    html += `
-      <div class="news-summary-row">
-        ${summaries.map(s => `
-          <span class="news-summary-chip">${s.icon ? `${escapeHtml(s.icon)} ` : ''}${escapeHtml(s.label)} · ${escapeHtml(s.count ?? 0)}</span>
-        `).join('')}
-      </div>`;
-  }
-
-  if(highlights.length) {
-    html += `
-      <div class="news-summary-row">
-        ${highlights.map(text => `<span class="news-summary-chip">${escapeHtml(text)}</span>`).join('')}
-      </div>`;
-  }
-
-  if(groups.length) {
-    html += `
-      <div class="news-group-grid">
-        ${groups.map(group => `
-          <div class="news-group-card">
-            <div class="news-group-head">
-              <div>
-                <div class="news-group-name">${escapeHtml(group.icon || '')} ${escapeHtml(group.name || '新聞')}</div>
-                <div class="news-group-sub">${escapeHtml(group.subtitle || '')}</div>
-              </div>
-              <div class="news-group-count">${escapeHtml(group.count ?? 0)} 則</div>
-            </div>
-            <div class="news-item-list">
-              ${(group.items || []).map(item => `
-                <div class="news-item">
-                  <a class="news-item-title" href="${safeUrl(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title || '')}</a>
-                  <div class="news-item-meta">${escapeHtml(item.source || '—')}${item.date ? ` · ${escapeHtml(item.date)}` : ''}</div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `).join('')}
-      </div>`;
-  } else if(n.news_list && n.news_list.length) {
-    html += `
-      <div class="news-group-card">
-        <div class="news-group-head">
-          <div>
-            <div class="news-group-name">重點新聞總覽</div>
-            <div class="news-group-sub">整合來源尚未分組，以下為最新清單</div>
-          </div>
-        </div>
-        <div class="news-item-list">
-          ${n.news_list.map(item => `
-            <div class="news-item">
-              <a class="news-item-title" href="${safeUrl(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title || '')}</a>
-              <div class="news-item-meta">${escapeHtml(item.source || '—')}${item.date ? ` · ${escapeHtml(item.date)}` : ''}</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>`;
-  }
 
   if(themes.length) {
     html += `
@@ -1225,6 +1170,11 @@ function renderMarketNews(n) {
             <div style="font-size:14px;color:var(--text);line-height:1.55;">${escapeHtml(t.insight || '')}</div>
           </div>
         `).join('')}
+      </div>`;
+  } else {
+    html += `
+      <div class="news-empty-state">
+        目前僅保留整理後主題，暫無可顯示內容。
       </div>`;
   }
 
