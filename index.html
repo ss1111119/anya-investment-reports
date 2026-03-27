@@ -1078,24 +1078,39 @@ function renderMarketInterpretation(d) {
 
 // ── KOL ──────────────────────────────────────────────────────────────────────
 function renderKol(sp) {
-  const bull = sp.bullish_pct||0;
+  const bull = Number(sp.bullish_pct || 0);
+  const bear = Number(sp.bearish_pct != null ? sp.bearish_pct : 100 - bull);
+  const themes = (sp.top_themes || [])
+    .map(t => ({ theme: String(t.theme || '').trim(), score: t.score }))
+    .filter(t => t.theme)
+    .filter((t, idx, arr) => idx === arr.findIndex(x => x.theme === t.theme));
+  const keyTopics = themes.slice(0, 3).map(t => t.theme);
+  const topicSummary = keyTopics.length
+    ? `KOL 重點聚焦在 ${keyTopics.join('、')}。`
+    : '目前可用 KOL 主題不足，暫時無法整理重點。';
+  const narrative = sp.retail_narrative ? sp.retail_narrative.replace(/\n/g, '<br>') : '';
   return card('sec-kol','📰 KOL 市場情緒', `
-    <div class="kol-row">
-      <span class="up" style="font-weight:600">${bull}% 多</span>
-      <div class="kol-bar-bg"><div class="kol-bar-bull" style="width:${bull}%"></div></div>
-      <span class="dn" style="font-weight:600">${sp.bearish_pct||100-bull}% 空</span>
-      <span style="color:var(--muted);font-size:12px">${sp.total_kols||0} 位 KOL 統計</span>
-    </div>
-    <div class="theme-row">
-      ${(sp.top_themes||[]).map(t=>`
-        <div class="theme-pill">${t.theme}<span class="theme-score">${t.score}</span></div>`).join('')}
-    </div>
-    ${sp.retail_narrative ? `
-      <div class="observation-box">
-        <div class="obs-title">散戶觀點與觀察重點</div>
-        <div class="obs-content">${sp.retail_narrative.replace(/\n/g,'<br>')}</div>
+    <div class="interpret-panel">
+      <div class="interpret-summary">${topicSummary}</div>
+      ${themes.length ? `
+        <div class="theme-row">
+          ${themes.slice(0, 5).map(t=>`
+            <div class="theme-pill">${t.theme}<span class="theme-score">${t.score}</span></div>`).join('')}
+        </div>
+      ` : ''}
+      ${narrative ? `
+        <div class="observation-box">
+          <div class="obs-title">KOL 觀點與觀察重點</div>
+          <div class="obs-content">${narrative}</div>
+        </div>
+      ` : ''}
+      <div class="kol-row">
+        <span class="up" style="font-weight:600">${bull}% 多</span>
+        <div class="kol-bar-bg"><div class="kol-bar-bull" style="width:${bull}%"></div></div>
+        <span class="dn" style="font-weight:600">${bear}% 空</span>
+        <span style="color:var(--muted);font-size:12px">${sp.total_kols||0} 位 KOL 統計</span>
       </div>
-    ` : ''}`);
+    </div>`);
 }
 
 // ── AI Analysis (persona tabs) ────────────────────────────────────────────────
