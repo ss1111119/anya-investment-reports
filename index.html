@@ -937,7 +937,8 @@ function renderHistoryTable(rows) {
 // ── Institutional ─────────────────────────────────────────────────────────────
 function renderInstitutional(inst) {
   const items=[{n:'外資',v:inst.foreign_net},{n:'投信',v:inst.trust_net},{n:'自營商',v:inst.dealer_net}];
-  return card('sec-inst',`🏛️ 三大法人 ${inst.date?`<span style="font-size:11px;color:var(--muted);font-weight:400">(${inst.date})</span>`:''}`, `
+  const staleBadge = inst.stale ? `<span style="font-size:11px;color:var(--yellow);font-weight:700;border:1px solid rgba(240,195,74,.25);background:rgba(240,195,74,.08);padding:2px 8px;border-radius:999px;">資料偏舊${inst.age_days!=null?` ${inst.age_days} 天`:''}</span>` : '';
+  return card('sec-inst',`🏛️ 三大法人 ${inst.date?`<span style="font-size:11px;color:var(--muted);font-weight:400">(${inst.date})</span>`:''} ${staleBadge}`, `
     <div class="inst-row">
       ${items.map(i=>`
         <div class="inst-card">
@@ -946,6 +947,7 @@ function renderInstitutional(inst) {
           <div class="inst-unit">億元</div>
         </div>`).join('')}
     </div>
+    ${inst.note ? `<div style="margin-top:6px;font-size:12px;color:var(--muted);">${inst.note}</div>` : ''}
     <div style="margin-top:4px"><canvas id="inst-chart" height="70"></canvas></div>`);
 }
 

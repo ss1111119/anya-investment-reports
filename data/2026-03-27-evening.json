@@ -1,7 +1,7 @@
 {
   "date": "2026-03-27",
   "report_type": "evening",
-  "generated_at": "2026-03-27T22:41:51",
+  "generated_at": "2026-03-27T22:47:58",
   "headline": {
     "teaser": "🚨 ANYA 風險警報：地緣政治",
     "signal": "neutral",
@@ -114,7 +114,9 @@
     "trust_net": 34.2,
     "dealer_net": -120.0,
     "date": "2026-02-10",
-    "note": "億元，當日彙總"
+    "note": "資料落後 45 天",
+    "stale": true,
+    "age_days": 45
   },
   "sector_flow": {
     "top5_strong": [
@@ -357,8 +359,8 @@
     ],
     "source_groups": [
       {
-        "name": "台股 / 台灣",
-        "subtitle": "CNYES 台股新聞",
+        "name": "MoneyDJ 熱門排行",
+        "subtitle": "台灣盤面與主題彙整",
         "icon": "🇹🇼",
         "items": [
           {
@@ -402,7 +404,55 @@
             "bucket": "tw"
           }
         ],
-        "count": 35
+        "count": 6
+      },
+      {
+        "name": "鉅亨網台灣",
+        "subtitle": "CNYES 台股新聞",
+        "icon": "🗞️",
+        "items": [
+          {
+            "id": "6398189",
+            "title": "賴清德：期許落實國防自主 重申強化國防、經濟韌性讓台灣更安全",
+            "summary": "總統賴清德今 (27) 日下午視導「國家中山科學研究院」時表示，政府強化國家力量，主要分為國防力量、經濟韌性及全民防衛三大部分，他除了期許中科院秉持專業及使命感，持續研發相關技術以落實國防自主外，也強化國防韌性。",
+            "url": "https://news.cnyes.com/news/id/6398189",
+            "published_at": 1774614390,
+            "source": "cnyes",
+            "category": "tw_stock",
+            "bucket": "tw_cnyes"
+          },
+          {
+            "id": "6398188",
+            "title": "樺漢去年獲利寫次高賺逾2股本 祭庫藏股擬買回千張",
+            "summary": "樺漢去年純益年增 17% 賺逾 2 股本 擬買回千張庫藏股",
+            "url": "https://news.cnyes.com/news/id/6398188",
+            "published_at": 1774614290,
+            "source": "cnyes",
+            "category": "tw_stock",
+            "bucket": "tw_cnyes"
+          },
+          {
+            "id": "6398187",
+            "title": "外資賣超384億元 減碼友達、台積電各3.2萬張、1.1萬張 單周賣超1030億元",
+            "summary": "台股下跌 225.03 點，收在 33,112.59 點，成交量縮至 6,582.73 億元，三大法人連袂賣超共 401.86 億元，外資今日賣超 384.71 億元，連 2 日賣超台股。外資由賣轉買華邦電 2.4 萬張最高，賣超台積電 1.1 萬張。",
+            "url": "https://news.cnyes.com/news/id/6398187",
+            "published_at": 1774614243,
+            "source": "cnyes",
+            "category": "tw_stock",
+            "bucket": "tw_cnyes"
+          },
+          {
+            "id": "6398184",
+            "title": "高端持續布局東南亞市場 腸病毒71型疫苗向馬來西亞送件新藥審查",
+            "summary": "高端疫苗 (6547-TW) 積極布局東南亞市場，旗下自主研發的恩穩健腸病毒 71 型疫苗日前取得越南藥證後，今 (27) 日再公告，向馬來西亞國家藥品管理局 (NPRA)，提交恩穩健腸病毒 71 型疫苗新藥審查 (NDA)。 ",
+            "url": "https://news.cnyes.com/news/id/6398184",
+            "published_at": 1774611296,
+            "source": "cnyes",
+            "category": "tw_stock",
+            "bucket": "tw_cnyes"
+          }
+        ],
+        "count": 29
       },
       {
         "name": "美股 / 宏觀",
@@ -647,9 +697,14 @@
     ],
     "source_summary": [
       {
-        "label": "台股 / 台灣",
-        "count": 35,
+        "label": "MoneyDJ 熱門排行",
+        "count": 6,
         "icon": "🇹🇼"
+      },
+      {
+        "label": "鉅亨網台灣",
+        "count": 29,
+        "icon": "🗞️"
       },
       {
         "label": "美股 / 宏觀",
@@ -678,10 +733,10 @@
       }
     ],
     "highlights": [
-      "🇹🇼 台股 / 台灣 35 則",
+      "🇹🇼 MoneyDJ 熱門排行 6 則",
+      "🗞️ 鉅亨網台灣 29 則",
       "🇺🇸 美股 / 宏觀 8 則",
-      "🌍 全球頭條 26 則",
-      "🧭 東南亞 / 印度 27 則"
+      "🌍 全球頭條 26 則"
     ]
   },
   "ai_analysis": {
