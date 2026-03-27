@@ -1009,7 +1009,6 @@ function renderMarketInterpretation(d) {
   const sentiment = d.sentiment || {};
   const tw = d.tw_premarket || {};
   const social = d.social_pulse || {};
-  const ai = d.ai_analysis || {};
   const macroRows = d.us_macro || [];
   const macroMap = Object.fromEntries(macroRows.map(r => [r.symbol, r]));
   const themes = news.themes || [];
@@ -1033,34 +1032,17 @@ function renderMarketInterpretation(d) {
       </div>`);
   }
 
-  const themeNames = themes.slice(0, 2).map(t => t.name).filter(Boolean);
-  const focusNews = highlights.slice(0, 2);
+  const themeNames = themes.slice(0, 3).map(t => t.name).filter(Boolean);
   const sourceChips = summaries.slice(0, 4).map(s =>
     `<span class="interpret-chip">${escapeHtml(s.icon || '')} ${escapeHtml(s.label || '')} · ${escapeHtml(s.count ?? 0)}</span>`
   );
 
-  const sp500 = macroMap.SP500?.change_pct;
-  const nasdaq = macroMap.Nasdaq?.change_pct;
-  const sox = macroMap.SOX?.change_pct;
-  const vix = macroMap.VIX?.change_pct;
-  const dxy = macroMap.DXY?.change_pct;
-  const taiex = sentiment.tw_index?.change != null ? Number(sentiment.tw_index.change) : null;
   const greed = sentiment.tw_greed?.value != null ? Number(sentiment.tw_greed.value) : null;
   const regime = (tw.regime || tw.trend_state || '').toString();
-  const richFut = tw.rich_fut?.change_pct != null ? Number(tw.rich_fut.change_pct) : null;
-  const sgxFut = tw.sgx_fut?.change_pct != null ? Number(tw.sgx_fut.change_pct) : null;
 
   let score = 0;
   if (regime.includes('BULL')) score += 2;
   if (regime.includes('BEAR')) score -= 2;
-  if (taiex != null) score += taiex > 0 ? 1 : taiex < 0 ? -1 : 0;
-  if (richFut != null) score += richFut > 0 ? 0.5 : richFut < 0 ? -0.5 : 0;
-  if (sgxFut != null) score += sgxFut > 0 ? 0.5 : sgxFut < 0 ? -0.5 : 0;
-  if (sp500 != null) score += sp500 > 0 ? 1 : -1;
-  if (nasdaq != null) score += nasdaq > 0 ? 0.5 : -0.5;
-  if (sox != null) score += sox > 0 ? 0.5 : -0.5;
-  if (vix != null) score += vix > 0 ? -0.5 : 0.5;
-  if (dxy != null) score += dxy > 0 ? -0.25 : 0.25;
   if (bullPct != null && bearPct != null) score += bullPct >= bearPct ? 0.5 : -0.5;
   if (greed != null) score += greed >= 70 ? -1 : greed <= 35 ? 0.5 : 0;
   if (themeNames.some(t => /AI|半導體|成長|軟體/.test(t))) score += 0.5;
@@ -1078,40 +1060,23 @@ function renderMarketInterpretation(d) {
       ? '策略上偏保守，等待風險降溫與趨勢確認。'
       : '策略上以觀望為主，等國際與資金訊號同步後再決定。';
 
-  let summary = '';
-  if (direction === '偏多') {
-    summary = `今日盤勢偏多，但目前仍可看到 ${riskText}`;
-  } else if (direction === '偏空') {
-    summary = `今日盤勢偏弱，國際與情緒面同時給出壓力，${riskText}`;
-  } else {
-    summary = `今日盤勢偏震盪，市場尚未出現單邊共識，${riskText}`;
-  }
+  const summary = direction === '偏多'
+    ? `今日盤勢偏多，市場主軸仍在題材輪動與國際訊號同步。`
+    : direction === '偏空'
+      ? `今日盤勢偏弱，外圍壓力與情緒降溫正在一起影響盤面。`
+      : `今日盤勢偏震盪，市場尚未形成單邊共識。`;
 
-  const intlLine = [
-    sp500 != null ? `S&P 500 ${fmtSigned(sp500)}` : null,
-    nasdaq != null ? `Nasdaq ${fmtSigned(nasdaq)}` : null,
-    sox != null ? `SOX ${fmtSigned(sox)}` : null,
-    vix != null ? `VIX ${fmtSigned(vix)}` : null,
-    dxy != null ? `DXY ${fmtSigned(dxy)}` : null,
-  ].filter(Boolean).join(' / ');
+  const newsLine = themeNames.length
+    ? `重點題材：${themeNames.join('、')}`
+    : '題材仍分散，尚未形成單一主線。';
 
-  const twLine = [
-    taiex != null ? `加權 ${fmtSigned(taiex)}` : null,
-    sentiment.tw_greed?.value != null ? `台股貪婪 ${sentiment.tw_greed.value}` : null,
-    tw.regime || tw.trend_state ? `趨勢 ${tw.regime || tw.trend_state}` : null,
-  ].filter(Boolean).join(' / ');
+  const intlLine = tw.regime || tw.trend_state
+    ? `盤前趨勢：${tw.regime || tw.trend_state}，國際盤仍需確認後續方向。`
+    : '國際與盤前訊號仍在觀察中。';
 
-  const kolLine = [
-    bullPct != null ? `${bullPct}% 多` : null,
-    bearPct != null ? `${bearPct}% 空` : null,
-    social.total_kols ? `${social.total_kols} 位 KOL` : null,
-  ].filter(Boolean).join(' / ');
-
-  const newsLine = [
-    themeNames[0] || null,
-    themeNames[1] || null,
-    focusNews[0] || null,
-  ].filter(Boolean).join(' / ');
+  const kolLine = bullPct != null && bearPct != null
+    ? `KOL 情緒：${bullPct >= bearPct ? '偏多' : '偏空'}，但尚未完全一致。`
+    : 'KOL 觀點可參考，但共識度仍有限。';
 
   return card('sec-interpret', '🧭 今日盤勢解讀', `
     <div class="interpret-panel">
@@ -1123,23 +1088,22 @@ function renderMarketInterpretation(d) {
         <div class="interpret-box">
           <div class="interpret-title">新聞驅動</div>
           <div class="interpret-list">
-            ${newsLine ? `<div>${escapeHtml(newsLine)}</div>` : ''}
-            ${focusNews.map(item => `<div>• ${escapeHtml(item)}</div>`).join('')}
+            <div>${escapeHtml(newsLine)}</div>
+            ${highlights.length ? `<div>題材焦點已整合為上方主題，不再逐條重複列出。</div>` : ''}
           </div>
         </div>
         <div class="interpret-box">
           <div class="interpret-title">國際與台股</div>
           <div class="interpret-list">
-            ${intlLine ? `<div>${escapeHtml(intlLine)}</div>` : ''}
-            ${twLine ? `<div>${escapeHtml(twLine)}</div>` : ''}
+            <div>${escapeHtml(intlLine)}</div>
+            <div>${escapeHtml(riskText)}</div>
           </div>
         </div>
         <div class="interpret-box">
           <div class="interpret-title">KOL / 情緒</div>
           <div class="interpret-list">
-            ${kolLine ? `<div>${escapeHtml(kolLine)}</div>` : ''}
-            ${social.retail_narrative ? `<div><span>散戶觀點：</span>${escapeHtml(social.retail_narrative.replace(/\n/g, ' '))}</div>` : ''}
-            ${ai.full_text ? `<div><span>AI 摘要：</span>${escapeHtml(ai.full_text.slice(0, 120))}${ai.full_text.length > 120 ? '…' : ''}</div>` : ''}
+            <div>${escapeHtml(kolLine)}</div>
+            <div>下方獨立區塊保留完整 KOL 與 AI 細節，這裡只保留方向判斷。</div>
           </div>
         </div>
       </div>
