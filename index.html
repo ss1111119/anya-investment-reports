@@ -17,6 +17,8 @@
       --surface:    #141922;
       --surface-2:  #1a2133;
       --surface-3:  #202a3d;
+      --card-bg:    var(--surface-2);
+      --primary:    var(--accent);
       --border:     #2a3448;
       --text:       #e2e8f5;
       --muted:      #7a8ba8;
@@ -177,6 +179,142 @@
       transition: transform .2s, box-shadow .2s;
     }
     .section-card:hover { transform:translateY(-2px); box-shadow: var(--shadow); }
+    .news-integrated { display: grid; gap: 16px; }
+    .news-summary-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .news-summary-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 10px; border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text); font-size: 12px; white-space: nowrap;
+    }
+    .news-group-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .news-group-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .news-group-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .news-group-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .news-group-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .news-group-count {
+      font-size: 12px; color: var(--accent);
+      background: rgba(79,158,255,.1);
+      border: 1px solid rgba(79,158,255,.22);
+      padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+    }
+    .news-item-list { display: grid; gap: 10px; }
+    .news-item { display: grid; gap: 2px; }
+    .news-item-title {
+      color: var(--text);
+      text-decoration: none;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .news-item-title:hover { color: var(--accent); }
+    .news-item-meta { font-size: 11px; color: var(--muted); }
+    .news-theme-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .news-theme-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .news-theme-name { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:8px; }
+    .news-theme-score {
+      font-size: 12px;
+      background: var(--accent);
+      color: var(--bg);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .interpret-panel {
+      display: grid;
+      gap: 14px;
+    }
+    .interpret-summary {
+      background: linear-gradient(135deg, rgba(79,158,255,.14), rgba(79,158,255,.04));
+      border: 1px solid rgba(79,158,255,.28);
+      border-radius: 12px;
+      padding: 16px 18px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .interpret-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .interpret-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .interpret-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .interpret-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .interpret-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .interpret-list {
+      display: grid;
+      gap: 8px;
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--text);
+    }
+    .interpret-list span {
+      color: var(--muted);
+    }
+    .interpret-note {
+      border-left: 3px solid var(--accent);
+      padding: 10px 12px;
+      background: rgba(79,158,255,.06);
+      border-radius: 0 10px 10px 0;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.65;
+    }
     /* ── TAIEX Banner ───────────────────────────────────────────── */
     .taiex-banner {
       padding: 24px 32px; margin-bottom: 24px; display: flex; 
@@ -597,6 +735,7 @@ function render(d) {
           ${d.headline?.action ? `<span class="action-badge action-${sig}">${d.headline.action}</span>` : ''}
         </div>
         <div id="hero-teaser">${d.headline?.teaser||'—'}</div>
+      </div>
     </div>
   </div>`;
 
@@ -640,8 +779,13 @@ function render(d) {
   // ── Sector flow (2-col: table + donut)
   if(d.sector_flow) html += renderSectorFlow(d.sector_flow);
 
+  // ── Daily market interpretation
+  if(d.market_news || d.sentiment || d.tw_premarket || d.social_pulse || d.us_macro || d.ai_analysis) {
+    html += renderMarketInterpretation(d);
+  }
+
   // ── Market News & Themes
-  if(d.market_news && (d.market_news.news_list?.length || d.market_news.themes?.length)) {
+  if(d.market_news && (d.market_news.source_groups?.length || d.market_news.news_list?.length || d.market_news.themes?.length)) {
     html += renderMarketNews(d.market_news);
   }
 
@@ -835,6 +979,161 @@ function renderSectorFlow(sf) {
     <div style="margin-top:18px"><canvas id="sector-chart" height="160"></canvas></div>`);
 }
 
+// ── Daily Market Interpretation ───────────────────────────────────────────────
+function renderMarketInterpretation(d) {
+  const escapeHtml = (value = '') => String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+  const fmtSigned = (value, digits = 1) => {
+    if (value == null || Number.isNaN(value)) return '—';
+    const num = Number(value);
+    return `${num > 0 ? '+' : ''}${num.toFixed(digits)}%`;
+  };
+  const news = d.market_news || {};
+  const sentiment = d.sentiment || {};
+  const tw = d.tw_premarket || {};
+  const social = d.social_pulse || {};
+  const ai = d.ai_analysis || {};
+  const macroRows = d.us_macro || [];
+  const macroMap = Object.fromEntries(macroRows.map(r => [r.symbol, r]));
+  const themes = news.themes || [];
+  const highlights = news.highlights || [];
+  const summaries = news.source_summary || [];
+  const bullPct = social.bullish_pct != null ? Number(social.bullish_pct) : null;
+  const bearPct = social.bearish_pct != null ? Number(social.bearish_pct) : null;
+
+  const evidence = [];
+  if (summaries.length) evidence.push('新聞已整合多來源');
+  if (highlights.length) evidence.push('題材焦點明確');
+  if (sentiment.tw_index?.change != null) evidence.push('台股指數有即時變動');
+  if (tw.regime || tw.trend_state) evidence.push('盤前趨勢已確認');
+  if (bullPct != null || bearPct != null) evidence.push('KOL 觀點可比對');
+  if (macroRows.length) evidence.push('國際市場可交叉驗證');
+
+  if (!evidence.length) {
+    return card('sec-interpret', '🧭 今日盤勢解讀', `
+      <div class="interpret-panel">
+        <div class="interpret-summary">目前可用資料不足，暫時無法生成今日盤勢解讀。</div>
+      </div>`);
+  }
+
+  const themeNames = themes.slice(0, 2).map(t => t.name).filter(Boolean);
+  const focusNews = highlights.slice(0, 2);
+  const sourceChips = summaries.slice(0, 4).map(s =>
+    `<span class="interpret-chip">${escapeHtml(s.icon || '')} ${escapeHtml(s.label || '')} · ${escapeHtml(s.count ?? 0)}</span>`
+  );
+
+  const sp500 = macroMap.SP500?.change_pct;
+  const nasdaq = macroMap.Nasdaq?.change_pct;
+  const sox = macroMap.SOX?.change_pct;
+  const vix = macroMap.VIX?.change_pct;
+  const dxy = macroMap.DXY?.change_pct;
+  const taiex = sentiment.tw_index?.change != null ? Number(sentiment.tw_index.change) : null;
+  const greed = sentiment.tw_greed?.value != null ? Number(sentiment.tw_greed.value) : null;
+  const regime = (tw.regime || tw.trend_state || '').toString();
+  const richFut = tw.rich_fut?.change_pct != null ? Number(tw.rich_fut.change_pct) : null;
+  const sgxFut = tw.sgx_fut?.change_pct != null ? Number(tw.sgx_fut.change_pct) : null;
+
+  let score = 0;
+  if (regime.includes('BULL')) score += 2;
+  if (regime.includes('BEAR')) score -= 2;
+  if (taiex != null) score += taiex > 0 ? 1 : taiex < 0 ? -1 : 0;
+  if (richFut != null) score += richFut > 0 ? 0.5 : richFut < 0 ? -0.5 : 0;
+  if (sgxFut != null) score += sgxFut > 0 ? 0.5 : sgxFut < 0 ? -0.5 : 0;
+  if (sp500 != null) score += sp500 > 0 ? 1 : -1;
+  if (nasdaq != null) score += nasdaq > 0 ? 0.5 : -0.5;
+  if (sox != null) score += sox > 0 ? 0.5 : -0.5;
+  if (vix != null) score += vix > 0 ? -0.5 : 0.5;
+  if (dxy != null) score += dxy > 0 ? -0.25 : 0.25;
+  if (bullPct != null && bearPct != null) score += bullPct >= bearPct ? 0.5 : -0.5;
+  if (greed != null) score += greed >= 70 ? -1 : greed <= 35 ? 0.5 : 0;
+  if (themeNames.some(t => /AI|半導體|成長|軟體/.test(t))) score += 0.5;
+  if (themeNames.some(t => /地緣|通膨|風險|疲弱/.test(t))) score -= 0.5;
+
+  const direction = score >= 2 ? '偏多' : score <= -2 ? '偏空' : '中性';
+  const riskText = greed != null && greed >= 70
+    ? '情緒已偏熱，短線追價風險上升。'
+    : greed != null && greed <= 35
+      ? '情緒仍偏冷，盤面若止穩，反彈空間可能打開。'
+      : '情緒位階仍屬中性，短線以區間理解較合理。';
+  const actionText = direction === '偏多'
+    ? '策略上維持偏多，但不建議在情緒過熱時追價。'
+    : direction === '偏空'
+      ? '策略上偏保守，等待風險降溫與趨勢確認。'
+      : '策略上以觀望為主，等國際與資金訊號同步後再決定。';
+
+  let summary = '';
+  if (direction === '偏多') {
+    summary = `今日盤勢偏多，但目前仍可看到 ${riskText}`;
+  } else if (direction === '偏空') {
+    summary = `今日盤勢偏弱，國際與情緒面同時給出壓力，${riskText}`;
+  } else {
+    summary = `今日盤勢偏震盪，市場尚未出現單邊共識，${riskText}`;
+  }
+
+  const intlLine = [
+    sp500 != null ? `S&P 500 ${fmtSigned(sp500)}` : null,
+    nasdaq != null ? `Nasdaq ${fmtSigned(nasdaq)}` : null,
+    sox != null ? `SOX ${fmtSigned(sox)}` : null,
+    vix != null ? `VIX ${fmtSigned(vix)}` : null,
+    dxy != null ? `DXY ${fmtSigned(dxy)}` : null,
+  ].filter(Boolean).join(' / ');
+
+  const twLine = [
+    taiex != null ? `加權 ${fmtSigned(taiex)}` : null,
+    sentiment.tw_greed?.value != null ? `台股貪婪 ${sentiment.tw_greed.value}` : null,
+    tw.regime || tw.trend_state ? `趨勢 ${tw.regime || tw.trend_state}` : null,
+  ].filter(Boolean).join(' / ');
+
+  const kolLine = [
+    bullPct != null ? `${bullPct}% 多` : null,
+    bearPct != null ? `${bearPct}% 空` : null,
+    social.total_kols ? `${social.total_kols} 位 KOL` : null,
+  ].filter(Boolean).join(' / ');
+
+  const newsLine = [
+    themeNames[0] || null,
+    themeNames[1] || null,
+    focusNews[0] || null,
+  ].filter(Boolean).join(' / ');
+
+  return card('sec-interpret', '🧭 今日盤勢解讀', `
+    <div class="interpret-panel">
+      <div class="interpret-summary">${escapeHtml(summary)}</div>
+      <div class="interpret-meta">
+        ${sourceChips.join('')}
+      </div>
+      <div class="interpret-grid">
+        <div class="interpret-box">
+          <div class="interpret-title">新聞驅動</div>
+          <div class="interpret-list">
+            ${newsLine ? `<div>${escapeHtml(newsLine)}</div>` : ''}
+            ${focusNews.map(item => `<div>• ${escapeHtml(item)}</div>`).join('')}
+          </div>
+        </div>
+        <div class="interpret-box">
+          <div class="interpret-title">國際與台股</div>
+          <div class="interpret-list">
+            ${intlLine ? `<div>${escapeHtml(intlLine)}</div>` : ''}
+            ${twLine ? `<div>${escapeHtml(twLine)}</div>` : ''}
+          </div>
+        </div>
+        <div class="interpret-box">
+          <div class="interpret-title">KOL / 情緒</div>
+          <div class="interpret-list">
+            ${kolLine ? `<div>${escapeHtml(kolLine)}</div>` : ''}
+            ${social.retail_narrative ? `<div><span>散戶觀點：</span>${escapeHtml(social.retail_narrative.replace(/\n/g, ' '))}</div>` : ''}
+            ${ai.full_text ? `<div><span>AI 摘要：</span>${escapeHtml(ai.full_text.slice(0, 120))}${ai.full_text.length > 120 ? '…' : ''}</div>` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="interpret-note">${escapeHtml(actionText)}</div>
+    </div>`);
+}
+
 // ── KOL ──────────────────────────────────────────────────────────────────────
 function renderKol(sp) {
   const bull = sp.bullish_pct||0;
@@ -902,46 +1201,102 @@ function renderMarkdown(ai) {
 
 // ── Market News & Themes ─────────────────────────────────────────────────────
 function renderMarketNews(n) {
-  let html = '<div class="market-news-container" style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:24px;">';
-  
-  // Left: News
-  if(n.news_list && n.news_list.length) {
-    let listHtml = n.news_list.map(item => `
-      <div style="margin-bottom:12px;display:flex;align-items:flex-start;gap:10px;">
-        <span style="color:var(--accent);font-size:18px;line-height:1;">•</span>
-        <div>
-          <a href="${item.url}" target="_blank" style="color:var(--text);text-decoration:none;font-size:15px;line-height:1.4;display:block;margin-bottom:2px;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text)'">${item.title}</a>
-          <span style="font-size:12px;color:var(--muted);">${item.source} ${item.date||''}</span>
-        </div>
-      </div>
-    `).join('');
+  const escapeHtml = (value = '') => String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+  const safeUrl = (value = '') => {
+    try {
+      const parsed = new URL(value, window.location.href);
+      return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '#';
+    } catch {
+      return '#';
+    }
+  };
+  const groups = n.source_groups || [];
+  const summaries = n.source_summary || [];
+  const highlights = n.highlights || [];
+  const themes = n.themes || [];
+  let html = '<div class="news-integrated">';
+
+  if(summaries.length) {
     html += `
-      <div style="flex:1;min-width:300px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:24px;">
-        <h3 style="margin-top:0;margin-bottom:20px;font-size:16px;color:var(--text);display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">📰</span> 重點新聞總覽</h3>
-        ${listHtml}
+      <div class="news-summary-row">
+        ${summaries.map(s => `
+          <span class="news-summary-chip">${s.icon ? `${escapeHtml(s.icon)} ` : ''}${escapeHtml(s.label)} · ${escapeHtml(s.count ?? 0)}</span>
+        `).join('')}
       </div>`;
   }
-  
-  // Right: Themes
-  if(n.themes && n.themes.length) {
-    let themesHtml = n.themes.map(t => `
-      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:16px;margin-bottom:12px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <strong style="color:var(--primary);font-size:15px;">${t.name}</strong>
-          <span style="font-size:12px;background:var(--accent);color:var(--bg);padding:2px 8px;border-radius:12px;font-weight:600;">熱度 ${t.score}</span>
-        </div>
-        <div style="font-size:14px;color:var(--text);line-height:1.5;">${t.insight}</div>
-      </div>
-    `).join('');
+
+  if(highlights.length) {
     html += `
-      <div style="flex:1;min-width:300px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:24px;">
-        <h3 style="margin-top:0;margin-bottom:20px;font-size:16px;color:var(--primary);display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">🎯</span> AI 盤前題材解析</h3>
-        ${themesHtml}
+      <div class="news-summary-row">
+        ${highlights.map(text => `<span class="news-summary-chip">${escapeHtml(text)}</span>`).join('')}
       </div>`;
   }
-  
+
+  if(groups.length) {
+    html += `
+      <div class="news-group-grid">
+        ${groups.map(group => `
+          <div class="news-group-card">
+            <div class="news-group-head">
+              <div>
+                <div class="news-group-name">${escapeHtml(group.icon || '')} ${escapeHtml(group.name || '新聞')}</div>
+                <div class="news-group-sub">${escapeHtml(group.subtitle || '')}</div>
+              </div>
+              <div class="news-group-count">${escapeHtml(group.count ?? 0)} 則</div>
+            </div>
+            <div class="news-item-list">
+              ${(group.items || []).map(item => `
+                <div class="news-item">
+                  <a class="news-item-title" href="${safeUrl(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title || '')}</a>
+                  <div class="news-item-meta">${escapeHtml(item.source || '—')}${item.date ? ` · ${escapeHtml(item.date)}` : ''}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>`;
+  } else if(n.news_list && n.news_list.length) {
+    html += `
+      <div class="news-group-card">
+        <div class="news-group-head">
+          <div>
+            <div class="news-group-name">重點新聞總覽</div>
+            <div class="news-group-sub">整合來源尚未分組，以下為最新清單</div>
+          </div>
+        </div>
+        <div class="news-item-list">
+          ${n.news_list.map(item => `
+            <div class="news-item">
+              <a class="news-item-title" href="${safeUrl(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title || '')}</a>
+              <div class="news-item-meta">${escapeHtml(item.source || '—')}${item.date ? ` · ${escapeHtml(item.date)}` : ''}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+  }
+
+  if(themes.length) {
+    html += `
+      <div class="news-theme-grid">
+        ${themes.map(t => `
+          <div class="news-theme-card">
+            <div class="news-theme-name">
+              <strong style="color:var(--text);font-size:15px;">${escapeHtml(t.name || '')}</strong>
+              <span class="news-theme-score">熱度 ${escapeHtml(t.score ?? '—')}</span>
+            </div>
+            <div style="font-size:14px;color:var(--text);line-height:1.55;">${escapeHtml(t.insight || '')}</div>
+          </div>
+        `).join('')}
+      </div>`;
+  }
+
   html += '</div>';
-  return html;
+  return card('sec-news', '📰 多來源新聞整合', html);
 }
 
 // ── Chart helpers ─────────────────────────────────────────────────────────────
