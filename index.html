@@ -733,7 +733,7 @@ function buildReportSectionMap(d, family) {
     const marketSnapshot = (d.sentiment || d.tw_premarket)
       ? `<div class="two-col">
            ${d.sentiment ? renderSentiment(d.sentiment) : ''}
-           ${d.tw_premarket ? renderTwHistoryChart(d, taiex) : ''}
+           ${d.tw_premarket ? renderTwHistoryChart(d) : ''}
          </div>`
       : '';
 
@@ -961,7 +961,7 @@ function renderSentiment(s) {
 }
 
 // ── TW History area chart ─────────────────────────────────────────────────────
-  function renderTwHistoryChart(d, taiexHtml = '') {
+  function renderTwHistoryChart(d) {
     const titleMap = {
       'Pre-open': '📈 盤前指數走勢',
       'Close Summary': '📈 收盤指數走勢',
@@ -973,7 +973,6 @@ function renderSentiment(s) {
     const hasHistory = Array.isArray(d.taiex_history) && d.taiex_history.length > 0;
     const emptyState = hasHistory ? '' : `<div style="height:180px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;">目前沒有可繪製的歷史資料。</div>`;
     return card('',''+title, `
-      ${taiexHtml ? `<div style="margin-bottom:12px;">${taiexHtml}</div>` : ''}
       <div class="chart-wrap" style="height:240px;">
         ${hasHistory ? '<canvas id="taiex-chart"></canvas>' : emptyState}
       </div>`);
