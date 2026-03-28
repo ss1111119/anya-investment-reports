@@ -608,6 +608,7 @@
     <a href="#sec-history">歷史走勢</a>
     <a href="#sec-inst">三大法人</a>
     <a href="#sec-sector">板塊流向</a>
+    <a href="#sec-chart-orchestration">圖表編排</a>
     <a href="#sec-kol">KOL 情緒</a>
     <a href="#sec-ai">AI 分析</a>
   </div>
@@ -630,6 +631,7 @@ let _charts = {};
 let _ttsUtterance = null;
 let _ttsPlaying = false;
 let _currentData = null;
+let _currentTemplateFamily = 'Pre-open';
 
 // Type labels
 const TYPE_LABELS = {
@@ -655,11 +657,11 @@ const fgClass = lbl => {
 };
 
 const WEEKLY_TEMPLATE_SECTION_ORDER = {
-  'Pre-open': ['hero', 'us_macro', 'taiex', 'market_snapshot', 'premarket', 'history', 'interpretation', 'news', 'kol', 'ai'],
-  'Close Summary': ['hero', 'taiex', 'institutional', 'sector_flow', 'history', 'interpretation', 'news', 'kol', 'ai'],
-  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'market_snapshot', 'sector_flow', 'history', 'news', 'kol', 'ai'],
-  'Weekend Macro': ['hero', 'us_macro', 'market_snapshot', 'interpretation', 'news', 'kol', 'ai'],
-  'Next Week Preview': ['hero', 'interpretation', 'news', 'us_macro', 'taiex', 'market_snapshot', 'kol', 'ai'],
+  'Pre-open': ['hero', 'us_macro', 'taiex', 'market_snapshot', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
+  'Close Summary': ['hero', 'taiex', 'institutional', 'sector_flow', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
+  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'market_snapshot', 'sector_flow', 'history', 'chart_orchestration', 'news', 'kol', 'ai'],
+  'Weekend Macro': ['hero', 'us_macro', 'market_snapshot', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
+  'Next Week Preview': ['hero', 'interpretation', 'chart_orchestration', 'news', 'us_macro', 'taiex', 'market_snapshot', 'kol', 'ai'],
 };
 
 function parseReportDate(dateValue) {
@@ -673,25 +675,26 @@ function parseReportDate(dateValue) {
 function getWeeklyTemplateFamily(d) {
   const reportType = String(d?.report_type || '').toLowerCase();
   const weekday = parseReportDate(d?.date)?.getDay();
+  const pythonWeekday = weekday == null ? null : ((weekday + 6) % 7);
 
   if(reportType === 'weekly_review') {
-    return weekday === 6 ? 'Weekend Macro' : 'Next Week Preview';
+    return pythonWeekday === 6 ? 'Weekend Macro' : 'Next Week Preview';
   }
   if(reportType === 'weekend_evening') {
-    return weekday === 6 ? 'Next Week Preview' : 'Weekend Macro';
+    return pythonWeekday === 6 ? 'Next Week Preview' : 'Weekend Macro';
   }
   if(reportType === 'weekend_morning') {
-    return weekday === 6 ? 'Weekend Macro' : 'Pre-open';
+    return pythonWeekday === 6 ? 'Weekend Macro' : 'Pre-open';
   }
   if(reportType === 'evening') {
-    if(weekday === 4) return 'Next Week Preview';
-    if(weekday === 2 || weekday === 3) return 'Midweek Risk';
+    if(pythonWeekday === 4) return 'Next Week Preview';
+    if(pythonWeekday === 2 || pythonWeekday === 3) return 'Midweek Risk';
     return 'Close Summary';
   }
 
-  if(weekday === 6) return 'Weekend Macro';
-  if(weekday === 4) return 'Next Week Preview';
-  if(weekday === 2 || weekday === 3) return 'Midweek Risk';
+  if(pythonWeekday === 6) return 'Weekend Macro';
+  if(pythonWeekday === 4) return 'Next Week Preview';
+  if(pythonWeekday === 2 || pythonWeekday === 3) return 'Midweek Risk';
   return 'Pre-open';
 }
 
@@ -741,6 +744,7 @@ function buildReportSectionMap(d, family) {
   const interpretation = (d.market_news || d.sentiment || d.tw_premarket || d.social_pulse || d.us_macro || d.ai_analysis)
     ? renderMarketInterpretation(d)
     : '';
+  const chartOrchestration = d.chart_orchestration ? renderChartOrchestration(d.chart_orchestration) : '';
   const news = d.market_news && (d.market_news.source_groups?.length || d.market_news.news_list?.length || d.market_news.themes?.length)
     ? renderMarketNews(d.market_news)
     : '';
@@ -773,6 +777,7 @@ function buildReportSectionMap(d, family) {
     institutional,
     sector_flow: sectorFlow,
     interpretation,
+    chart_orchestration: chartOrchestration,
     news,
     kol,
     ai,
@@ -868,6 +873,7 @@ async function loadReport(file) {
 // ── Render ───────────────────────────────────────────────────────────────────
 function render(d) {
   const family = getWeeklyTemplateFamily(d);
+  _currentTemplateFamily = family;
   const sections = buildReportSectionMap(d, family);
   const order = WEEKLY_TEMPLATE_SECTION_ORDER[family] || WEEKLY_TEMPLATE_SECTION_ORDER['Pre-open'];
   const html = order.map(key => sections[key] || '').join('');
@@ -955,7 +961,15 @@ function renderSentiment(s) {
 
 // ── TW History area chart ─────────────────────────────────────────────────────
 function renderTwHistoryChart(d) {
-  return card('','📈 盤前指數走勢', `
+  const titleMap = {
+    'Pre-open': '📈 盤前指數走勢',
+    'Close Summary': '📈 收盤指數走勢',
+    'Midweek Risk': '📈 週中風險走勢',
+    'Weekend Macro': '📈 昨夜指數走勢',
+    'Next Week Preview': '📈 下週觀察走勢',
+  };
+  const title = titleMap[_currentTemplateFamily || 'Pre-open'] || '📈 指數走勢';
+  return card('',''+title, `
     <div class="chart-wrap"><canvas id="taiex-chart"></canvas></div>`);
 }
 
@@ -1133,6 +1147,118 @@ function renderMarketInterpretation(d) {
     </div>`);
 }
 
+// ── Gemini chart orchestration ───────────────────────────────────────────────
+function renderChartOrchestration(o) {
+  const escapeHtml = (value = '') => String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+  const selected = Array.isArray(o.selected_charts) ? o.selected_charts : [];
+  const themes = Array.isArray(o.news_themes) ? o.news_themes : [];
+  const gaps = Array.isArray(o.chart_gap_suggestions) ? o.chart_gap_suggestions : [];
+  const budget = Number(o.chart_budget ?? selected.length ?? 0);
+  const family = String(o.family || _currentTemplateFamily || 'Pre-open');
+  const source = String(o.source || 'fallback');
+  const summary = String(o.overall_summary || '圖表編排目前不可用，系統已回退到靜態報告區塊。');
+  const selectedCount = selected.length;
+  const chartCards = selected.map(chart => {
+    const title = chart.title || chart.id || '未命名圖表';
+    const desc = chart.description || '';
+    const takeaway = chart.takeaway || desc || '';
+    const action = chart.action || '';
+    return `
+      <div class="news-theme-card">
+        <div class="news-theme-name">
+          <strong style="color:var(--text);font-size:15px;">${escapeHtml(title)}</strong>
+          <span class="news-theme-score">${escapeHtml(chart.priority || '—')}</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:6px;">${escapeHtml(chart.id || '')}</div>
+        <div style="font-size:14px;color:var(--text);line-height:1.55;margin-bottom:8px;">${escapeHtml(takeaway)}</div>
+        ${action ? `<div class="interpret-note" style="margin-top:0;">${escapeHtml(action)}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+  const themeCards = themes.map(theme => {
+    const label = theme.label || theme.name || '未命名主題';
+    const summaryText = theme.summary || theme.insight || '';
+    const evidence = Array.isArray(theme.evidence) ? theme.evidence : [];
+    const sources = Array.isArray(theme.sources) ? theme.sources : [];
+    return `
+      <div class="interpret-box">
+        <div class="interpret-title">${escapeHtml(label)}<span style="color:var(--muted);font-weight:400">${sources.length ? escapeHtml(sources.join('、')) : ''}</span></div>
+        <div class="interpret-list">
+          <div>${escapeHtml(summaryText || 'Gemini 整理後主題')}</div>
+          ${evidence.length ? `<div><span>證據：</span>${escapeHtml(evidence.slice(0, 2).join('； '))}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+  const gapRows = gaps.map(item => {
+    const dataNeeded = Array.isArray(item.data_needed) ? item.data_needed.join('、') : '';
+    const reportTypes = Array.isArray(item.which_report_types) ? item.which_report_types.join('、') : '';
+    return `
+      <div class="interpret-box">
+        <div class="interpret-title">${escapeHtml(item.chart_name || '缺圖建議')}<span style="color:var(--muted);font-weight:400">${escapeHtml(item.priority || 'medium')}</span></div>
+        <div class="interpret-list">
+          ${item.why_needed ? `<div>${escapeHtml(item.why_needed)}</div>` : ''}
+          ${dataNeeded ? `<div><span>需要資料：</span>${escapeHtml(dataNeeded)}</div>` : ''}
+          ${reportTypes ? `<div><span>適用時段：</span>${escapeHtml(reportTypes)}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  let html = '<div class="interpret-panel">';
+  html += `
+    <div class="interpret-summary">${escapeHtml(summary)}</div>
+    <div class="interpret-meta">
+      <span class="interpret-chip">Family: ${escapeHtml(family)}</span>
+      <span class="interpret-chip">Charts: ${selectedCount}/${budget}</span>
+      <span class="interpret-chip">Source: ${escapeHtml(source)}</span>
+    </div>
+  `;
+
+  if(chartCards) {
+    html += `
+      <div class="news-theme-grid">
+        ${chartCards}
+      </div>
+    `;
+  }
+
+  if(themes.length) {
+    html += `
+      <div class="interpret-box">
+        <div class="interpret-title">Gemini 主題整合</div>
+        <div class="theme-row" style="margin-bottom:0">
+          ${themes.slice(0, 5).map(theme => `
+            <div class="theme-pill">${escapeHtml(theme.label || theme.name || '')}</div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="interpret-grid">
+        ${themeCards}
+      </div>
+    `;
+  }
+
+  if(gaps.length) {
+    html += `
+      <div class="interpret-box">
+        <div class="interpret-title">缺圖建議（待審核）</div>
+        <div class="interpret-grid">
+          ${gapRows}
+        </div>
+      </div>
+    `;
+  }
+
+  html += '</div>';
+  return card('sec-chart-orchestration', '🧠 Gemini 圖表編排', html);
+}
+
 // ── KOL ──────────────────────────────────────────────────────────────────────
 function renderKol(sp) {
   const bull = Number(sp.bullish_pct || 0);
@@ -1252,7 +1378,15 @@ function renderMarketNews(n) {
   }
 
   html += '</div>';
-  return card('sec-news', '📰 多來源新聞整合', html);
+  const titleMap = {
+    'Pre-open': '📰 多來源新聞整合',
+    'Close Summary': '📰 收盤後多來源新聞整合',
+    'Midweek Risk': '📰 風險主題整合',
+    'Weekend Macro': '📰 週末多來源新聞整合',
+    'Next Week Preview': '📰 下週題材整合',
+  };
+  const title = titleMap[_currentTemplateFamily || 'Pre-open'] || '📰 多來源新聞整合';
+  return card('sec-news', title, html);
 }
 
 // ── Chart helpers ─────────────────────────────────────────────────────────────
