@@ -154,6 +154,16 @@
     .type-weekend_morning{ background:#2e1c4a; color:#a37cff; }
     .type-weekend_evening{ background:#2e2a1c; color:#f0c34a; }
     .type-weekly_review  { background:#1c2e2e; color:#38d9c0; }
+    .family-badge {
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; letter-spacing: .5px;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .family-pre-open { background: rgba(79,158,255,.12); color: #8ec2ff; }
+    .family-close-summary { background: rgba(52,208,88,.12); color: var(--green); }
+    .family-midweek-risk { background: rgba(242,94,94,.12); color: var(--red); }
+    .family-weekend-macro { background: rgba(163,124,255,.12); color: #c8afff; }
+    .family-next-week-preview { background: rgba(56,217,192,.12); color: #38d9c0; }
     .signal-label {
       padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
     }
@@ -644,6 +654,132 @@ const fgClass = lbl => {
   return l.includes('greed') ? 'fg-greed' : l.includes('fear') ? 'fg-fear' : 'fg-neutral';
 };
 
+const WEEKLY_TEMPLATE_SECTION_ORDER = {
+  'Pre-open': ['hero', 'us_macro', 'taiex', 'market_snapshot', 'premarket', 'history', 'interpretation', 'news', 'kol', 'ai'],
+  'Close Summary': ['hero', 'taiex', 'institutional', 'sector_flow', 'history', 'interpretation', 'news', 'kol', 'ai'],
+  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'market_snapshot', 'sector_flow', 'history', 'news', 'kol', 'ai'],
+  'Weekend Macro': ['hero', 'us_macro', 'market_snapshot', 'interpretation', 'news', 'kol', 'ai'],
+  'Next Week Preview': ['hero', 'interpretation', 'news', 'us_macro', 'taiex', 'market_snapshot', 'kol', 'ai'],
+};
+
+function parseReportDate(dateValue) {
+  if(!dateValue) return null;
+  const parsed = new Date(`${String(dateValue).trim()}T00:00:00`);
+  if(!Number.isNaN(parsed.getTime())) return parsed;
+  const fallback = new Date(dateValue);
+  return Number.isNaN(fallback.getTime()) ? null : fallback;
+}
+
+function getWeeklyTemplateFamily(d) {
+  const reportType = String(d?.report_type || '').toLowerCase();
+  const weekday = parseReportDate(d?.date)?.getDay();
+
+  if(reportType === 'weekly_review') {
+    return weekday === 6 ? 'Weekend Macro' : 'Next Week Preview';
+  }
+  if(reportType === 'weekend_evening') {
+    return weekday === 6 ? 'Next Week Preview' : 'Weekend Macro';
+  }
+  if(reportType === 'weekend_morning') {
+    return weekday === 6 ? 'Weekend Macro' : 'Pre-open';
+  }
+  if(reportType === 'evening') {
+    if(weekday === 4) return 'Next Week Preview';
+    if(weekday === 2 || weekday === 3) return 'Midweek Risk';
+    return 'Close Summary';
+  }
+
+  if(weekday === 6) return 'Weekend Macro';
+  if(weekday === 4) return 'Next Week Preview';
+  if(weekday === 2 || weekday === 3) return 'Midweek Risk';
+  return 'Pre-open';
+}
+
+function familyClassName(family) {
+  return String(family || 'Pre-open').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
+
+function buildReportSectionMap(d, family) {
+  const sig   = d.headline?.signal || 'neutral';
+  const emoji = sig==='bullish'?'📈':sig==='bearish'?'📉':'📊';
+  const familyClass = familyClassName(family);
+  const typeLabel = TYPE_LABELS[d.report_type] || d.report_type || '';
+  const actionBadge = d.headline?.action ? `<span class="action-badge action-${sig}">${d.headline.action}</span>` : '';
+  const taiex = d.sentiment && d.sentiment.tw_index && d.sentiment.tw_index.price ? (() => {
+    const idx = d.sentiment.tw_index;
+    const changeVal = Number(idx.change ?? 0);
+    const changePctVal = idx.change_pct != null ? Number(idx.change_pct) : null;
+    const isUp = changeVal >= 0;
+    const arrow = isUp ? '▲' : '▼';
+    const clsName = isUp ? 'up' : 'dn';
+    const pointText = `${arrow} ${Math.abs(changeVal).toFixed(2)} 點`;
+    const pctText = changePctVal != null ? ` (${changePctVal >= 0 ? '+' : '-'}${Math.abs(changePctVal).toFixed(2)}%)` : '';
+    const chgStr = `${pointText}${pctText}`;
+    const formatPrice = new Intl.NumberFormat('en-US').format(idx.price);
+    return `
+      <div class="taiex-banner ${clsName}">
+        <div>
+          <div class="taiex-label">加權指數 TAIEX</div>
+          <div class="taiex-price">${formatPrice}</div>
+        </div>
+        <div class="taiex-chg ${clsName}">${chgStr}</div>
+      </div>
+    `;
+  })() : '';
+
+  const marketSnapshot = (d.sentiment || d.tw_premarket)
+    ? `<div class="two-col">
+         ${d.sentiment ? renderSentiment(d.sentiment) : ''}
+         ${d.tw_premarket ? renderTwHistoryChart(d) : ''}
+       </div>`
+    : '';
+
+  const premarket = d.tw_premarket ? renderTwPremarket(d.tw_premarket) : '';
+  const history = d.taiex_history?.length ? renderHistoryTable(d.taiex_history) : '';
+  const institutional = d.institutional ? renderInstitutional(d.institutional) : '';
+  const sectorFlow = d.sector_flow ? renderSectorFlow(d.sector_flow) : '';
+  const interpretation = (d.market_news || d.sentiment || d.tw_premarket || d.social_pulse || d.us_macro || d.ai_analysis)
+    ? renderMarketInterpretation(d)
+    : '';
+  const news = d.market_news && (d.market_news.source_groups?.length || d.market_news.news_list?.length || d.market_news.themes?.length)
+    ? renderMarketNews(d.market_news)
+    : '';
+  const kol = d.social_pulse ? renderKol(d.social_pulse) : '';
+  const ai = d.ai_analysis ? renderAI(d.ai_analysis) : '';
+  const usMacro = d.us_macro?.length ? renderUsMacro(d.us_macro) : '';
+
+  return {
+    hero: `
+      <div id="sec-hero" class="section-card" style="padding:28px 32px;position:relative;overflow:hidden;margin-bottom:20px">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--purple),var(--teal))"></div>
+        <div style="display:flex;align-items:center;gap:20px">
+          <div class="signal-orb signal-${sig}">${emoji}</div>
+          <div style="flex:1">
+            <div class="hero-meta">
+              <span class="hero-date">${d.date||''}</span>
+              <span class="type-badge type-${(d.report_type||'').replace('_','_')}">${typeLabel}</span>
+              <span class="family-badge family-${familyClass}">${family}</span>
+              <span class="signal-label label-${sig}">${sig==='bullish'?'偏多':sig==='bearish'?'偏空':'中性'}</span>
+              ${actionBadge}
+            </div>
+            <div id="hero-teaser">${d.headline?.teaser||'—'}</div>
+          </div>
+        </div>
+      </div>`,
+    taiex,
+    market_snapshot: marketSnapshot,
+    premarket,
+    history,
+    institutional,
+    sector_flow: sectorFlow,
+    interpretation,
+    news,
+    kol,
+    ai,
+    us_macro: usMacro,
+  };
+}
+
 // ── Market status ────────────────────────────────────────────────────────────
 function updateMarketStatus() {
   const now = new Date();
@@ -731,89 +867,10 @@ async function loadReport(file) {
 
 // ── Render ───────────────────────────────────────────────────────────────────
 function render(d) {
-  const sig   = d.headline?.signal || 'neutral';
-  const emoji = sig==='bullish'?'📈':sig==='bearish'?'📉':'📊';
-  const typeClass = d.report_type?.replace('_','-') || 'morning';
-
-  let html = '';
-
-  // ── Hero
-  html += `
-  <div id="sec-hero" class="section-card" style="padding:28px 32px;position:relative;overflow:hidden;margin-bottom:20px">
-    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--purple),var(--teal))"></div>
-    <div style="display:flex;align-items:center;gap:20px">
-      <div class="signal-orb signal-${sig}">${emoji}</div>
-      <div style="flex:1">
-        <div class="hero-meta">
-          <span class="hero-date">${d.date||''}</span>
-          <span class="type-badge type-${(d.report_type||'').replace('_','_')}">${TYPE_LABELS[d.report_type]||d.report_type}</span>
-          <span class="signal-label label-${sig}">${sig==='bullish'?'偏多':sig==='bearish'?'偏空':'中性'}</span>
-          ${d.headline?.action ? `<span class="action-badge action-${sig}">${d.headline.action}</span>` : ''}
-        </div>
-        <div id="hero-teaser">${d.headline?.teaser||'—'}</div>
-      </div>
-    </div>
-  </div>`;
-
-  // ── Market Index Banner (TAIEX)
-  if (d.sentiment && d.sentiment.tw_index && d.sentiment.tw_index.price) {
-    const idx = d.sentiment.tw_index;
-    const changeVal = Number(idx.change ?? 0);
-    const changePctVal = idx.change_pct != null ? Number(idx.change_pct) : null;
-    const isUp = changeVal >= 0;
-    const arrow = isUp ? '▲' : '▼';
-    const cls = isUp ? 'up' : 'dn';
-    const pointText = `${arrow} ${Math.abs(changeVal).toFixed(2)} 點`;
-    const pctText = changePctVal != null ? ` (${changePctVal >= 0 ? '+' : '-'}${Math.abs(changePctVal).toFixed(2)}%)` : '';
-    const chgStr = `${pointText}${pctText}`;
-    const formatPrice = new Intl.NumberFormat('en-US').format(idx.price);
-    html += `
-      <div class="taiex-banner ${cls}">
-        <div>
-          <div class="taiex-label">加權指數 TAIEX</div>
-          <div class="taiex-price">${formatPrice}</div>
-        </div>
-        <div class="taiex-chg ${cls}">${chgStr}</div>
-      </div>
-    `;
-  }
-
-  // ── US Macro
-  if(d.us_macro?.length) html += renderUsMacro(d.us_macro);
-
-  // ── Sentiment + TAIEX Trend  (2-col on wide screens)
-  html += `<div class="two-col">`;
-  if(d.sentiment) html += renderSentiment(d.sentiment);
-  if(d.tw_premarket) html += renderTwHistoryChart(d);
-  html += `</div>`;
-
-  // ── TW Premarket
-  if(d.tw_premarket) html += renderTwPremarket(d.tw_premarket);
-
-  // ── History table
-  if(d.taiex_history?.length) html += renderHistoryTable(d.taiex_history);
-
-  // ── Institutional
-  if(d.institutional) html += renderInstitutional(d.institutional);
-
-  // ── Sector flow (2-col: table + donut)
-  if(d.sector_flow) html += renderSectorFlow(d.sector_flow);
-
-  // ── Daily market interpretation
-  if(d.market_news || d.sentiment || d.tw_premarket || d.social_pulse || d.us_macro || d.ai_analysis) {
-    html += renderMarketInterpretation(d);
-  }
-
-  // ── Market News & Themes
-  if(d.market_news && (d.market_news.source_groups?.length || d.market_news.news_list?.length || d.market_news.themes?.length)) {
-    html += renderMarketNews(d.market_news);
-  }
-
-  // ── KOL
-  if(d.social_pulse) html += renderKol(d.social_pulse);
-
-  // ── AI Analysis (persona tabs)
-  if(d.ai_analysis) html += renderAI(d.ai_analysis);
+  const family = getWeeklyTemplateFamily(d);
+  const sections = buildReportSectionMap(d, family);
+  const order = WEEKLY_TEMPLATE_SECTION_ORDER[family] || WEEKLY_TEMPLATE_SECTION_ORDER['Pre-open'];
+  const html = order.map(key => sections[key] || '').join('');
 
   document.getElementById('app').innerHTML = html;
 
