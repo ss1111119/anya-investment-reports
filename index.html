@@ -1313,6 +1313,17 @@ function renderChartOrchestration(o) {
     `;
   }
 
+  if(gaps.length) {
+    html += `
+      <div class="interpret-box">
+        <div class="interpret-title">圖表補強建議</div>
+        <div class="interpret-grid">
+          ${gapRows}
+        </div>
+      </div>
+    `;
+  }
+
   html += '</div>';
   return card('sec-chart-orchestration', '🧠 Gemini 圖表編排', html);
 }
