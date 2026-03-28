@@ -1156,6 +1156,7 @@ function renderMarketInterpretation(d) {
   const summaries = news.source_summary || [];
   const bullPct = social.bullish_pct != null ? Number(social.bullish_pct) : null;
   const bearPct = social.bearish_pct != null ? Number(social.bearish_pct) : null;
+  const isWeekendMorning = String(d.report_type || '').toLowerCase() === 'weekend_morning';
 
   const evidence = [];
   if (summaries.length) evidence.push('新聞已整合多來源');
@@ -1186,19 +1187,23 @@ function renderMarketInterpretation(d) {
   if (themeNames.some(t => /地緣|通膨|風險|疲弱/.test(t))) score -= 0.5;
 
   const direction = score >= 2 ? '偏多' : score <= -2 ? '偏空' : '中性';
-  const summary = direction === '偏多'
-    ? `今日盤勢偏多，市場主軸仍在題材輪動與國際訊號同步。`
-    : direction === '偏空'
-      ? `今日盤勢偏弱，外圍壓力與情緒降溫正在一起影響盤面。`
-      : `今日盤勢偏震盪，市場尚未形成單邊共識。`;
+  const summary = isWeekendMorning
+    ? `週末盤勢偏震盪，市場尚未形成單邊共識。`
+    : direction === '偏多'
+      ? `今日盤勢偏多，市場主軸仍在題材輪動與國際訊號同步。`
+      : direction === '偏空'
+        ? `今日盤勢偏弱，外圍壓力與情緒降溫正在一起影響盤面。`
+        : `今日盤勢偏震盪，市場尚未形成單邊共識。`;
 
-  const actionText = direction === '偏多'
-    ? '策略上維持偏多，但不建議在情緒過熱時追價。'
-    : direction === '偏空'
-      ? '策略上偏保守，等待風險降溫與趨勢確認。'
-      : '策略上以觀望為主，等國際與資金訊號同步後再決定。';
+  const actionText = isWeekendMorning
+    ? '週末以整理國際、商品與資金訊號為主，等週一開盤再確認方向。'
+    : direction === '偏多'
+      ? '策略上維持偏多，但不建議在情緒過熱時追價。'
+      : direction === '偏空'
+        ? '策略上偏保守，等待風險降溫與趨勢確認。'
+        : '策略上以觀望為主，等國際與資金訊號同步後再決定。';
 
-  return card('sec-interpret', '🧭 今日盤勢解讀', `
+  return card('sec-interpret', isWeekendMorning ? '🧭 週末盤勢解讀' : '🧭 今日盤勢解讀', `
     <div class="interpret-panel">
       <div class="interpret-summary">${escapeHtml(summary)}</div>
       <div class="interpret-note">${escapeHtml(actionText)}</div>
@@ -1304,17 +1309,6 @@ function renderChartOrchestration(o) {
       </div>
       <div class="interpret-grid">
         ${themeCards}
-      </div>
-    `;
-  }
-
-  if(gaps.length) {
-    html += `
-      <div class="interpret-box">
-        <div class="interpret-title">缺圖建議（待審核）</div>
-        <div class="interpret-grid">
-          ${gapRows}
-        </div>
       </div>
     `;
   }
