@@ -660,10 +660,10 @@ const fgClass = lbl => {
 
 const WEEKLY_TEMPLATE_SECTION_ORDER = {
   'Pre-open': ['hero', 'us_macro', 'taiex', 'market_snapshot', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
-  'Close Summary': ['hero', 'taiex', 'institutional', 'sector_flow', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
-  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'market_snapshot', 'sector_flow', 'history', 'chart_orchestration', 'news', 'kol', 'ai'],
-  'Weekend Macro': ['hero', 'us_macro', 'commodity_history', 'yield_oil_history', 'market_snapshot', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
-  'Next Week Preview': ['hero', 'interpretation', 'chart_orchestration', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'taiex', 'market_snapshot', 'kol', 'ai'],
+  'Close Summary': ['hero', 'taiex', 'institutional', 'sector_flow', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
+  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'market_snapshot', 'sector_flow', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'ai'],
+  'Weekend Macro': ['hero', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
+  'Next Week Preview': ['hero', 'interpretation', 'chart_orchestration', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'market_snapshot', 'kol', 'ai'],
 };
 
 function parseReportDate(dateValue) {
@@ -743,6 +743,7 @@ function buildReportSectionMap(d, family) {
     const history = d.taiex_history?.length ? renderHistoryTable(d.taiex_history) : '';
     const commodityHistory = d.commodity_history?.series?.length ? renderCommodityHistory(d.commodity_history) : '';
     const yieldOilHistory = d.yield_oil_history?.series?.length ? renderYieldOilHistory(d.yield_oil_history) : '';
+    const usSectorHistory = d.us_sector_history?.series?.length ? renderUsSectorHistory(d.us_sector_history) : '';
     const institutional = d.institutional ? renderInstitutional(d.institutional) : '';
     const sectorFlow = d.sector_flow ? renderSectorFlow(d.sector_flow) : '';
   const interpretation = (d.market_news || d.sentiment || d.tw_premarket || d.social_pulse || d.us_macro || d.ai_analysis)
@@ -780,6 +781,7 @@ function buildReportSectionMap(d, family) {
       history,
       commodity_history: commodityHistory,
       yield_oil_history: yieldOilHistory,
+      us_sector_history: usSectorHistory,
       institutional,
       sector_flow: sectorFlow,
     interpretation,
@@ -893,6 +895,7 @@ function render(d) {
       if(d.taiex_history?.length) buildTwHistoryChart(d.taiex_history);
       if(d.commodity_history?.series?.length) buildCommodityHistoryChart(d.commodity_history);
       if(d.yield_oil_history?.series?.length) buildYieldOilHistoryChart(d.yield_oil_history);
+      if(d.us_sector_history?.series?.length) buildUSSectorHistoryChart(d.us_sector_history);
       if(d.sector_flow) buildSectorChart(d.sector_flow);
       if(d.ai_analysis) renderMarkdown(d.ai_analysis);
       updateAnchors();
@@ -1028,6 +1031,31 @@ function renderSentiment(s) {
       <div class="macro-grid">${chips}</div>
       ${dateRange ? `<div style="margin-top:8px;font-size:11px;color:var(--muted);">${dateRange}</div>` : ''}
       <div style="margin-top:14px;height:260px;"><canvas id="yield-oil-chart"></canvas></div>
+    `);
+  }
+
+  function renderUsSectorHistory(c) {
+    const titleMap = {
+      'Weekend Macro': '📊 美股產業類股輪動與避險流向',
+      'Next Week Preview': '📊 美股產業類股輪動與避險流向',
+      'Midweek Risk': '📊 美股產業類股輪動與避險流向',
+      'Close Summary': '📊 美股產業類股輪動與避險流向',
+    };
+    const title = titleMap[_currentTemplateFamily || 'Weekend Macro'] || '📊 美股產業類股輪動與避險流向';
+    const series = Array.isArray(c.series) ? c.series : [];
+    const dates = Array.isArray(c.dates) ? c.dates : [];
+    const dateRange = dates.length ? `資料區間：${dates[0]} ~ ${dates[dates.length - 1]}` : '';
+    const chips = series.map(s => `
+      <div class="macro-chip">
+        <div class="chip-name">${s.name}</div>
+        <div class="chip-value">${s.latest != null ? fmt(s.latest, 2) : 'N/A'}</div>
+        <div class="chip-chg ${cls(s.change_pct)}">${arr(s.change_pct)} ${fmtPct(s.change_pct)}</div>
+      </div>
+    `).join('');
+    return card('sec-us-sector', title, `
+      <div class="macro-grid">${chips}</div>
+      ${dateRange ? `<div style="margin-top:8px;font-size:11px;color:var(--muted);">${dateRange}</div>` : ''}
+      <div style="margin-top:14px;height:260px;"><canvas id="us-sector-chart"></canvas></div>
     `);
   }
 
@@ -1220,7 +1248,6 @@ function renderChartOrchestration(o) {
     .replace(/'/g, '&#39;');
   const selected = Array.isArray(o.selected_charts) ? o.selected_charts : [];
   const themes = Array.isArray(o.news_themes) ? o.news_themes : [];
-  const gaps = Array.isArray(o.chart_gap_suggestions) ? o.chart_gap_suggestions : [];
   const budget = Number(o.chart_budget ?? selected.length ?? 0);
   const family = String(o.family || _currentTemplateFamily || 'Pre-open');
   const source = String(o.source || 'fallback');
@@ -1258,27 +1285,6 @@ function renderChartOrchestration(o) {
       </div>
     `;
   }).join('');
-  const gapRows = gaps.map(item => {
-      const chartName = String(item.chart_name || '');
-      if (/美債.*油價|公債.*油價|yield.*oil/i.test(chartName.replace(/\s+/g, ''))) return '';
-      const dataNeeded = Array.isArray(item.data_needed) ? item.data_needed.join('、') : '';
-      const reportTypes = Array.isArray(item.which_report_types)
-        ? item.which_report_types
-            .filter(t => !(family === 'Weekend Macro' && String(t).includes('Pre-open')))
-            .join('、')
-        : '';
-      return `
-        <div class="interpret-box">
-          <div class="interpret-title">${escapeHtml(item.chart_name || '缺圖建議')}<span style="color:var(--muted);font-weight:400">${escapeHtml(item.priority || 'medium')}</span></div>
-        <div class="interpret-list">
-          ${item.why_needed ? `<div>${escapeHtml(item.why_needed)}</div>` : ''}
-          ${dataNeeded ? `<div><span>需要資料：</span>${escapeHtml(dataNeeded)}</div>` : ''}
-          ${reportTypes ? `<div><span>適用時段：</span>${escapeHtml(reportTypes)}</div>` : ''}
-        </div>
-      </div>
-    `;
-  }).filter(Boolean).join('');
-
   let html = '<div class="interpret-panel">';
   html += `
     <div class="interpret-summary">${escapeHtml(summary)}</div>
@@ -1309,17 +1315,6 @@ function renderChartOrchestration(o) {
       </div>
       <div class="interpret-grid">
         ${themeCards}
-      </div>
-    `;
-  }
-
-  if(gaps.length) {
-    html += `
-      <div class="interpret-box">
-        <div class="interpret-title">圖表補強建議</div>
-        <div class="interpret-grid">
-          ${gapRows}
-        </div>
       </div>
     `;
   }
@@ -1614,6 +1609,59 @@ const chartDefaults = {
       };
     });
     _charts.yieldOil = new Chart(el, {
+      type: 'line',
+      data: { labels: dates.map(d => String(d).slice(5)), datasets },
+      options: {
+        ...chartDefaults,
+        plugins: {
+          legend: { display: true, labels: { color: '#c7d4ea', font: { size: 11 }, usePointStyle: true, pointStyle: 'line' } },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const series = c.series[ctx.datasetIndex] || {};
+                const point = (series.values || [])[ctx.dataIndex] || {};
+                const raw = point.raw != null ? fmt(point.raw, 2) : 'N/A';
+                const norm = point.normalized != null ? fmt(point.normalized, 2) : 'N/A';
+                return `${series.name}: ${raw} (基準 ${norm})`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: { ticks: { color:'#7a8ba8', font:{size:10}, maxRotation:0 }, grid:{ color: dark } },
+          y: { ticks: { color:'#7a8ba8', font:{size:10} }, grid:{ color: dark }, title:{ display:true, text:'基準值=100', color:'#7a8ba8', font:{ size:10 } } }
+        },
+        maintainAspectRatio: false,
+      }
+    });
+  }
+
+  function buildUSSectorHistoryChart(c) {
+    const el = document.getElementById('us-sector-chart');
+    if(!el || !c || !Array.isArray(c.series) || c.series.length < 2) return;
+    if(_charts.usSectorHistory) {
+      _charts.usSectorHistory.destroy();
+      delete _charts.usSectorHistory;
+    }
+    const dates = Array.isArray(c.dates) ? c.dates : [];
+    if(!dates.length) return;
+    const colors = ['#63b3ff', '#f0c34a', '#34d058', '#a37cff', '#f25e5e', '#47c6b8', '#ff9f43', '#8ea6ff', '#ff6fb1', '#70d6ff', '#ffd166'];
+    const datasets = c.series.map((series, idx) => {
+      const color = colors[idx % colors.length];
+      const values = (series.values || []).map(v => v?.normalized ?? null);
+      return {
+        label: series.name,
+        data: values,
+        borderColor: color,
+        backgroundColor: color,
+        fill: false,
+        tension: 0.24,
+        pointRadius: 1.5,
+        pointHoverRadius: 4,
+        borderWidth: 2,
+      };
+    });
+    _charts.usSectorHistory = new Chart(el, {
       type: 'line',
       data: { labels: dates.map(d => String(d).slice(5)), datasets },
       options: {
