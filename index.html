@@ -684,7 +684,7 @@ function getWeeklyTemplateFamily(d) {
     return pythonWeekday === 6 ? 'Next Week Preview' : 'Weekend Macro';
   }
   if(reportType === 'weekend_morning') {
-    return pythonWeekday === 6 ? 'Weekend Macro' : 'Pre-open';
+    return (pythonWeekday === 5 || pythonWeekday === 6) ? 'Weekend Macro' : 'Pre-open';
   }
   if(reportType === 'evening') {
     if(pythonWeekday === 4) return 'Next Week Preview';
@@ -1200,12 +1200,16 @@ function renderChartOrchestration(o) {
       </div>
     `;
   }).join('');
-  const gapRows = gaps.map(item => {
-    const dataNeeded = Array.isArray(item.data_needed) ? item.data_needed.join('、') : '';
-    const reportTypes = Array.isArray(item.which_report_types) ? item.which_report_types.join('、') : '';
-    return `
-      <div class="interpret-box">
-        <div class="interpret-title">${escapeHtml(item.chart_name || '缺圖建議')}<span style="color:var(--muted);font-weight:400">${escapeHtml(item.priority || 'medium')}</span></div>
+    const gapRows = gaps.map(item => {
+      const dataNeeded = Array.isArray(item.data_needed) ? item.data_needed.join('、') : '';
+      const reportTypes = Array.isArray(item.which_report_types)
+        ? item.which_report_types
+            .filter(t => !(family === 'Weekend Macro' && String(t).includes('Pre-open')))
+            .join('、')
+        : '';
+      return `
+        <div class="interpret-box">
+          <div class="interpret-title">${escapeHtml(item.chart_name || '缺圖建議')}<span style="color:var(--muted);font-weight:400">${escapeHtml(item.priority || 'medium')}</span></div>
         <div class="interpret-list">
           ${item.why_needed ? `<div>${escapeHtml(item.why_needed)}</div>` : ''}
           ${dataNeeded ? `<div><span>需要資料：</span>${escapeHtml(dataNeeded)}</div>` : ''}
