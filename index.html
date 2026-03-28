@@ -730,12 +730,12 @@ function buildReportSectionMap(d, family) {
     `;
   })() : '';
 
-  const marketSnapshot = (d.sentiment || d.tw_premarket)
-    ? `<div class="two-col">
-         ${d.sentiment ? renderSentiment(d.sentiment) : ''}
-         ${d.tw_premarket ? renderTwHistoryChart(d) : ''}
-       </div>`
-    : '';
+    const marketSnapshot = (d.sentiment || d.tw_premarket)
+      ? `<div class="two-col">
+           ${d.sentiment ? renderSentiment(d.sentiment) : ''}
+           ${d.tw_premarket ? renderTwHistoryChart(d, taiex) : ''}
+         </div>`
+      : '';
 
   const premarket = d.tw_premarket ? renderTwPremarket(d.tw_premarket) : '';
   const history = d.taiex_history?.length ? renderHistoryTable(d.taiex_history) : '';
@@ -881,14 +881,15 @@ function render(d) {
   document.getElementById('app').innerHTML = html;
 
   // post-render: charts & markdown
-  requestAnimationFrame(() => {
-    if(d.us_macro?.length) buildMacroMiniCharts(d.us_macro);
-    if(d.sentiment) buildSentimentCharts(d.sentiment);
-    if(d.sector_flow) buildSectorChart(d.sector_flow);
-    if(d.ai_analysis) renderMarkdown(d.ai_analysis);
-    updateAnchors();
-  });
-}
+    requestAnimationFrame(() => {
+      if(d.us_macro?.length) buildMacroMiniCharts(d.us_macro);
+      if(d.sentiment) buildSentimentCharts(d.sentiment);
+      if(d.taiex_history?.length) buildTwHistoryChart(d.taiex_history);
+      if(d.sector_flow) buildSectorChart(d.sector_flow);
+      if(d.ai_analysis) renderMarkdown(d.ai_analysis);
+      updateAnchors();
+    });
+  }
 
 // ── US Macro ─────────────────────────────────────────────────────────────────
 function renderUsMacro(rows) {
@@ -960,18 +961,23 @@ function renderSentiment(s) {
 }
 
 // ── TW History area chart ─────────────────────────────────────────────────────
-function renderTwHistoryChart(d) {
-  const titleMap = {
-    'Pre-open': '📈 盤前指數走勢',
-    'Close Summary': '📈 收盤指數走勢',
-    'Midweek Risk': '📈 週中風險走勢',
-    'Weekend Macro': '📈 昨夜指數走勢',
-    'Next Week Preview': '📈 下週觀察走勢',
-  };
-  const title = titleMap[_currentTemplateFamily || 'Pre-open'] || '📈 指數走勢';
-  return card('',''+title, `
-    <div class="chart-wrap"><canvas id="taiex-chart"></canvas></div>`);
-}
+  function renderTwHistoryChart(d, taiexHtml = '') {
+    const titleMap = {
+      'Pre-open': '📈 盤前指數走勢',
+      'Close Summary': '📈 收盤指數走勢',
+      'Midweek Risk': '📈 週中風險走勢',
+      'Weekend Macro': '📈 昨夜指數走勢',
+      'Next Week Preview': '📈 下週觀察走勢',
+    };
+    const title = titleMap[_currentTemplateFamily || 'Pre-open'] || '📈 指數走勢';
+    const hasHistory = Array.isArray(d.taiex_history) && d.taiex_history.length > 0;
+    const emptyState = hasHistory ? '' : `<div style="height:180px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;">目前沒有可繪製的歷史資料。</div>`;
+    return card('',''+title, `
+      ${taiexHtml ? `<div style="margin-bottom:12px;">${taiexHtml}</div>` : ''}
+      <div class="chart-wrap" style="height:240px;">
+        ${hasHistory ? '<canvas id="taiex-chart"></canvas>' : emptyState}
+      </div>`);
+  }
 
 // ── TW Premarket ─────────────────────────────────────────────────────────────
 function renderTwPremarket(p) {
@@ -1399,10 +1405,72 @@ const chartDefaults = {
   maintainAspectRatio: false,
 };
 
-function buildMacroMiniCharts(rows) {
-  // Show 5/10 year bond yield trend (if available) or skip
-  // Mini trend lines are embedded in chips later if history exists
-}
+  function buildMacroMiniCharts(rows) {
+    // Show 5/10 year bond yield trend (if available) or skip
+    // Mini trend lines are embedded in chips later if history exists
+  }
+
+  function buildTwHistoryChart(rows) {
+    const el = document.getElementById('taiex-chart');
+    if(!el || !Array.isArray(rows) || rows.length < 2) return;
+    if(_charts.taiex) {
+      _charts.taiex.destroy();
+      delete _charts.taiex;
+    }
+    const data = rows.filter(r => r && r.close != null);
+    if(data.length < 2) return;
+    const labels = data.map(r => String(r.date || '').slice(5));
+    const closes = data.map(r => Number(r.close));
+    const gradientFill = (ctx) => {
+      const chart = ctx.chart;
+      const {chartArea} = chart;
+      if (!chartArea) return 'rgba(99, 179, 255, 0.12)';
+      const gradient = chart.ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+      gradient.addColorStop(0, 'rgba(99, 179, 255, 0.28)');
+      gradient.addColorStop(1, 'rgba(99, 179, 255, 0.02)');
+      return gradient;
+    };
+    _charts.taiex = new Chart(el, {
+      type:'line',
+      data:{
+        labels,
+        datasets:[{
+          label:'TAIEX',
+          data:closes,
+          borderColor:'#63b3ff',
+          backgroundColor: gradientFill,
+          fill:true,
+          tension:0.28,
+          pointRadius:2,
+          pointHoverRadius:4,
+          borderWidth:2,
+        }]
+      },
+      options:{
+        ...chartDefaults,
+        plugins:{
+          legend:{display:false},
+          tooltip:{
+            callbacks:{
+              title: items => items[0]?.label || '',
+              label: ctx => {
+                const idx = data[ctx.dataIndex] || {};
+                const price = ctx.raw != null ? fmt(ctx.raw, 2) : 'N/A';
+                const chg = idx.change != null ? `${idx.change > 0 ? '+' : ''}${fmt(idx.change, 2)} 點` : '—';
+                const pct = idx.change_pct != null ? ` (${idx.change_pct > 0 ? '+' : ''}${fmt(idx.change_pct, 2)}%)` : '';
+                return `收盤 ${price}｜漲跌 ${chg}${pct}`;
+              }
+            }
+          }
+        },
+        scales:{
+          x:{ ticks:{ color:'#7a8ba8', font:{size:10}, maxRotation:0, autoSkip:true }, grid:{ color:dark } },
+          y:{ ticks:{ color:'#7a8ba8', font:{size:10} }, grid:{ color:dark } }
+        },
+        maintainAspectRatio:false,
+      }
+    });
+  }
 
 function buildSentimentCharts(s) {
   const drawGauge = (id, val, color) => {
