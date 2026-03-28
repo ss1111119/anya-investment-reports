@@ -1035,6 +1035,12 @@ function renderSentiment(s) {
   }
 
   function renderUsSectorHistory(c) {
+    const escapeHtml = (value = '') => String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
     const titleMap = {
       'Weekend Macro': '📊 美股產業類股輪動與避險流向',
       'Next Week Preview': '📊 美股產業類股輪動與避險流向',
@@ -1045,6 +1051,28 @@ function renderSentiment(s) {
     const series = Array.isArray(c.series) ? c.series : [];
     const dates = Array.isArray(c.dates) ? c.dates : [];
     const dateRange = dates.length ? `資料區間：${dates[0]} ~ ${dates[dates.length - 1]}` : '';
+    const latestRank = series
+      .map(s => ({
+        name: s.name,
+        symbol: s.symbol,
+        latestNorm: (s.values || []).slice().reverse().find(v => v?.normalized != null)?.normalized ?? null,
+        latestRaw: s.latest,
+      }))
+      .filter(s => s.latestNorm != null)
+      .sort((a, b) => Number(b.latestNorm) - Number(a.latestNorm));
+    const leader = latestRank[0];
+    const laggard = latestRank[latestRank.length - 1];
+    const defensiveSet = new Set(['必需消費', '公用事業', '醫療保健', '不動產']);
+    const offensiveSet = new Set(['科技', '非必需消費', '金融', '工業', '能源', '原物料', '通訊服務']);
+    const defensiveAvg = latestRank.filter(s => defensiveSet.has(s.name)).reduce((acc, s) => acc + Number(s.latestNorm || 0), 0) / Math.max(1, latestRank.filter(s => defensiveSet.has(s.name)).length);
+    const offensiveAvg = latestRank.filter(s => offensiveSet.has(s.name)).reduce((acc, s) => acc + Number(s.latestNorm || 0), 0) / Math.max(1, latestRank.filter(s => offensiveSet.has(s.name)).length);
+    const biasText = latestRank.length
+      ? (defensiveAvg >= offensiveAvg
+        ? '資金相對偏向防禦族群。'
+        : '資金相對偏向進攻族群。')
+      : '目前仍在觀察輪動方向。';
+    const leaderText = leader ? `領漲：${leader.name}` : '領漲：—';
+    const laggardText = laggard ? `弱勢：${laggard.name}` : '弱勢：—';
     const chips = series.map(s => `
       <div class="macro-chip">
         <div class="chip-name">${s.name}</div>
@@ -1055,6 +1083,10 @@ function renderSentiment(s) {
     return card('sec-us-sector', title, `
       <div class="macro-grid">${chips}</div>
       ${dateRange ? `<div style="margin-top:8px;font-size:11px;color:var(--muted);">${dateRange}</div>` : ''}
+      <div class="interpret-panel" style="margin-top:12px;padding:12px 14px;">
+        <div class="interpret-summary">${escapeHtml(biasText)}</div>
+        <div class="interpret-note" style="margin-top:6px">${escapeHtml(`${leaderText}｜${laggardText}`)}</div>
+      </div>
       <div style="margin-top:14px;height:260px;"><canvas id="us-sector-chart"></canvas></div>
     `);
   }
