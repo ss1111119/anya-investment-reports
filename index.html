@@ -1009,12 +1009,14 @@ function renderSentiment(s) {
 
   function renderYieldOilHistory(c) {
     const titleMap = {
-      'Weekend Macro': '📈 美債殖利率與油價',
-      'Next Week Preview': '📈 美債殖利率與油價',
-      'Midweek Risk': '📈 美債殖利率與油價',
+      'Weekend Macro': '📈 美債殖利率與油價（歷史關聯）',
+      'Next Week Preview': '📈 美債殖利率與油價（歷史關聯）',
+      'Midweek Risk': '📈 美債殖利率與油價（歷史關聯）',
     };
-    const title = titleMap[_currentTemplateFamily || 'Weekend Macro'] || '📈 美債殖利率與油價';
+    const title = titleMap[_currentTemplateFamily || 'Weekend Macro'] || '📈 美債殖利率與油價（歷史關聯）';
     const series = Array.isArray(c.series) ? c.series : [];
+    const dates = Array.isArray(c.dates) ? c.dates : [];
+    const dateRange = dates.length ? `資料區間：${dates[0]} ~ ${dates[dates.length - 1]}` : '';
     const chips = series.map(s => `
       <div class="macro-chip">
         <div class="chip-name">${s.name}</div>
@@ -1024,6 +1026,7 @@ function renderSentiment(s) {
     `).join('');
     return card('sec-yield-oil', title, `
       <div class="macro-grid">${chips}</div>
+      ${dateRange ? `<div style="margin-top:8px;font-size:11px;color:var(--muted);">${dateRange}</div>` : ''}
       <div style="margin-top:14px;height:260px;"><canvas id="yield-oil-chart"></canvas></div>
     `);
   }
