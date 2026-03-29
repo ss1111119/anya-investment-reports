@@ -1322,7 +1322,7 @@ function renderChartOrchestration(o) {
     <div class="interpret-summary">${escapeHtml(summary)}</div>
     <div class="interpret-meta">
       <span class="interpret-chip">Family: ${escapeHtml(family)}</span>
-      <span class="interpret-chip">Charts: ${selectedCount}/${budget}</span>
+      <span class="interpret-chip">Selected: ${selectedCount} / Max: ${budget}</span>
       <span class="interpret-chip">Source: ${escapeHtml(source)}</span>
     </div>
   `;
@@ -1352,7 +1352,7 @@ function renderChartOrchestration(o) {
   }
 
   html += '</div>';
-  return card('sec-chart-orchestration', '🧠 Gemini 圖表編排', html);
+  return card('sec-chart-orchestration', '🧠 Gemini 編排摘要', html);
 }
 
 // ── KOL ──────────────────────────────────────────────────────────────────────
@@ -1443,14 +1443,13 @@ function renderMarketNews(n) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-  const curatedThemeOrder = [
-    'AI時代的新成長動能',
-    '地緣政治與通膨疑慮',
-    '日圓疲弱與日本通膨',
-    '中東局勢與通膨疑慮',
-  ];
-  const themeMap = new Map((n.themes || []).map(t => [String(t?.name || '').trim(), t]));
-  const themes = curatedThemeOrder.map(name => themeMap.get(name)).filter(Boolean);
+  const themes = (n.themes || [])
+    .map(t => ({
+      ...t,
+      name: String(t?.name || t?.label || '').trim(),
+      insight: String(t?.insight || t?.summary || '').trim(),
+    }))
+    .filter(t => t.name);
   let html = '<div class="news-integrated">';
 
   if(themes.length) {
