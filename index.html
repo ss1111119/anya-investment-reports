@@ -487,8 +487,10 @@
 
     /* ── Social pulse ────────────────────────────────────────────── */
     .kol-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
-    .kol-bar-bg { flex:1; height: 14px; background: var(--red); border-radius: 7px; overflow: hidden; min-width: 200px; }
+    .kol-bar-bg { flex:1; height: 14px; background: var(--surface-3); border-radius: 7px; overflow: hidden; min-width: 200px; display: flex; }
     .kol-bar-bull { height: 100%; background: var(--green); border-radius: 7px 0 0 7px; transition: width .5s; }
+    .kol-bar-neutral { height: 100%; background: var(--yellow); transition: width .5s; }
+    .kol-bar-bear { height: 100%; background: var(--red); border-radius: 0 7px 7px 0; transition: width .5s; }
     .theme-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
     .theme-pill {
       background: var(--surface-2); border: 1px solid var(--border);
@@ -1359,6 +1361,7 @@ function renderChartOrchestration(o) {
 function renderKol(sp) {
   const bull = Number(sp.bullish_pct || 0);
   const bear = Number(sp.bearish_pct != null ? sp.bearish_pct : 100 - bull);
+  const neutral = Math.max(0, 100 - bull - bear);
   const themes = (sp.top_themes || [])
     .map(t => ({ theme: String(t.theme || '').trim(), score: t.score }))
     .filter(t => t.theme)
@@ -1385,9 +1388,13 @@ function renderKol(sp) {
       ` : ''}
       <div class="kol-row">
         <span class="up" style="font-weight:600">${bull}% 多</span>
-        <div class="kol-bar-bg"><div class="kol-bar-bull" style="width:${bull}%"></div></div>
+        <div class="kol-bar-bg">
+          <div class="kol-bar-bull" style="width:${bull}%"></div>
+          <div class="kol-bar-neutral" style="width:${neutral}%"></div>
+          <div class="kol-bar-bear" style="width:${bear}%"></div>
+        </div>
         <span class="dn" style="font-weight:600">${bear}% 空</span>
-        <span style="color:var(--muted);font-size:12px">${sp.total_kols||0} 位 KOL 統計</span>
+        <span style="color:var(--muted);font-size:12px">${neutral}% 中性 / ${sp.total_kols||0} 位 KOL 統計</span>
       </div>
     </div>`);
 }
