@@ -496,22 +496,21 @@ function renderSocialTopicHeatmap(heatmap) {
       </div>
     </div>
   `).join('');
-  return card('sec-social-heatmap', `📌 社群熱度圖${asOf ? ` <span style="font-size:11px;color:var(--muted);font-weight:400">(${escapeHtml(asOf)})</span>` : ''}`, `
+  const body = topics.length ? `
     <div class="interpret-summary">${escapeHtml(summary)}</div>
     <div class="interpret-meta">
       ${chips.map(chip => `<span class="interpret-chip">${escapeHtml(chip.label)}：${escapeHtml(chip.value)}</span>`).join('')}
     </div>
-    ${topics.length ? `
-      <div class="news-theme-grid" style="margin-top:14px;">
-        ${rows}
-      </div>
-      <div style="margin-top:14px;height:260px;"><canvas id="social-heatmap-chart"></canvas></div>
-    ` : `
-      <div class="news-empty-state" style="margin-top:14px;">
-        已過濾掉非市場主題，暫無有效社群熱點可顯示。
-      </div>
-    `}
-  `);
+    <div class="news-theme-grid" style="margin-top:14px;">
+      ${rows}
+    </div>
+    <div style="margin-top:14px;height:260px;"><canvas id="social-heatmap-chart"></canvas></div>
+  ` : `
+    <div class="news-empty-state">
+      已過濾掉非市場主題，暫無有效社群熱點可顯示。
+    </div>
+  `;
+  return card('sec-social-heatmap', `📌 社群熱度圖${asOf ? ` <span style="font-size:11px;color:var(--muted);font-weight:400">(${escapeHtml(asOf)})</span>` : ''}`, body);
 }
 
 function renderTechTopicHeatmap(heatmap) {
