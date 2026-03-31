@@ -475,11 +475,11 @@ function renderSocialTopicHeatmap(heatmap) {
     .replace(/'/g, '&#39;');
   const topics = Array.isArray(heatmap.topics) ? heatmap.topics : [];
   const summary = String(heatmap.summary || '社群熱度資料').trim();
-  const benchmark = String(heatmap.benchmark || 'PTT / Dcard / Google Trends').trim();
+  const benchmark = String(heatmap.benchmark || 'PTT Stock / Google Trends（商業與財經）').trim();
   const coverage = heatmap.coverage != null ? Number(heatmap.coverage) : topics.length;
   const asOf = String(heatmap.as_of || '').trim();
   const chips = [
-    { label: '來源', value: String(heatmap.source || 'trend_pulse') },
+    { label: '來源', value: String(heatmap.source || 'stock_social') },
     { label: '覆蓋', value: `${coverage} 檔` },
     { label: '樣本', value: benchmark },
   ];
@@ -507,7 +507,7 @@ function renderSocialTopicHeatmap(heatmap) {
     <div style="margin-top:14px;height:260px;"><canvas id="social-heatmap-chart"></canvas></div>
   ` : `
     <div class="news-empty-state">
-      已過濾掉非市場主題，暫無有效社群熱點可顯示。
+      暫無可顯示的熱門社群討論。
     </div>
   `;
   return card('sec-social-heatmap', `📌 社群熱度圖${asOf ? ` <span style="font-size:11px;color:var(--muted);font-weight:400">(${escapeHtml(asOf)})</span>` : ''}`, body);

@@ -2551,48 +2551,82 @@
     ]
   },
   "social_topic_heatmap": {
-    "source": "trend_pulse",
-    "benchmark": "PTT / Dcard / Google Trends",
+    "source": "stock_social",
+    "benchmark": "PTT Stock / Google Trends（商業與財經）",
     "report_date": "2026-03-31",
-    "coverage": 3,
-    "as_of": "2026-03-31T05:38:24.284629+00:00",
-    "summary": "社群熱度聚焦在 [新聞] 花旗護價 喊台積電2,800元、Rapidus CTO：1 奈米與台積電縮短至「半、多頭總司令喊話！張錫：台積電1800元以下，目前共有 3 個市場相關主題。",
+    "coverage": 6,
+    "as_of": "2026-03-31T14:03:37.944290",
+    "summary": "社群熱度聚焦在 台股大跌、台聚股價、花旗護價 喊台積電2,800元，共有 6 個上升主題。",
     "topics": [
       {
-        "topic": "[新聞] 花旗護價 喊台積電2,800元",
-        "source": "ptt",
-        "score": 99.0,
-        "velocity": 0.0,
-        "timestamp": "2026-03-31T05:38:24.284629+00:00",
+        "topic": "台股大跌",
+        "source": "google_trends_finance",
+        "score": 2000.0,
+        "velocity": 300.0,
+        "timestamp": "2026-03-31T14:03:37.944290",
+        "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
+        "direction": "rising",
+        "is_rising": true
+      },
+      {
+        "topic": "台聚股價",
+        "source": "google_trends_finance",
+        "score": 1000.0,
+        "velocity": 200.0,
+        "timestamp": "2026-03-31T14:03:37.944290",
+        "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
+        "direction": "stable",
+        "is_rising": true
+      },
+      {
+        "topic": "花旗護價 喊台積電2,800元",
+        "source": "ptt_stock",
+        "score": 100.0,
+        "velocity": 100.0,
+        "timestamp": "2026-03-31T14:03:38.603194",
         "url": "https://www.ptt.cc/bbs/Stock/M.1774924145.A.81B.html",
-        "direction": "",
-        "is_rising": false
+        "direction": "rising",
+        "is_rising": true
       },
       {
-        "topic": "Rapidus CTO：1 奈米與台積電縮短至「半",
-        "source": "ptt",
-        "score": 43.0,
-        "velocity": 0.0,
-        "timestamp": "2026-03-31T05:38:24.284629+00:00",
-        "url": "https://www.ptt.cc/bbs/Stock/M.1774931976.A.A4E.html",
-        "direction": "",
-        "is_rising": false
+        "topic": "韓政府：自俄羅斯進口2.7萬噸石腦油今運",
+        "source": "ptt_stock",
+        "score": 100.0,
+        "velocity": 100.0,
+        "timestamp": "2026-03-31T14:03:38.603194",
+        "url": "https://www.ptt.cc/bbs/Stock/M.1774926172.A.781.html",
+        "direction": "rising",
+        "is_rising": true
       },
       {
-        "topic": "多頭總司令喊話！張錫：台積電1800元以下",
-        "source": "ptt",
-        "score": 32.0,
-        "velocity": 0.0,
-        "timestamp": "2026-03-31T05:38:24.284629+00:00",
-        "url": "https://www.ptt.cc/bbs/Stock/M.1774934775.A.103.html",
-        "direction": "",
-        "is_rising": false
+        "topic": "記憶體模組價跳水 業者喊話 根本不用擔心",
+        "source": "ptt_stock",
+        "score": 77.0,
+        "velocity": 77.0,
+        "timestamp": "2026-03-31T14:03:38.603194",
+        "url": "https://www.ptt.cc/bbs/Stock/M.1774933768.A.D30.html",
+        "direction": "rising",
+        "is_rising": true
+      },
+      {
+        "topic": "今天亮燈的電子股能撿嗎？",
+        "source": "ptt_stock",
+        "score": 68.0,
+        "velocity": 68.0,
+        "timestamp": "2026-03-31T14:03:38.603194",
+        "url": "https://www.ptt.cc/bbs/Stock/M.1774932155.A.0F7.html",
+        "direction": "rising",
+        "is_rising": true
       }
     ],
     "source_summary": [
       {
-        "source": "ptt",
-        "count": 3
+        "source": "ptt_stock",
+        "count": 4
+      },
+      {
+        "source": "google_trends_finance",
+        "count": 2
       }
     ]
   },
