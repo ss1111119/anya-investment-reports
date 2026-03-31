@@ -1,7 +1,7 @@
 {
   "date": "2026-03-31",
   "report_type": "morning",
-  "generated_at": "2026-03-31T08:45:30",
+  "generated_at": "2026-03-31T10:40:49",
   "us_macro": [
     {
       "symbol": "SP500",
@@ -88,19 +88,19 @@
         "name": "日經225",
         "region": "Japan",
         "currency": "JPY",
-        "value": 50750.23,
-        "change_pct": -4.91
+        "value": 51824.7,
+        "change_pct": -0.12
       },
       {
         "symbol": "^KS11",
         "name": "KOSPI",
         "region": "Korea",
         "currency": "KRW",
-        "value": 5066.38,
-        "change_pct": -6.85
+        "value": 5184.75,
+        "change_pct": -1.75
       }
     ],
-    "summary": "日經225 50750.23 (-4.91%)；KOSPI 5066.38 (-6.85%)",
+    "summary": "日經225 51824.70 (-0.12%)；KOSPI 5184.75 (-1.75%)",
     "source": "yfinance"
   },
   "sentiment": {
@@ -131,6 +131,198 @@
       "total_stocks": 1060,
       "source": "market_stats_twse"
     }
+  },
+  "sa_consensus": {
+    "source": "seeking_alpha",
+    "benchmark": "Magnificent 7",
+    "report_date": "2026-03-31",
+    "coverage": 7,
+    "as_of": "2026-03-30",
+    "summary": "Seeking Alpha 目前覆蓋 7 檔 Mag 7，共識較強的是 TSLA，相對偏弱的是 AMZN。",
+    "items": [
+      {
+        "symbol": "TSLA",
+        "as_of": "2026-03-30",
+        "quant_rating": 3.23,
+        "authors_rating": 2.23,
+        "wall_street_rating": 3.56,
+        "consensus_score": 3.01,
+        "factor_grades": {
+          "value": "F",
+          "growth": "A",
+          "profitability": "A+",
+          "momentum": "C+",
+          "revisions": "C"
+        }
+      },
+      {
+        "symbol": "AAPL",
+        "as_of": "2026-03-30",
+        "quant_rating": 3.47,
+        "authors_rating": 3.36,
+        "wall_street_rating": 4.1,
+        "consensus_score": 3.64,
+        "factor_grades": {
+          "value": "F",
+          "growth": "D",
+          "profitability": "A+",
+          "momentum": "B",
+          "revisions": "B+"
+        }
+      },
+      {
+        "symbol": "NVDA",
+        "as_of": "2026-03-30",
+        "quant_rating": 3.48,
+        "authors_rating": 3.74,
+        "wall_street_rating": 4.72,
+        "consensus_score": 3.98,
+        "factor_grades": {
+          "value": "F",
+          "growth": "A-",
+          "profitability": "A+",
+          "momentum": "B",
+          "revisions": "B+"
+        }
+      },
+      {
+        "symbol": "GOOGL",
+        "as_of": "2026-03-30",
+        "quant_rating": 3.48,
+        "authors_rating": 3.92,
+        "wall_street_rating": 4.64,
+        "consensus_score": 4.01,
+        "factor_grades": {
+          "value": "F",
+          "growth": "B",
+          "profitability": "A+",
+          "momentum": "A-",
+          "revisions": "B+"
+        }
+      },
+      {
+        "symbol": "META",
+        "as_of": "2026-03-30",
+        "quant_rating": 3.34,
+        "authors_rating": 4.14,
+        "wall_street_rating": 4.66,
+        "consensus_score": 4.05,
+        "factor_grades": {
+          "value": "F",
+          "growth": "B-",
+          "profitability": "A+",
+          "momentum": "C-",
+          "revisions": "C+"
+        }
+      },
+      {
+        "symbol": "MSFT",
+        "as_of": "2026-03-30",
+        "quant_rating": 3.48,
+        "authors_rating": 4.15,
+        "wall_street_rating": 4.72,
+        "consensus_score": 4.12,
+        "factor_grades": {
+          "value": "D-",
+          "growth": "C",
+          "profitability": "A+",
+          "momentum": "C-",
+          "revisions": "A-"
+        }
+      },
+      {
+        "symbol": "AMZN",
+        "as_of": "2026-03-30",
+        "quant_rating": 4.69,
+        "authors_rating": 4.08,
+        "wall_street_rating": 4.66,
+        "consensus_score": 4.48,
+        "factor_grades": {
+          "value": "D",
+          "growth": "A-",
+          "profitability": "A+",
+          "momentum": "C+",
+          "revisions": "C"
+        }
+      }
+    ],
+    "top_picks": [
+      {
+        "symbol": "TSLA",
+        "as_of": "2026-03-30",
+        "quant_rating": 3.23,
+        "authors_rating": 2.23,
+        "wall_street_rating": 3.56,
+        "consensus_score": 3.01,
+        "factor_grades": {
+          "value": "F",
+          "growth": "A",
+          "profitability": "A+",
+          "momentum": "C+",
+          "revisions": "C"
+        }
+      },
+      {
+        "symbol": "AAPL",
+        "as_of": "2026-03-30",
+        "quant_rating": 3.47,
+        "authors_rating": 3.36,
+        "wall_street_rating": 4.1,
+        "consensus_score": 3.64,
+        "factor_grades": {
+          "value": "F",
+          "growth": "D",
+          "profitability": "A+",
+          "momentum": "B",
+          "revisions": "B+"
+        }
+      },
+      {
+        "symbol": "NVDA",
+        "as_of": "2026-03-30",
+        "quant_rating": 3.48,
+        "authors_rating": 3.74,
+        "wall_street_rating": 4.72,
+        "consensus_score": 3.98,
+        "factor_grades": {
+          "value": "F",
+          "growth": "A-",
+          "profitability": "A+",
+          "momentum": "B",
+          "revisions": "B+"
+        }
+      },
+      {
+        "symbol": "GOOGL",
+        "as_of": "2026-03-30",
+        "quant_rating": 3.48,
+        "authors_rating": 3.92,
+        "wall_street_rating": 4.64,
+        "consensus_score": 4.01,
+        "factor_grades": {
+          "value": "F",
+          "growth": "B",
+          "profitability": "A+",
+          "momentum": "A-",
+          "revisions": "B+"
+        }
+      },
+      {
+        "symbol": "META",
+        "as_of": "2026-03-30",
+        "quant_rating": 3.34,
+        "authors_rating": 4.14,
+        "wall_street_rating": 4.66,
+        "consensus_score": 4.05,
+        "factor_grades": {
+          "value": "F",
+          "growth": "B-",
+          "profitability": "A+",
+          "momentum": "C-",
+          "revisions": "C+"
+        }
+      }
+    ]
   },
   "tw_premarket": {
     "sgx_fut": {
@@ -1936,50 +2128,50 @@
         "bucket": "tw"
       },
       {
-        "id": "nai_9156467357",
-        "title": "NTPC plans nuclear power entry in UP, 3 sites proposed",
-        "summary": "NTPC, India's largest integrated power utility, has proposed setting up a nuclear power plant in Uttar Pradesh, identifying three potential sites as part of its push to expand non-fossil fuel capacity, officials said on Monday.\n\nDiwakar Kaushik, regional executive director (North), NTPC Limited, said at a press conference that the final decision on the site will rest with the state government after feasibility assessments and clearances.\n\nThe three sites identified are in Prayagraj, Lalitpur and Sonbhadra. The state government will be responsible for allocating land and water resources for the project. As HT recently reported, Indian Oil Corporation Ltd is also surveying at least two sites in the state for a similar initiative.\n\nKaushik said nuclear energy is being considered as a long-term alternative to coal-based power due to rising demand and climate commitments.\n\nHe pointed to land availability as a key challenge in Uttar Pradesh. \"UP is a densely populated state. For a nuclear plant, a significant area has to be vacated, which limits the scope,\" he said, indicating that land acquisition and rehabilitation could be major hurdles in project execution.\n\nThe proposal aligns with NTPC's broader plan to scale up its installed capacity to 149 GW by 2032, including 60 GW from non-fossil fuel sources.\n\nMeanwhile, NTPC's Northern Region generated 1,10,992 million units till March 29, contributing 25.64% to the company's total output, with a plant load factor of 72.4%. Stations such as Singrauli, Rihand and Vindhyachal recorded strong performance, with no fatal incidents reported in the past three years.\n\nIn Uttar Pradesh, NTPC is expanding capacity through the 1,600 MW Singrauli Stage III project, targeted for commissioning by 2028, with the state willing to procure up to 100% of the output. The company is also developing 1,000 MW solar capacity in Lalitpur and Chitrakoot.\n\nIt further outlined clean energy initiatives as part of its expansion roadmap, including carbon capture at Vindhyachal, a waste-to-energy project in Varanasi, green hydrogen efforts, biomass co-firing and flue gas desulfurisation (FGD) systems.",
-        "url": "https://www.hindustantimes.com/cities/lucknow-news/ntpc-plans-nuclear-power-entry-in-up-3-sites-proposed-101774897449502.html",
-        "published_at": 1774915659,
-        "source": "Hindustan Times",
-        "category": "regional_in",
-        "bucket": "regional"
+        "id": "6402199",
+        "title": "台股市場回暖：晶技漲價激勵股市，特斯拉安全評價獲五顆星，鋼筋價格上升顯示需求增強",
+        "summary": "台股市場回暖：晶技漲價激勵股市，特斯拉安全評價獲五顆星，鋼筋價格上升顯示需求增強",
+        "url": "https://news.cnyes.com/news/id/6402199",
+        "published_at": 1774923610,
+        "source": "cnyes",
+        "category": "ai_news",
+        "bucket": "api"
       },
       {
-        "id": "nai_9156467328",
-        "title": "Cotton On says not closing stores or exiting Asia, liquidated entity was inactive holding company",
-        "summary": "SINGAPORE - Cotton On has no plans to exit the Asia region, the retail company said in a media statement released on March 31.\n\nA Cotton On spokesperson said: \"There have been misleading media reports suggesting that Cotton On stores operating in Asia are being closed, this information is incorrect and we have no plans to exit the Asia region.\"\n\nThe statement added that Cotton On Asia, the liquidated entity, does not and has never operated any stores or employed team members. It was an inactive holding company that was no longer required.\n\n\"This has no impact on customer, team, stores, suppliers or operations within the Asia region,\" Cotton On said.\n\nA notice published in the Government Gazette on March 30, stated that Cotton On Asia was to undergo voluntary liquidation, and that liquidators from PwC Singapore were appointed to wind up the business.\n\nBut checks on the Accounting and Corporate Regulatory Authority website on March 30 showed that a second entity, Cotton On Singapore, is still operating as a retail business providing clothing for adults.\n\nCotton On Asia is part of Australian fashion and lifestyle retailer Cotton On Group, founded in 1991 by Mr Nigel Austin. The brand opened its first store in Singapore at Wisma Atria in 2007, and its Asia headquarters here in 2014 with more than 90 staff.\n\nBrands under the Cotton On umbrella available in Singapore are Cotton On, Cotton On Body, Cotton On Kids, stationery brand Typo and shoe brand Rubi. Other brands in the group include Factorie, Supre and Ceres Life.\n\nAccording to the group's website, it operates in 20 countries with 20,000 employees.\n\nMore than 30 stores in Singapore were listed on the Cotton On website as at March 30.",
-        "url": "https://www.straitstimes.com/business/companies-markets/cotton-on-says-not-closing-stores-or-exiting-asia-liquidated-entity-was-inactive-holding-company",
-        "published_at": 1774915653,
-        "source": "The Straits Times",
-        "category": "regional_sg",
-        "bucket": "regional"
+        "id": "6402198",
+        "title": "中國PMI回升與全球油價飆升：地緣政治影響市場動態及投資機會",
+        "summary": "中國PMI回升與全球油價飆升：地緣政治影響市場動態及投資機會",
+        "url": "https://news.cnyes.com/news/id/6402198",
+        "published_at": 1774923608,
+        "source": "cnyes",
+        "category": "ai_news",
+        "bucket": "api"
       },
       {
-        "id": "nai_9156466791",
-        "title": "CAG Flags ₹27 Crore Loss Over MEA Office Delay, Highlights Financial Lapses",
-        "summary": "Delay in finalising the licence fee for its office space in Akbar Bhawan in New Delhi with the NDMC by the MEA led to an avoidable expenditure of Rs 27 crores, the Comptroller and Auditor General (CAG) in its report on Monday said. The financial watchdog also flagged cases like not undertaking timely repairs in the Indian embassy in China, and its embassy in Denmark not adhering to the rental ceiling, which also caused wasteful and avoidable expenditure. Similarly, the delay by the Indian embassy and the MEA in Israel for acquiring a property there also led to unnecessary financial outgo, the report said.\n\nThe report tabled in the parliament lays cracks in the ministry's fiscal oversight, which include Rs 27.43 crore excess expenditure on unused space in Delhi, Rs 3.22 crore avoidable rent due to uninhabitable embassy housing in Beijing and others.\n\nThe report states that the ministry retained the unutilised space at Akbar Bhawan, New Delhi, for 15 months without formalising pro-rata license fees with the New Delhi Municipal Corporation for the space actually utilised by it, which resulted in excess expenditure of Rs 27.43 crore towards licence fee for unutilised space.\n\nThough the Embassy of India, Beijing, China, had incurred significant expenditure on repairs and maintenance of 16 residential units constructed in 2011 in the New Chancery Premises, six residential units had become uninhabitable within a span of 10 to 13 years. Delay in carrying out necessary comprehensive repairs and renovation of these six vacant units resulted in avoidable rental outgo of Rs 3.22 crore up to February 2025. Moreover, the mission had made continued payment of heating charges for the Old Chancery Premises, which was not in use since 2014, leading to wasteful expenditure of Rs 74 lakh during the period 2015-16 to 2024-25, the CAG stated.\n\nThe Embassy of India, Copenhagen, in Denmark, had not adhered to the rental ceiling fixed by the ministry for hiring of leased accommodation for its officials, which resulted in excess expenditure of Rs 99.12 lakh.\n\nThe reports stated that the delay by both the Embassy of India, Tel Aviv in Israel and the ministry in undertaking pre-acquisition activities and according administrative approval and financial sanction for acquisition of a property within the extended timeline set by the seller led to termination of the deal and thereby, rendered expenditure of Rs 92.01 lakh towards professional and legal services associated to pre-acquisition activities unfruitful.\n\nFurther, it highlighted that the Regional Passport Offices of Goa, Mumbai and Pune did not claim exemption from electricity duty and tax of the Maharashtra Electricity Act, 2016 and the Goa, Daman and Diu Electricity Duty Act, 1986, which resulted in an irregular payment of Rs 1.47 crore.\n\nIt also stated that despite vacating the leased premises for the Regional Passport Office, Thane in 2017, the Regional Passport Office, Mumbai and the ministry did not finalise the surrender or alternate use of the property leased from the Maharashtra Industrial Development Corporation for over seven years, leading to avoidable expenditure of Rs 76 lakh along with pending liabilities of Rs 1.38 crore.",
-        "url": "https://dailypioneer.com/news/cag-slams-mea-for-over-rs-30-crore-in-avoidable-waste",
-        "published_at": 1774915595,
-        "source": "The Pioneer",
-        "category": "regional_in",
-        "bucket": "regional"
+        "id": "6401998",
+        "title": "油價飆升66%反成利多 債市浮現買點 大小摩齊看多",
+        "summary": "在油價飆升與通膨壓力升高之際，華爾街卻逆勢看多美國公債，認為經濟放緩風險正在累積，將推動資金回流避險資產，債券市場投資價值逐步浮現。",
+        "url": "https://news.cnyes.com/news/id/6401998",
+        "published_at": 1774923602,
+        "source": "cnyes",
+        "category": "us_stock",
+        "bucket": "us"
       },
       {
-        "id": "nai_9156466435",
-        "title": "Analysis: Garuda's losses persist despite bailouts, raising governance concerns - Academia - The Jakarta Post",
-        "summary": "aruda Indonesia continues to face deep financial distress, recording a net loss of US$319.39 million (Rp 5.2 trillion) in 2025, nearly five times larger than its 2024 loss. The recurring deficit has raised serious concerns, particularly as the flag carrier received a substantial capital injection of US$1.42 billion from state asset fund Danantara last year to stabilize its operations. Despite this financial support and multiple leadership changes, the national airline has yet to return to profitability, underscoring persistent governance challenges that have plagued it for years.\n\nFounded in 1949, Garuda Indonesia has long symbolized national identity and connectivity, but this historical significance contrasts sharply with its recent performance. Over the past decade, the airline has been embroiled in a series of scandals, including an earnings manipulation case in 2019 and a luxury goods smuggling case in 2020, as well as allegations of bribery, corruption and money laundering related to aircraft procurement. One of the most damaging cases involved former CEO Emirsyah Satar, whose proven role in a bribery case significantly undermined Garuda's credibility and governance standards and left the company struggling financially to this day.\n\nThese governance failures have had lasting financial consequences. Garuda struggled to meet its debt obligations, prompting government intervention in 2022 through a Rp 7.5 trillion state capital injection (PMN). This support temporarily improved its financial performance, allowing the airline to post net profits in 2022 and 2023. However, the recovery proved short-lived and Garuda returned to losses in 2024, recording a net deficit of $69 million (Rp 1.18 trillion).\n\nIts financial health worsened in 2025, driven largely by rising operational costs primarily due to a surge in maintenance expenses, placing the airline under significant pressure. As a result, 15 aircraft operated by its low-cost subsidiary Citilink were temporarily grounded. Management attributed the losses mainly to exchange rate fluctuations and higher fixed costs associated with its fleet recovery program. A total of 43 aircraft were grounded, limiting operational capacity and constraining revenue generation.\n\nWith fewer planes in service, Garuda's revenue declined 6 percent. On the cost side, foreign exchange losses rose sharply while maintenance costs increased 23 percent compared with 2024. These pressures further weakened the airline's financial position.\n\nOf Danantara's total capital injection, approximately 64 percent (Rp 15 trillion) was allocated to support Citilink, including for the settlement of obligations to state-owned oil and gas company Pertamina. The remaining Rp 8.7 trillion was earmarked for aircraft maintenance, aimed at increasing the number of operational aircraft from 99 in 2025 to 118 by the end of 2026.\n\nHowever, financial support alone has been unable to address the underlying governance issues, and leadership instability has only added to the uncertainty. In late 2024, President Prabowo Subianto appointed Wamildan Tsani, a former Air Force pilot and Lion Air Group executive, as Garuda CEO. Less than a year later in October 2025, he was replaced by Glenny H. Kahuripan, Prabowo's close associate from the military, following a 39.3 percent year-on-year decline in Garuda's income during the third quarter last year.",
-        "url": "https://www.thejakartapost.com/opinion/2026/03/31/analysis-garudas-losses-persist-despite-bailouts-raising-governance-concerns.html",
-        "published_at": 1774915574,
-        "source": "The Jakarta Post",
-        "category": "regional_id",
-        "bucket": "regional"
+        "id": "6402186",
+        "title": "美股市場面臨油價飆升與地緣緊張挑戰，卻也孕育新機遇",
+        "summary": "美股市場面臨油價飆升與地緣緊張挑戰，卻也孕育新機遇",
+        "url": "https://news.cnyes.com/news/id/6402186",
+        "published_at": 1774923307,
+        "source": "cnyes",
+        "category": "ai_news",
+        "bucket": "api"
       }
     ],
     "themes": [
       {
-        "name": "中東衝突對美元匯率的影響",
-        "insight": "中東地區的衝突是影響美元走勢的重要因素。雖然有報導指出衝突推動美元上漲，但同時也有報導提到美元走勢在緊盯局勢發展時陷入掙扎，顯示市場對地緣政治風險的反應存在不確定性，但避險需求仍支撐美元。",
+        "name": "中東地緣政治緊張與美元匯率波動",
+        "insight": "中東地區的衝突局勢對美元匯率造成影響，市場情緒在避險需求與不確定性之間擺盪，導致美元走勢掙扎但整體避險情緒推動美元需求。",
         "score": 90,
         "sources": [
           "MoneyDJ"
@@ -1990,8 +2182,33 @@
         ]
       },
       {
-        "name": "亞洲股市與基金表現",
-        "insight": "亞洲市場的基金表現受到關注，特別是主動式基金和ETF的獲獎紀錄。儘管近期亞股面臨賣壓，但從基金公司的評論來看，長期對亞洲市場仍抱持信心。",
+        "name": "油價飆升與市場對通膨及經濟放緩的擔憂",
+        "insight": "油價的飆升引發了對通膨壓力加劇的擔憂，同時市場也開始評估經濟放緩的風險，這促使部分投資者轉向避險資產，如美國公債。",
+        "score": 80,
+        "sources": [
+          "cnyes"
+        ],
+        "evidence": [
+          "中國PMI回升與全球油價飆升：地緣政治影響市場動態及投資機會",
+          "油價飆升66%反成利多 債市浮現買點 大小摩齊看多",
+          "美股市場面臨油價飆升與地緣緊張挑戰，卻也孕育新機遇"
+        ]
+      },
+      {
+        "name": "台灣股市回暖與產業動態",
+        "insight": "台灣股市呈現回暖跡象，部分產業如晶技因漲價而受到激勵，同時其他市場動態，如鋼筋價格上升，也顯示出市場需求的增強。",
+        "score": 70,
+        "sources": [
+          "cnyes",
+          "MoneyDJ"
+        ],
+        "evidence": [
+          "台股市場回暖：晶技漲價激勵股市，特斯拉安全評價獲五顆星，鋼筋價格上升顯示需求增強"
+        ]
+      },
+      {
+        "name": "亞洲股票市場基金與ETF的表現",
+        "insight": "主動式基金和被動式ETF在亞洲市場表現依然穩健，顯示投資者對這些金融產品的信心，儘管面臨短期壓力，但長期亞洲市場仍被看好。",
         "score": 65,
         "sources": [
           "MoneyDJ"
@@ -1999,31 +2216,8 @@
         "evidence": [
           "統一投信主動式基金、被動ET...",
           "基金獎常勝軍富蘭克林再添戰績...",
+          "摩根士丹利新興債團隊：多項訊...",
           "霸菱：亞股評論-2026年3月..."
-        ]
-      },
-      {
-        "name": "印度能源轉型與核電計畫",
-        "insight": "印度國家電力公司（NTPC）正積極推動能源轉型，並計劃進入核能發電領域，在北方邦提出了三個潛在的核電廠選址。這項計畫符合印度擴大非化石燃料發電容量的目標，但也面臨土地取得的挑戰。",
-        "score": 70,
-        "sources": [
-          "Hindustan Times"
-        ],
-        "evidence": [
-          "NTPC plans nuclear power entry in UP, 3 sites proposed",
-          "NTPC, India's largest integrated power utility, has proposed setting up a nuclear power plant in Uttar Pradesh, identifying three potential sites as part of its push to expand non-fossil fuel capacity, officials said on Monday."
-        ]
-      },
-      {
-        "name": "印尼航空業的財務困境與公司治理",
-        "insight": "印尼航空（Garuda Indonesia）在獲得政府大規模注資後，2025年持續錄得巨額虧損，引發了對其公司治理的嚴重擔憂。儘管有多項改革和領導層更迭，但航空公司仍未能恢復盈利，顯示其長期存在的問題。",
-        "score": 80,
-        "sources": [
-          "The Jakarta Post"
-        ],
-        "evidence": [
-          "Analysis: Garuda's losses persist despite bailouts, raising governance concerns - Academia - The Jakarta Post",
-          "Garuda Indonesia continues to face deep financial distress, recording a net loss of US$319.39 million (Rp 5.2 trillion) in 2025, nearly five times larger than its 2024 loss."
         ]
       }
     ],
@@ -2082,17 +2276,47 @@
         "icon": "🗞️",
         "items": [
           {
-            "id": "6401849",
-            "title": "〈台股盤前要聞〉台股收月線 清明前拚守住季線、漲價搧動蝴蝶效應 提防輸入性通膨",
-            "summary": "台股盤前要聞",
-            "url": "https://news.cnyes.com/news/id/6401849",
-            "published_at": 1774905003,
+            "id": "6402176",
+            "title": "鉅亨速報 - Factset 最新調查：胡連(6279-TW)目標價調降至132.5元，幅度約3.28%",
+            "summary": "FactSet 最新調查：胡連(6279-TW)目標價調降，最高估值、最低估值、中位數、綜合評級、近5日股價、大盤表現、即時新聞資訊。",
+            "url": "https://news.cnyes.com/news/id/6402176",
+            "published_at": 1774923020,
+            "source": "cnyes",
+            "category": "tw_stock",
+            "bucket": "tw_cnyes"
+          },
+          {
+            "id": "6402154",
+            "title": "〈焦點股〉龍頭廠晶技發出產品漲價聲 頻率元件族群受激勵走揚",
+            "summary": "全球頻率元件龍頭廠晶技 (3042-TW) 已對客戶端發出產品調漲通知，預計 4 月 1 日起元件價格調漲 5-10%，除晶技股價今 (31) 爆大量逾 3300 張長紅棒站上全部均線之外，族群安碁、希華走高。",
+            "url": "https://news.cnyes.com/news/id/6402154",
+            "published_at": 1774922580,
+            "source": "cnyes",
+            "category": "tw_stock",
+            "bucket": "tw_cnyes"
+          },
+          {
+            "id": "6402031",
+            "title": "〈台股開盤〉跌逾400點3萬2一度告急 台積電翻紅搶救季線",
+            "summary": "布蘭特原油持續上漲，美伊戰事擴大，美股標普那指收黑，台股今 (31) 日開低以 32416.38 點開出，下跌 101.78 點，而電子權值股紛紛走弱，指數一路下探，最低跌逾 400 點，來到 32031.62 點，跌破 10 日均線。早盤估量",
+            "url": "https://news.cnyes.com/news/id/6402031",
+            "published_at": 1774921615,
+            "source": "cnyes",
+            "category": "tw_stock",
+            "bucket": "tw_cnyes"
+          },
+          {
+            "id": "6402012",
+            "title": "匯鑽科轉型陣痛 2025年稅後虧1.84億元每股虧損3.88元  不配發股利",
+            "summary": "匯鑽科布局泰國及越南新產能且進行技術升級之中，轉型中的匯鑽科並最新財報，匯鑽科技 2025 年全年稅後虧損 1.84 億元，每股虧損 3.88 元，這是匯鑽科在近 6 年來首度出現虧損。同時，董事會決議不配發股利。",
+            "url": "https://news.cnyes.com/news/id/6402012",
+            "published_at": 1774919570,
             "source": "cnyes",
             "category": "tw_stock",
             "bucket": "tw_cnyes"
           }
         ],
-        "count": 1
+        "count": 5
       },
       {
         "name": "美股 / 宏觀",
@@ -2100,47 +2324,47 @@
         "icon": "🇺🇸",
         "items": [
           {
-            "id": "6401909",
-            "title": "中東產油國為何拋售美債？關鍵原因揭曉",
-            "summary": "自 2 月 28 日美國與以色列對伊朗開戰以來，中東主要產油國已開始減持美國公債，其背後原因似乎在於提高流動性。戰爭爆發後對流動性的需求，也反映在其他金融市場，例如美股已連續五周下跌。",
-            "url": "https://news.cnyes.com/news/id/6401909",
-            "published_at": 1774913404,
+            "id": "6401998",
+            "title": "油價飆升66%反成利多 債市浮現買點 大小摩齊看多",
+            "summary": "在油價飆升與通膨壓力升高之際，華爾街卻逆勢看多美國公債，認為經濟放緩風險正在累積，將推動資金回流避險資產，債券市場投資價值逐步浮現。",
+            "url": "https://news.cnyes.com/news/id/6401998",
+            "published_at": 1774923602,
             "source": "cnyes",
             "category": "us_stock",
             "bucket": "us"
           },
           {
-            "id": "6401859",
-            "title": "不怕Anthropic威脅 資安龍頭CEO豪擲千萬增持自家股 帶動Palo Alto大漲",
-            "summary": "面對 Anthropic 發表新 AI 模型引發的資安市場恐慌，網路安全巨頭 Palo Alto Networks 股價陷入低迷。然而，執行長阿羅拉逆勢豪擲千萬美元增持自家股票，被市場視為強烈的偏多訊號，成功帶動股價反彈。",
-            "url": "https://news.cnyes.com/news/id/6401859",
-            "published_at": 1774912807,
+            "id": "6401907",
+            "title": "鮑爾釋出利多訊號 投資人鬆口氣",
+            "summary": "考量伊朗戰爭導致近期油價大幅上漲，加上最新通膨數據偏高，投資人對聯準會 (Fed) 未來利率政策走向的憂慮日益升高。不過，聯準會主席鮑爾 (Jerome Powell) 最新談話為市場帶來短期利多。",
+            "url": "https://news.cnyes.com/news/id/6401907",
+            "published_at": 1774923003,
             "source": "cnyes",
             "category": "us_stock",
             "bucket": "us"
           },
           {
-            "id": "6401905",
-            "title": "美光大跌近10% 財報後拋售潮延燒",
-            "summary": "記憶體大廠美光科技 (Micron Technology)(MU-US) 股價周一 (30 日) 重挫 9.8%，延續財報公布後的拋售潮。",
-            "url": "https://news.cnyes.com/news/id/6401905",
-            "published_at": 1774908888,
+            "id": "6401934",
+            "title": "市場動盪才能撈寶！阿克曼喊進場：多年來抄底高品質股最佳時機",
+            "summary": "在能源飆升與地緣政治風險夾擊下，市場震盪加劇，但億萬投資人阿克曼認為這正是布局良機，指出多家優質企業估值遭低估，甚至直言是多年來最佳買點之一。",
+            "url": "https://news.cnyes.com/news/id/6401934",
+            "published_at": 1774917604,
             "source": "cnyes",
             "category": "us_stock",
             "bucket": "us"
           },
           {
-            "id": "6401880",
-            "title": "官方版「隱身術」來了！IG Plus版於日、墨、菲試行 7大專屬功能吸引重度玩家",
-            "summary": "官方版「隱身術」來了！IG Plus版於日、墨、菲試行 7大專屬功能吸引重度玩家",
-            "url": "https://news.cnyes.com/news/id/6401880",
-            "published_at": 1774908603,
+            "id": "6401993",
+            "title": "美股漲跌互見伊朗戰事擴大壓抑風險偏好科技股領跌",
+            "summary": "美股漲跌互見伊朗戰事擴大壓抑風險偏好科技股領跌",
+            "url": "https://news.cnyes.com/news/id/6401993",
+            "published_at": 1774917004,
             "source": "cnyes",
             "category": "us_stock",
             "bucket": "us"
           }
         ],
-        "count": 7
+        "count": 8
       },
       {
         "name": "全球頭條",
@@ -2148,47 +2372,47 @@
         "icon": "🌍",
         "items": [
           {
-            "id": "gn_bloomberg_1774915802_6315",
-            "title": "Asian Stocks Set for Losses, Bonds Climb on Powell: Markets Wrap",
-            "summary": "Asian Stocks Set for Losses, Bonds Climb on Powell: Markets Wrap",
+            "id": "gn_cnbc_top_1774923864_96",
+            "title": "Oil prices extend gains as Trump threatens to escalate Mideast war, Iran targets Kuwaiti tanker",
+            "summary": "Oil prices extend gains as Trump threatens to escalate Mideast war, Iran targets Kuwaiti tanker",
+            "url": "https://www.cnbc.com/2026/03/31/oil-price-today-wti-brent-trump-energy-sites-water-war-escalation-deal.html",
+            "published_at": 1774922379,
+            "source": "global_cnbc_top",
+            "category": "headline",
+            "bucket": "global"
+          },
+          {
+            "id": "gn_bloomberg_1774923862_8424",
+            "title": "US Stock Futures Rise on Trump War Remarks Report: Markets Wrap",
+            "summary": "US Stock Futures Rise on Trump War Remarks Report: Markets Wrap",
             "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQYUVpMTJqbl9ZOTFTaENzUDRvbWFqZHBRdF94UE1YVFpQNGxPNFpVWnVrNUtEV3BoN2VMdWFyM0ZsTHpmUXRVdno0Y0UtaGQ4WDlJdFZDZlA4a0dybVNaTjE4N2ZMYW9zZ3kzNmhDUjNtUl9zSEk4X09uNGlsQVhVMlk3Q2RRVEZfeGhiX2FaV1YxWmYw?oc=5",
-            "published_at": 1774914130,
+            "published_at": 1774921560,
             "source": "global_bloomberg",
             "category": "headline",
             "bucket": "global"
           },
           {
-            "id": "gn_bloomberg_1774914041_6612",
-            "title": "Fed’s Williams Says Policy Well Positioned Amid Supply Shock",
-            "summary": "Fed’s Williams Says Policy Well Positioned Amid Supply Shock",
-            "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNanBIbXhCbklYbGZNX1FseUd0T2JrSldNLWY2Y0hMTUdPM3JZZXY3aGpMRW95ZUFMb0Y2d1d0Y1lIOUJRbDktVENyTzY3VXFVbHBTbzlvYWthZFVPdFF5Tko4a3VlQ1EtMHVJVHQ1N0RZY2dIdGtEdlRIV042emdqZ3dKclRNQnhqN0xnYTRXcUIxeThYbXAwWENybXgxNWxqLUgyOXVIY1U1VVBkTzc2Vw?oc=5",
-            "published_at": 1774909196,
+            "id": "gn_bloomberg_1774923862_4048",
+            "title": "Asian Stocks Wipe Out 2026 Gains as War Drives Inflation Worries",
+            "summary": "Asian Stocks Wipe Out 2026 Gains as War Drives Inflation Worries",
+            "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQX0RmMjdVOEFkVVVpd0ZHWFFXNm5kUTBlOXlpdk5YZkZjdmVSbkNCdHpFcHNSNVRpTC0ySmRSLXg5SjNRbEZDdWtOUHYzb2ZGSkFNeXVIUmJhcFdGSXBzRVBGRHBMbDYzV3g2QmdoUUtIaGlqYzlUd21SVTU1RldsQ0pfZk9Td1Q1Zkk5QWlfQk8wbk9Nd3djbHo2Tk9sR1FDLXY0MGZ2Qm14RGQ5em16NkFWQktsdw?oc=5",
+            "published_at": 1774919160,
             "source": "global_bloomberg",
             "category": "headline",
             "bucket": "global"
           },
           {
-            "id": "gn_cnbc_tech_1774907494_4728",
-            "title": "Micron stock sinks 10%, further cratering in post-earnings sell-off",
-            "summary": "Micron stock sinks 10%, further cratering in post-earnings sell-off",
-            "url": "https://www.cnbc.com/2026/03/30/micron-stock-earnings-sell-off-memory-shortage.html",
-            "published_at": 1774904786,
-            "source": "global_cnbc_tech",
-            "category": "headline",
-            "bucket": "global"
-          },
-          {
-            "id": "gn_bloomberg_1774907492_5425",
-            "title": "US Crude Oil Settles Above $100 for First Time Since 2022",
-            "summary": "US Crude Oil Settles Above $100 for First Time Since 2022",
-            "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQR1JhZ2gySmpYOFVRQlV5REdUcnJWcXFzUW9NOGNiWkVKb09zTVlGclMwNjF1SHVGcHQ5TDIxME9JYWVLRy16MFBrTjFUcG9aRVdyelQzdTgtY3BXeHJELVVYUzJ6Wkk5YlRWajJoMExKSU1pZlVLak4xRV9PRnhnRFdWZmxhd3d2QVJjUElobVhZMWpUckdUb2lFVF9SblNIcVZHcllNNXRjN1k?oc=5",
-            "published_at": 1774903869,
-            "source": "global_bloomberg",
+            "id": "gn_cnbc_top_1774917965_3233",
+            "title": "Asia-Pacific markets fall as Iran war keeps investors jittery, oil extends gains",
+            "summary": "Asia-Pacific markets fall as Iran war keeps investors jittery, oil extends gains",
+            "url": "https://www.cnbc.com/2026/03/31/asia-markets-today-hsi-nikkei-kospi-csi.html",
+            "published_at": 1774915849,
+            "source": "global_cnbc_top",
             "category": "headline",
             "bucket": "global"
           }
         ],
-        "count": 8
+        "count": 5
       },
       {
         "name": "東南亞 / 印度",
@@ -2236,7 +2460,7 @@
             "bucket": "regional"
           }
         ],
-        "count": 35
+        "count": 32
       },
       {
         "name": "API 新聞",
@@ -2244,47 +2468,47 @@
         "icon": "🔌",
         "items": [
           {
-            "id": "6401964",
-            "title": "全球市場受地緣政治影響加劇，油價飆升美元觸10個月高點，科技股承壓",
-            "summary": "全球市場受地緣政治影響加劇，油價飆升美元觸10個月高點，科技股承壓",
-            "url": "https://news.cnyes.com/news/id/6401964",
-            "published_at": 1774914603,
+            "id": "6402199",
+            "title": "台股市場回暖：晶技漲價激勵股市，特斯拉安全評價獲五顆星，鋼筋價格上升顯示需求增強",
+            "summary": "台股市場回暖：晶技漲價激勵股市，特斯拉安全評價獲五顆星，鋼筋價格上升顯示需求增強",
+            "url": "https://news.cnyes.com/news/id/6402199",
+            "published_at": 1774923610,
             "source": "cnyes",
             "category": "ai_news",
             "bucket": "api"
           },
           {
-            "id": "6401959",
-            "title": "美股面臨地緣政治與科技股波動挑戰，市場信心脆弱",
-            "summary": "美股面臨地緣政治與科技股波動挑戰，市場信心脆弱",
-            "url": "https://news.cnyes.com/news/id/6401959",
-            "published_at": 1774914304,
+            "id": "6402198",
+            "title": "中國PMI回升與全球油價飆升：地緣政治影響市場動態及投資機會",
+            "summary": "中國PMI回升與全球油價飆升：地緣政治影響市場動態及投資機會",
+            "url": "https://news.cnyes.com/news/id/6402198",
+            "published_at": 1774923608,
             "source": "cnyes",
             "category": "ai_news",
             "bucket": "api"
           },
           {
-            "id": "6401954",
-            "title": "台股市場動態：反詐騙合作升級、企業靈活應對外資流出及旅遊需求回暖",
-            "summary": "台股市場動態：反詐騙合作升級、企業靈活應對外資流出及旅遊需求回暖",
-            "url": "https://news.cnyes.com/news/id/6401954",
-            "published_at": 1774914012,
+            "id": "6402186",
+            "title": "美股市場面臨油價飆升與地緣緊張挑戰，卻也孕育新機遇",
+            "summary": "美股市場面臨油價飆升與地緣緊張挑戰，卻也孕育新機遇",
+            "url": "https://news.cnyes.com/news/id/6402186",
+            "published_at": 1774923307,
             "source": "cnyes",
             "category": "ai_news",
             "bucket": "api"
           },
           {
-            "id": "6401953",
-            "title": "美股科技股挑戰加劇，Palo Alto增持提振信心，美光重挫10%",
-            "summary": "美股科技股挑戰加劇，Palo Alto增持提振信心，美光重挫10%",
-            "url": "https://news.cnyes.com/news/id/6401953",
-            "published_at": 1774913407,
+            "id": "6402165",
+            "title": "美股受伊朗局勢與美國政策影響，投資者調整策略把握機會",
+            "summary": "美股受伊朗局勢與美國政策影響，投資者調整策略把握機會",
+            "url": "https://news.cnyes.com/news/id/6402165",
+            "published_at": 1774922418,
             "source": "cnyes",
             "category": "ai_news",
             "bucket": "api"
           }
         ],
-        "count": 20
+        "count": 25
       }
     ],
     "source_summary": [
@@ -2295,39 +2519,176 @@
       },
       {
         "label": "鉅亨網台灣",
-        "count": 1,
+        "count": 5,
         "icon": "🗞️"
       },
       {
         "label": "美股 / 宏觀",
-        "count": 7,
+        "count": 8,
         "icon": "🇺🇸"
       },
       {
         "label": "全球頭條",
-        "count": 8,
+        "count": 5,
         "icon": "🌍"
       },
       {
         "label": "東南亞 / 印度",
-        "count": 35,
+        "count": 32,
         "icon": "🧭"
       },
       {
         "label": "API 新聞",
-        "count": 20,
+        "count": 25,
         "icon": "🔌"
       }
     ],
     "highlights": [
       "🇹🇼 MoneyDJ 熱門排行 6 則",
-      "🗞️ 鉅亨網台灣 1 則",
-      "🇺🇸 美股 / 宏觀 7 則",
-      "🌍 全球頭條 8 則"
+      "🗞️ 鉅亨網台灣 5 則",
+      "🇺🇸 美股 / 宏觀 8 則",
+      "🌍 全球頭條 5 則"
+    ]
+  },
+  "social_topic_heatmap": {
+    "source": "trend_pulse",
+    "benchmark": "PTT / Dcard / Google Trends",
+    "report_date": "2026-03-31",
+    "coverage": 6,
+    "as_of": "2026-03-31T02:41:30.328299+00:00",
+    "summary": "社群熱度聚焦在 [閒聊] 2026/03/31 盤中閒聊、[公告] 伺服器狀況詢問/聊天/揪團/抱怨/多功能區、[公告] 豐川祥子誕生日八卦板主徵選報名開始，共有 0 個上升主題。",
+    "topics": [
+      {
+        "topic": "[閒聊] 2026/03/31 盤中閒聊",
+        "source": "ptt",
+        "score": 100.0,
+        "velocity": 0.0,
+        "timestamp": "2026-03-31T02:41:30.328299+00:00",
+        "url": "https://www.ptt.cc/bbs/Stock/M.1774917011.A.3C5.html",
+        "direction": "",
+        "is_rising": false
+      },
+      {
+        "topic": "[公告] 伺服器狀況詢問/聊天/揪團/抱怨/多功能區",
+        "source": "ptt",
+        "score": 100.0,
+        "velocity": 0.0,
+        "timestamp": "2026-03-31T02:41:30.328299+00:00",
+        "url": "https://www.ptt.cc/bbs/LoL/M.1640966625.A.84F.html",
+        "direction": "",
+        "is_rising": false
+      },
+      {
+        "topic": "[公告] 豐川祥子誕生日八卦板主徵選報名開始",
+        "source": "ptt",
+        "score": 91.0,
+        "velocity": 0.0,
+        "timestamp": "2026-03-31T02:41:30.328299+00:00",
+        "url": "https://www.ptt.cc/bbs/Gossiping/M.1771040474.A.61B.html",
+        "direction": "",
+        "is_rising": false
+      },
+      {
+        "topic": "[新聞] 聽到頭骨碎裂聲！巨業客運撞死東海女大",
+        "source": "ptt",
+        "score": 53.0,
+        "velocity": 0.0,
+        "timestamp": "2026-03-31T02:41:30.328299+00:00",
+        "url": "https://www.ptt.cc/bbs/Gossiping/M.1774923525.A.776.html",
+        "direction": "",
+        "is_rising": false
+      },
+      {
+        "topic": "[公告] 樂透說明（最終結果）",
+        "source": "ptt",
+        "score": 51.0,
+        "velocity": 0.0,
+        "timestamp": "2026-03-31T02:41:30.328299+00:00",
+        "url": "https://www.ptt.cc/bbs/HatePolitics/M.1774595596.A.45B.html",
+        "direction": "",
+        "is_rising": false
+      },
+      {
+        "topic": "[電競] 2026 LEC Spring W1D3",
+        "source": "ptt",
+        "score": 45.0,
+        "velocity": 0.0,
+        "timestamp": "2026-03-31T02:41:30.328299+00:00",
+        "url": "https://www.ptt.cc/bbs/LoL/M.1774882351.A.0D2.html",
+        "direction": "",
+        "is_rising": false
+      }
+    ],
+    "source_summary": [
+      {
+        "source": "ptt",
+        "count": 6
+      }
+    ]
+  },
+  "tech_topic_heatmap": {
+    "source": "market_news",
+    "benchmark": "科技主題 / 新聞主線",
+    "report_date": "2026-03-31",
+    "coverage": 4,
+    "as_of": "2026-03-31",
+    "summary": "科技主題熱度集中在 中東地緣政治緊張與美元匯率波動、油價飆升與市場對通膨及經濟放緩的擔憂、台灣股市回暖與產業動態，主線仍由新聞主題驅動。",
+    "topics": [
+      {
+        "topic": "中東地緣政治緊張與美元匯率波動",
+        "summary": "中東地區的衝突局勢對美元匯率造成影響，市場情緒在避險需求與不確定性之間擺盪，導致美元走勢掙扎但整體避險情緒推動美元需求。",
+        "score": 90,
+        "sources": [
+          "MoneyDJ"
+        ],
+        "evidence": [
+          "緊盯中東局勢，美元走勢掙扎",
+          "中東衝突難解，推動美元上漲"
+        ]
+      },
+      {
+        "topic": "油價飆升與市場對通膨及經濟放緩的擔憂",
+        "summary": "油價的飆升引發了對通膨壓力加劇的擔憂，同時市場也開始評估經濟放緩的風險，這促使部分投資者轉向避險資產，如美國公債。",
+        "score": 80,
+        "sources": [
+          "cnyes"
+        ],
+        "evidence": [
+          "中國PMI回升與全球油價飆升：地緣政治影響市場動態及投資機會",
+          "油價飆升66%反成利多 債市浮現買點 大小摩齊看多",
+          "美股市場面臨油價飆升與地緣緊張挑戰，卻也孕育新機遇"
+        ]
+      },
+      {
+        "topic": "台灣股市回暖與產業動態",
+        "summary": "台灣股市呈現回暖跡象，部分產業如晶技因漲價而受到激勵，同時其他市場動態，如鋼筋價格上升，也顯示出市場需求的增強。",
+        "score": 70,
+        "sources": [
+          "cnyes",
+          "MoneyDJ"
+        ],
+        "evidence": [
+          "台股市場回暖：晶技漲價激勵股市，特斯拉安全評價獲五顆星，鋼筋價格上升顯示需求增強"
+        ]
+      },
+      {
+        "topic": "亞洲股票市場基金與ETF的表現",
+        "summary": "主動式基金和被動式ETF在亞洲市場表現依然穩健，顯示投資者對這些金融產品的信心，儘管面臨短期壓力，但長期亞洲市場仍被看好。",
+        "score": 65,
+        "sources": [
+          "MoneyDJ"
+        ],
+        "evidence": [
+          "統一投信主動式基金、被動ET...",
+          "基金獎常勝軍富蘭克林再添戰績...",
+          "摩根士丹利新興債團隊：多項訊...",
+          "霸菱：亞股評論-2026年3月..."
+        ]
+      }
     ]
   },
   "ai_analysis": {
-    "full_text": "台股技術線圖與市場情緒顯示貪婪，然美債殖利率上升、VIX 飆高，加上台積電ADR下跌，預示短線可能面臨拉回修正壓力。\n\n(Technical chart and market sentiment show greed, but rising US bond yields, soaring VIX, and TSM ADR decline suggest potential short-term pullback pressure.)",
+    "full_text": "【今日結論】\n台股技術線圖與市場情緒皆顯示「貪婪」訊號，然而，多項不利因素正悄然累積。美國債殖利率的上升、VIX 指數飆升，加上台積電 ADR 的顯著下跌，這些跡象都預示著台股短線可能面臨拉回修正的壓力。\n【新聞驅動】\n今日新聞重點涵蓋了多個面向。在台灣，MoneyDJ 熱門排行和鉅亨網的報導聚焦市場動態，共有 6 則和 5 則相關新聞。國際方面，美國股市及宏觀經濟新聞有 8 則，全球頭條則有 5 則。此外，東南亞及印度市場也有 32 則相關報導。主要新聞主題圍繞著中東地緣政治緊張與美元匯率波動、油價飆升引發的通膨及經濟放緩擔憂、台灣股市回暖與產業發展，以及亞洲股票市場基金與 ETF 的表現。\n【國際與台股】\n亞洲市場方面，日經 225 指數小幅下跌 0.12%，報 51824.70 點；KOSPI 指數則下跌 1.75%，報 5184.75 點。\n\n國際股市方面，S&P 500 下跌 0.39%，Nasdaq 下跌 0.73%，費城半導體指數 (SOX) 重挫 4.23%，而道瓊工業平均指數則微幅上漲 0.11%。Nasdaq 期貨小跌 0.29%。VIX 指數下跌 1.42%，報 30.61。\n\n台股相關指標顯示，台積電 ADR 大跌 3.13%，台灣 ETF 下跌 0.76%。整體加權指數 (TAIEX) 大跌 594.43 點，收在 32518.16 點。市場情緒方面，台灣市場的「貪婪」指數為 63，然而 CNN 恐懼與貪婪指數為 8（極度恐懼），加密貨幣恐懼與貪婪指數亦為 8（極度恐懼），顯示市場情緒存在分歧。台股的市場廣度數據顯示，上漲家數為 226 家，下跌家數為 772 家，總計 1060 家。\n\n台股的綜合交易量指標顯示，PC ratio 為 1.2229，處於偏多狀態；市場趨勢為「BULL」（牛市）， vol（成交量）為 HIGH（高）， regime（市場結構）為 BULL_HIGH（牛市高成交量）。\n\nKOL / 情緒\n\n（此區塊無具體內容提供）\n【操作含意】\n（綜合以上資訊，考量到技術線圖與市場情緒的「貪婪」訊號，但同時面臨美債殖利率上升、VIX 飆高、台積電 ADR 下跌等壓力，預計短線有拉回修正的可能。）",
     "generated_at": "2026-03-31 08:10:39"
   },
   "chart_orchestration": {
@@ -2336,7 +2697,7 @@
     "report_date": "2026-03-31",
     "chart_budget": 3,
     "source": "gemini",
-    "generated_at": "2026-03-31T08:46:42",
+    "generated_at": "2026-03-31T10:43:04",
     "selected_charts": [
       {
         "id": "us_macro_panel",
@@ -2347,8 +2708,8 @@
           "Weekend Macro",
           "Next Week Preview"
         ],
-        "takeaway": "儘管S&P 500和道瓊指數小幅上漲，但Nasdaq和費半的大幅下跌，加上VIX指數飆升及台積電ADR的下跌，顯示市場對科技股和整體風險資產情緒趨於保守，預示盤勢可能面臨壓力。",
-        "action": "觀察科技股和半導體類股的後續表現，以及VIX指數的動向，以判斷市場情緒是否持續惡化。",
+        "takeaway": "美股全面走弱，費半重挫 4.23%，VIX 指數走高，顯示市場避險情緒濃厚。台積電 ADR 下跌，對台股構成壓力。",
+        "action": "密切關注美股開盤後的走勢，特別是科技類股的表現。",
         "priority": "medium"
       },
       {
@@ -2360,14 +2721,14 @@
           "Weekend Macro",
           "Next Week Preview"
         ],
-        "takeaway": "Nasdaq期貨下跌，以及台積電ADR的明顯跌幅，與台灣ETF的走勢一同顯示，盤前市場情緒偏弱，可能對今日台股開盤產生負面影響。",
-        "action": "密切關注開盤後台股的實際表現，特別是科技相關權值股的動態。",
+        "takeaway": "Nasdaq 期貨、台積電 ADR、台灣 ETF 均呈現下跌，預示台股開盤可能面臨較大的開盤壓力。",
+        "action": "留意台股開盤的成交量與價格變化。",
         "priority": "medium"
       },
       {
-        "id": "sentiment_panel",
-        "title": "市場情緒",
-        "description": "CNN 恐懼貪婪、加密貨幣情緒、台灣市場情緒與廣度。",
+        "id": "news_theme_strip",
+        "title": "多來源新聞主題",
+        "description": "Gemini 整合後的 3 到 5 個核心新聞主題與來源證據。",
         "families": [
           "Pre-open",
           "Close Summary",
@@ -2375,67 +2736,156 @@
           "Weekend Macro",
           "Next Week Preview"
         ],
-        "takeaway": "台灣市場情緒顯示為「貪婪」，但CNN和加密貨幣市場皆顯示為「極度恐懼」，這種情緒的背離可能意味著市場存在潛在的波動性，需謹慎應對。",
-        "action": "注意市場情緒的變化，特別是恐懼情緒的升溫可能預示著修正風險。",
+        "takeaway": "市場關注地緣政治、油價、通膨與經濟放緩的擔憂，台灣股市的回暖及產業動態也是新聞焦點。",
+        "action": "追蹤新聞事件的發展，判斷其對市場的短期與長期影響。",
         "priority": "medium"
       }
     ],
     "chart_order": [
       "us_macro_panel",
       "futures_adr_panel",
-      "sentiment_panel"
+      "news_theme_strip"
     ],
     "chart_commentary": [
       {
         "chart_id": "us_macro_panel",
-        "takeaway": "儘管S&P 500和道瓊指數小幅上漲，但Nasdaq和費半的大幅下跌，加上VIX指數飆升及台積電ADR的下跌，顯示市場對科技股和整體風險資產情緒趨於保守，預示盤勢可能面臨壓力。",
-        "action": "觀察科技股和半導體類股的後續表現，以及VIX指數的動向，以判斷市場情緒是否持續惡化。"
+        "takeaway": "美股全面走弱，費半重挫 4.23%，VIX 指數走高，顯示市場避險情緒濃厚。台積電 ADR 下跌，對台股構成壓力。",
+        "action": "密切關注美股開盤後的走勢，特別是科技類股的表現。"
       },
       {
         "chart_id": "futures_adr_panel",
-        "takeaway": "Nasdaq期貨下跌，以及台積電ADR的明顯跌幅，與台灣ETF的走勢一同顯示，盤前市場情緒偏弱，可能對今日台股開盤產生負面影響。",
-        "action": "密切關注開盤後台股的實際表現，特別是科技相關權值股的動態。"
+        "takeaway": "Nasdaq 期貨、台積電 ADR、台灣 ETF 均呈現下跌，預示台股開盤可能面臨較大的開盤壓力。",
+        "action": "留意台股開盤的成交量與價格變化。"
       },
       {
-        "chart_id": "sentiment_panel",
-        "takeaway": "台灣市場情緒顯示為「貪婪」，但CNN和加密貨幣市場皆顯示為「極度恐懼」，這種情緒的背離可能意味著市場存在潛在的波動性，需謹慎應對。",
-        "action": "注意市場情緒的變化，特別是恐懼情緒的升溫可能預示著修正風險。"
+        "chart_id": "news_theme_strip",
+        "takeaway": "市場關注地緣政治、油價、通膨與經濟放緩的擔憂，台灣股市的回暖及產業動態也是新聞焦點。",
+        "action": "追蹤新聞事件的發展，判斷其對市場的短期與長期影響。"
       }
     ],
-    "overall_summary": "今日美股走勢分歧，科技股承壓，VIX指數回升，台積電ADR下跌，均預示台股今日可能面臨拉回修正壓力。市場情緒方面，台灣市場顯示貪婪，但國際市場卻呈現極度恐懼，需密切關注後續發展。",
+    "overall_summary": "今日台股市場情緒顯示「貪婪」，然而，國際市場的擔憂加劇。美股主要指數普遍下跌，VIX 指數攀升，台積電 ADR 顯著走弱，這些跡象都指向台股盤勢可能面臨壓力。地緣政治緊張、油價上漲引發的通膨擔憂，以及美元匯率的波動，是當前市場關注的焦點。儘管台灣股市本身出現回暖跡象，但全球宏觀風險仍不容忽視。",
     "news_themes": [
       {
-        "label": "中東衝突對美元匯率的影響",
-        "summary": "中東地區衝突是影響美元走勢的關鍵因素。市場對地緣政治風險反應不確定，但避險需求仍支撐美元。",
+        "label": "中東地緣政治緊張與美元匯率波動",
+        "summary": "中東地區的衝突局勢對美元匯率造成影響，市場情緒在避險需求與不確定性之間擺盪，導致美元走勢掙扎但整體避險情緒推動美元需求。",
         "sources": [
-          "全球頭條"
+          "MoneyDJ"
         ],
         "evidence": [
-          "中東地區的衝突是影響美元走勢的重要因素。雖然有報導指出衝突推動美元上漲，但同時也有報導提到美元走勢在緊盯局勢發展時陷入掙扎，顯示市場對地緣政治風險的反應存在不確定性，但避險需求仍支撐美元。"
+          "緊盯中東局勢，美元走勢掙扎",
+          "中東衝突難解，推動美元上漲"
         ]
       },
       {
-        "label": "印度能源轉型與核電計畫",
-        "summary": "印度國家電力公司（NTPC）正積極推動能源轉型，並計劃進入核能發電領域，但面臨土地取得的挑戰。",
+        "label": "油價飆升與市場對通膨及經濟放緩的擔憂",
+        "summary": "油價的飆升引發了對通膨壓力加劇的擔憂，同時市場也開始評估經濟放緩的風險，這促使部分投資者轉向避險資產，如美國公債。",
         "sources": [
-          "全球頭條"
+          "cnyes",
+          "MoneyDJ"
         ],
         "evidence": [
-          "印度國家電力公司（NTPC）正積極推動能源轉型，並計劃進入核能發電領域，在北方邦提出了三個潛在的核電廠選址。這項計畫符合印度擴大非化石燃料發電容量的目標，但也面臨土地取得的挑戰。"
+          "中國PMI回升與全球油價飆升：地緣政治影響市場動態及投資機會",
+          "油價飆升66%反成利多 債市浮現買點 大小摩齊看多",
+          "美股市場面臨油價飆升與地緣緊張挑戰，卻也孕育新機遇"
         ]
       },
       {
-        "label": "印尼航空業的財務困境與公司治理",
-        "summary": "印尼航空（Garuda Indonesia）在獲得政府注資後，2025年仍錄得巨額虧損，引發對其公司治理的擔憂。",
+        "label": "台灣股市回暖與產業動態",
+        "summary": "台灣股市呈現回暖跡象，部分產業如晶技因漲價而受到激勵，同時其他市場動態，如鋼筋價格上升，也顯示出市場需求的增強。",
         "sources": [
-          "全球頭條"
+          "cnyes",
+          "MoneyDJ"
         ],
         "evidence": [
-          "印尼航空（Garuda Indonesia）在獲得政府大規模注資後，2025年持續錄得巨額虧損，引發了對其公司治理的嚴重擔憂。儘管有多項改革和領導層更迭，但航空公司仍未能恢復盈利，顯示其長期存在的問題。"
+          "台股市場回暖：晶技漲價激勵股市，特斯拉安全評價獲五顆星，鋼筋價格上升顯示需求增強"
+        ]
+      },
+      {
+        "label": "亞洲股票市場基金與ETF的表現",
+        "summary": "主動式基金和被動式ETF在亞洲市場表現依然穩健，顯示投資者對這些金融產品的信心，儘管面臨短期壓力，但長期亞洲市場仍被看好。",
+        "sources": [
+          "MoneyDJ"
+        ],
+        "evidence": [
+          "統一投信主動式基金、被動ET...",
+          "基金獎常勝軍富蘭克林再添戰績...",
+          "摩根士丹利新興債團隊：多項訊...",
+          "霸菱：亞股評論-2026年3月..."
         ]
       }
     ],
-    "chart_gap_suggestions": []
+    "chart_gap_suggestions": [
+      {
+        "chart_name": "美股分析師共識圖 (Seeking Alpha)",
+        "why_needed": "補上美股大型權值與科技股的分析師一致預期，讓報告不只看價格，也能看到評級與上行空間。",
+        "data_needed": [
+          "quant rating",
+          "wall street rating",
+          "target mean price",
+          "upside percent"
+        ],
+        "which_report_types": [
+          "morning",
+          "weekend_morning",
+          "weekend_evening",
+          "weekly_review"
+        ],
+        "priority": "medium",
+        "evidence": "專案已有 Seeking Alpha service，可直接轉成圖表。"
+      },
+      {
+        "chart_name": "地緣政治風險圖 (ACLED)",
+        "why_needed": "把衝突事件數、致死數與未來風險預測可視化，讓地緣政治對市場的影響更直觀。",
+        "data_needed": [
+          "recent conflict count",
+          "fatalities",
+          "forecast hotspots",
+          "date range"
+        ],
+        "which_report_types": [
+          "morning",
+          "evening",
+          "weekend_morning",
+          "weekend_evening",
+          "weekly_review"
+        ],
+        "priority": "high",
+        "evidence": "專案已有 ACLED service，但目前未做成可視化圖表。"
+      },
+      {
+        "chart_name": "社群熱度圖 (PTT / Dcard)",
+        "why_needed": "把 PTT 與 Dcard 的熱門討論、看多看空比與主題熱度做成圖，補足市場情緒面。",
+        "data_needed": [
+          "top posts",
+          "bullish/bearish ratio",
+          "topic themes",
+          "engagement score"
+        ],
+        "which_report_types": [
+          "morning",
+          "evening",
+          "weekend_morning",
+          "weekend_evening"
+        ],
+        "priority": "medium",
+        "evidence": "現有 trend_pulse 與社群抓取已能提供底層資料。"
+      },
+      {
+        "chart_name": "科技主題熱度圖",
+        "why_needed": "晨報常聚焦 AI / 半導體 / 科技權值，將科技主題與新聞來源拆開呈現會更清楚。",
+        "data_needed": [
+          "topic score",
+          "news source mix",
+          "trend velocity"
+        ],
+        "which_report_types": [
+          "morning",
+          "weekend_morning"
+        ],
+        "priority": "low",
+        "evidence": "目前科技內容散落在新聞主題與 AI 分析中，尚未獨立成圖。"
+      }
+    ]
   },
   "headline": {
     "teaser": "🚨 【ANYA 特別警報：地緣政治】🚨",
