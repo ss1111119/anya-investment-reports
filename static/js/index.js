@@ -101,7 +101,7 @@ function collapseAllSections() {
 const WEEKLY_TEMPLATE_SECTION_ORDER = {
   'Pre-open': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'taiex', 'market_snapshot', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
   'Close Summary': ['hero', 'taiex', 'institutional', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
-  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'ai'],
+  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'institutional', 'market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'ai'],
   'Weekend Macro': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
   'Next Week Preview': ['hero', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'market_snapshot', 'kol', 'ai'],
 };
