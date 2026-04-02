@@ -10,9 +10,9 @@ const sectionTemplate = document.getElementById("section-template");
 
 function labelForState(state) {
   const normalized = String(state || "UNKNOWN").toUpperCase();
-  if (normalized === "OK") return "OK";
-  if (normalized === "WARNING") return "Warning";
-  if (normalized === "CRITICAL") return "Critical";
+  if (normalized === "OK") return "正常";
+  if (normalized === "WARNING") return "警示";
+  if (normalized === "CRITICAL") return "嚴重";
   return normalized;
 }
 
@@ -35,10 +35,10 @@ function renderOverview(data) {
   const overview = data.overview || {};
   const detail = overview.detail || {};
   const metrics = [
-    { label: "Healthy", value: detail.healthy ?? 0, note: "Sections in a healthy state." },
-    { label: "Warning", value: detail.warning ?? 0, note: "Sections needing attention soon." },
-    { label: "Critical", value: detail.critical ?? 0, note: "Sections requiring immediate action." },
-    { label: "Last Update", value: "Live", note: data.generated_at ? `Snapshot: ${data.generated_at}` : "No timestamp available." },
+    { label: "正常", value: detail.healthy ?? 0, note: "目前狀態良好的區塊數。" },
+    { label: "警示", value: detail.warning ?? 0, note: "需要留意但尚未到嚴重的區塊。" },
+    { label: "嚴重", value: detail.critical ?? 0, note: "需要立即處理的區塊。" },
+    { label: "最後更新", value: "即時", note: data.generated_at ? `快照時間：${data.generated_at}` : "尚無時間戳記。" },
   ];
   overviewGrid.innerHTML = metrics.map((metric) => `
     <article class="metric">
@@ -50,26 +50,157 @@ function renderOverview(data) {
 
   overallStateEl.textContent = labelForState(overview.severity || overview.state);
   overallStateEl.className = `meta-pill state-${stateClass(overview.severity || overview.state)}`;
-  generatedAtEl.textContent = data.generated_at ? `Generated at ${data.generated_at}` : "Generated at --";
-  boardModeEl.textContent = data.last_notification ? "Live + Alerts" : "Live";
+  generatedAtEl.textContent = data.generated_at ? `產生於 ${data.generated_at}` : "產生於 --";
+  boardModeEl.textContent = data.last_notification ? "即時 + 通知" : "即時";
 }
 
 function renderMetaRow(section) {
   const tags = [];
-  if (section.source) tags.push(`<span class="meta-tag">Source: ${escapeHtml(section.source)}</span>`);
-  if (section.updated_at) tags.push(`<span class="meta-tag">Updated: ${escapeHtml(section.updated_at)}</span>`);
+  if (section.source) tags.push(`<span class="meta-tag">來源：${escapeHtml(section.source)}</span>`);
+  if (section.updated_at) tags.push(`<span class="meta-tag">更新：${escapeHtml(section.updated_at)}</span>`);
   if (section.counts) {
     const c = section.counts;
-    tags.push(`<span class="meta-tag">OK ${c.OK ?? 0} · Warn ${c.WARNING ?? 0} · Crit ${c.CRITICAL ?? 0}</span>`);
+    tags.push(`<span class="meta-tag">正常 ${c.OK ?? 0} · 警示 ${c.WARNING ?? 0} · 嚴重 ${c.CRITICAL ?? 0}</span>`);
   }
   return tags.join("");
 }
 
+function parseSystemStatus(detail) {
+  const lines = String(detail || "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const title = lines.find((line) => line.startsWith("🤖")) || "系統健康監控";
+  const timestamp = lines.find((line) => line.startsWith("━━ 檢查時間:")) || "";
+  const groups = [];
+  let currentGroup = null;
+
+  const ensureGroup = (label) => {
+    if (!currentGroup || currentGroup.label !== label) {
+      currentGroup = { label, items: [] };
+      groups.push(currentGroup);
+    }
+  };
+
+  for (const line of lines) {
+    if (line === title || line === timestamp) continue;
+
+    if (line.includes("服務連線狀態")) {
+      ensureGroup("服務連線狀態");
+      continue;
+    }
+    if (line.includes("數據更新狀態")) {
+      ensureGroup("數據更新狀態");
+      continue;
+    }
+
+    const normalized = line.replace(/\*\*/g, "");
+    const match = normalized.match(/^([🟢🟡🔴])\s+(.+?):\s*(.+)$/);
+    if (match) {
+      const [, emoji, label, value] = match;
+      const state = emoji === "🟢" ? "OK" : emoji === "🟡" ? "WARNING" : "CRITICAL";
+      ensureGroup(currentGroup?.label || "狀態卡片");
+      currentGroup.items.push({ label: label.trim(), value: value.trim(), state });
+    }
+  }
+
+  return { title, timestamp, groups };
+}
+
+function renderStatusReport(section) {
+  const structured = Array.isArray(section.status_groups)
+    ? {
+        title: section.status_title || "系統健康監控",
+        timestamp: section.status_timestamp || "",
+        groups: section.status_groups,
+        highlights: Array.isArray(section.status_highlights) ? section.status_highlights : [],
+      }
+    : parseSystemStatus(section.detail);
+
+  const highlightHtml = structured.highlights.length > 0
+    ? `<div class="highlight-list">
+        ${structured.highlights.map((item) => `
+          <div class="highlight-item">
+            <div class="highlight-label">${escapeHtml(item.label)}</div>
+            <span class="state-chip ${stateClass(item.state)}">${labelForState(item.state)}</span>
+            <div class="highlight-value">${escapeHtml(item.value)}</div>
+          </div>
+        `).join("")}
+      </div>`
+    : "";
+
+  const groupsHtml = structured.groups.map((group) => `
+    <div class="status-group">
+      <div class="status-group-title">${escapeHtml(group.label)}</div>
+      ${
+        Array.isArray(group.items) && group.items.length > 0
+          ? `<div class="status-grid">
+              ${group.items.map((item) => `
+                <div class="status-card state-${stateClass(item.state)}">
+                  <div class="status-card-label">${escapeHtml(item.label)}</div>
+                  <div class="status-card-value">${escapeHtml(item.value)}</div>
+                </div>
+              `).join("")}
+            </div>`
+          : `<div class="empty-state">這個群組目前沒有可顯示的項目。</div>`
+      }
+    </div>
+  `).join("");
+
+  const macroItems = Array.isArray(section.macro_items) ? section.macro_items : [];
+  const macroHtml = macroItems.length > 0
+    ? `<div class="macro-list">
+        <div class="macro-list-head">總經數據清單</div>
+        <div class="macro-list-grid">
+          ${macroItems.map((item) => `
+            <div class="macro-item">
+              <div class="macro-item-top">
+                <strong>${escapeHtml(item.label || item.symbol || "項目")}</strong>
+                <span class="macro-state state-${stateClass(item.severity || item.status)}">${escapeHtml(item.status || item.severity || "n/a")}</span>
+              </div>
+              <div class="macro-item-meta">
+                <span>${escapeHtml(item.symbol || "n/a")}</span>
+                <span>${escapeHtml(item.last_date || "n/a")}</span>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </div>`
+    : "";
+
+  return `
+    <div class="status-report">
+      <div class="status-report-head">
+        <div class="status-report-title">${escapeHtml(structured.title)}</div>
+        ${structured.timestamp ? `<div class="status-report-time">${escapeHtml(structured.timestamp)}</div>` : ""}
+      </div>
+      ${highlightHtml}
+      ${groupsHtml}
+      ${macroHtml}
+    </div>
+  `;
+}
+
 function renderSectionBody(section) {
   const detail = section.detail;
+  if (typeof detail === "string") {
+    if (String(section.label || "").includes("/status")) {
+      return renderStatusReport(section);
+    }
+    return `
+      <details class="expandable-text" open>
+        <summary>
+          <span class="expandable-title">展開內容</span>
+          <span class="expandable-hint">點擊查看完整內容</span>
+        </summary>
+        <pre class="text-block">${escapeHtml(detail)}</pre>
+      </details>
+    `;
+  }
   if (Array.isArray(detail)) {
     if (!detail.length) {
-      return `<div class="empty-state">No detailed items are available for this section.</div>`;
+      return `<div class="empty-state">這個區塊暫時沒有明細。</div>`;
     }
     return `<div class="section-list">${detail.map((item) => `
       <div class="row">
@@ -91,10 +222,10 @@ function renderSectionBody(section) {
         </div>
       </div>
     `).join("");
-    return rows || `<div class="empty-state">No summary rows available.</div>`;
+    return rows || `<div class="empty-state">暫時沒有可顯示的摘要列。</div>`;
   }
 
-  return `<div class="empty-state">${escapeHtml(section.summary || "No section detail available.")}</div>`;
+  return `<div class="empty-state">${escapeHtml(section.summary || "暫時沒有區塊明細。")}</div>`;
 }
 
 function renderSections(data) {
@@ -111,7 +242,8 @@ function renderSections(data) {
 
     card.dataset.state = section.severity || section.state || "OK";
     title.textContent = section.label || section.key || "Section";
-    summary.textContent = section.summary || "No summary available.";
+    summary.textContent = section.summary || "";
+    summary.hidden = !section.summary;
     chip.textContent = labelForState(section.severity || section.state);
     chip.className = `state-chip ${stateClass(section.severity || section.state)}`;
     metaRow.innerHTML = renderMetaRow(section);
@@ -123,7 +255,7 @@ function renderSections(data) {
 function renderWarnings(data) {
   const warnings = data.recent_warnings || [];
   if (!warnings.length) {
-    warningsEl.innerHTML = `<div class="empty-state">No warnings captured yet.</div>`;
+    warningsEl.innerHTML = `<div class="empty-state">目前沒有警示。</div>`;
     return;
   }
 
@@ -131,7 +263,7 @@ function renderWarnings(data) {
     <article class="warning-item">
       <div class="warning-title state-${stateClass(warning.state)}">${escapeHtml(warning.label || "Warning")}</div>
       <div class="warning-meta">${escapeHtml(warning.summary || "No summary available.")}</div>
-      <div class="warning-meta">Source: ${escapeHtml(warning.source || "n/a")}</div>
+      <div class="warning-meta">來源：${escapeHtml(warning.source || "n/a")}</div>
     </article>
   `).join("");
 }
@@ -139,7 +271,7 @@ function renderWarnings(data) {
 function renderNotification(data) {
   const notification = data.last_notification;
   if (!notification) {
-    notificationEl.innerHTML = `<div class="empty-state">No critical notification has been sent yet.</div>`;
+    notificationEl.innerHTML = `<div class="empty-state">目前尚未送出重要通知。</div>`;
     return;
   }
 
@@ -150,7 +282,7 @@ function renderNotification(data) {
 
 async function loadBoard() {
   refreshBtn.disabled = true;
-  boardModeEl.textContent = "Refreshing";
+  boardModeEl.textContent = "更新中";
   try {
     const response = await fetch("/api/ops-control-board", { cache: "no-store" });
     if (!response.ok) {
@@ -164,17 +296,17 @@ async function loadBoard() {
   } catch (error) {
     overviewGrid.innerHTML = `
       <article class="metric" style="grid-column: 1 / -1;">
-        <div class="metric-label">Board Error</div>
-        <div class="metric-value">Unavailable</div>
+        <div class="metric-label">控制板錯誤</div>
+        <div class="metric-value">無法讀取</div>
         <div class="metric-note">${escapeHtml(error.message || error)}</div>
       </article>
     `;
-    sectionsEl.innerHTML = `<div class="empty-state">Failed to load the control board snapshot.</div>`;
-    warningsEl.innerHTML = `<div class="empty-state">Warnings unavailable because the board snapshot could not load.</div>`;
-    notificationEl.innerHTML = `<div class="empty-state">Notification context unavailable.</div>`;
-    overallStateEl.textContent = "Critical";
+    sectionsEl.innerHTML = `<div class="empty-state">無法載入控制板快照。</div>`;
+    warningsEl.innerHTML = `<div class="empty-state">因控制板快照載入失敗，暫時無法顯示警示。</div>`;
+    notificationEl.innerHTML = `<div class="empty-state">暫時無法顯示通知上下文。</div>`;
+    overallStateEl.textContent = "嚴重";
     overallStateEl.className = "meta-pill state-critical";
-    boardModeEl.textContent = "Offline";
+    boardModeEl.textContent = "離線";
   } finally {
     refreshBtn.disabled = false;
   }
@@ -182,4 +314,3 @@ async function loadBoard() {
 
 refreshBtn.addEventListener("click", loadBoard);
 loadBoard();
-setInterval(loadBoard, 60000);
