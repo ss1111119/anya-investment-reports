@@ -33,7 +33,10 @@ function showError(containerId, msg) {
 function fmtNet(v) {
   if (v == null) return "N/A";
   const abs = Math.abs(v);
-  const str = abs >= 10000 ? (abs / 10000).toFixed(1) + "億" : abs.toLocaleString() + "張";
+  // unit: 千元；1億 = 100,000 千元
+  const str = abs >= 100000
+    ? (abs / 100000).toFixed(1) + "億"
+    : (abs / 1000).toFixed(1) + "千萬";
   return (v >= 0 ? "+" : "-") + str;
 }
 
