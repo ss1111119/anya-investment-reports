@@ -148,27 +148,6 @@ function renderStatusReport(section) {
     </div>
   `).join("");
 
-  const macroItems = Array.isArray(section.macro_items) ? section.macro_items : [];
-  const macroHtml = macroItems.length > 0
-    ? `<div class="macro-list">
-        <div class="macro-list-head">總經數據清單</div>
-        <div class="macro-list-grid">
-          ${macroItems.map((item) => `
-            <div class="macro-item">
-              <div class="macro-item-top">
-                <strong>${escapeHtml(item.label || item.symbol || "項目")}</strong>
-                <span class="macro-state state-${stateClass(item.severity || item.status)}">${escapeHtml(item.status || item.severity || "n/a")}</span>
-              </div>
-              <div class="macro-item-meta">
-                <span>${escapeHtml(item.symbol || "n/a")}</span>
-                <span>${escapeHtml(item.last_date || "n/a")}</span>
-              </div>
-            </div>
-          `).join("")}
-        </div>
-      </div>`
-    : "";
-
   return `
     <div class="status-report">
       <div class="status-report-head">
@@ -177,7 +156,6 @@ function renderStatusReport(section) {
       </div>
       ${highlightHtml}
       ${groupsHtml}
-      ${macroHtml}
     </div>
   `;
 }
@@ -201,6 +179,25 @@ function renderSectionBody(section) {
   if (Array.isArray(detail)) {
     if (!detail.length) {
       return `<div class="empty-state">這個區塊暫時沒有明細。</div>`;
+    }
+    // Groups of macro items (資料健康 format: [{label, items:[{label,symbol,last_date,severity}]}])
+    if (detail[0] && Array.isArray(detail[0].items)) {
+      return detail.map((group) => `
+        <div class="status-group">
+          <div class="status-group-title">${escapeHtml(group.label)}</div>
+          ${group.items.length > 0
+            ? `<div class="status-grid">
+                ${group.items.map((item) => `
+                  <div class="status-card state-${stateClass(item.severity)}">
+                    <div class="status-card-label">${escapeHtml(item.label)}</div>
+                    <div class="status-card-value">${escapeHtml(item.last_date || "n/a")}</div>
+                  </div>
+                `).join("")}
+              </div>`
+            : `<div class="empty-state">All healthy.</div>`
+          }
+        </div>
+      `).join("");
     }
     return `<div class="section-list">${detail.map((item) => `
       <div class="row">
