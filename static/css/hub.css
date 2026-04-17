@@ -1,0 +1,153 @@
+/* ── Hub layout ── */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Inter", "Noto Sans TC", system-ui, sans-serif;
+}
+
+/* ── Top Navbar ── */
+.hub-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+  background: rgba(7, 16, 28, 0.96);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  backdrop-filter: blur(12px);
+}
+
+.hub-brand {
+  font-size: 15px;
+  font-weight: 800;
+  color: #76a9ff;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.hub-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.hub-tab {
+  padding: 6px 16px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: #8da1bf;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+
+.hub-tab:hover {
+  color: #e5eefc;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.hub-tab.active {
+  color: #e5eefc;
+  background: rgba(118, 169, 255, 0.12);
+  border-color: rgba(118, 169, 255, 0.30);
+}
+
+/* ── Tab sections ── */
+.hub-section {
+  display: none;
+  padding-top: 48px; /* navbar height */
+  min-height: 100vh;
+}
+
+.hub-section.active {
+  display: block;
+}
+
+/* ── Scope workbench shell width ── */
+#tab-workbench .shell {
+  width: min(1200px, calc(100% - 32px));
+}
+
+/* ── Scope ops shell width ── */
+#tab-ops .shell {
+  width: min(1400px, calc(100% - 32px));
+}
+
+/* ── Trading tab ── */
+#tab-trading {
+  background: #07101c;
+}
+
+#tab-trading .pt-standalone {
+  background: transparent;
+  min-height: unset;
+}
+
+/* ── Reports tab ── */
+#tab-reports {
+  display: none;
+  flex-direction: column;
+  padding-top: 48px;
+}
+
+#tab-reports.active {
+  display: flex;
+}
+
+.reports-toolbar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 20px;
+  background: rgba(7, 16, 28, 0.9);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  flex-shrink: 0;
+}
+
+.reports-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #8da1bf;
+}
+
+.reports-toolbar input[type="date"],
+.reports-toolbar select {
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 8px;
+  color: #e5eefc;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+}
+
+.reports-toolbar input[type="date"]:focus,
+.reports-toolbar select:focus {
+  border-color: #76a9ff;
+}
+
+.reports-toolbar select option {
+  background: #0e1627;
+}
+
+#reports-frame {
+  flex: 1;
+  width: 100%;
+  height: calc(100vh - 100px);
+  border: none;
+  background: #09111d;
+}

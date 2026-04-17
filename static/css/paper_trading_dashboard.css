@@ -1,0 +1,263 @@
+/* ── Paper Trading Dashboard — all classes prefixed .pt- ── */
+* { box-sizing: border-box; }
+
+/* standalone page body */
+.pt-standalone {
+  margin: 0;
+  background: #07101c;
+  color: #e5eefc;
+  font-family: "Inter", "Noto Sans TC", system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+/* ── Shell ── */
+.pt-shell {
+  width: min(1200px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 64px;
+}
+
+/* ── Hero ── */
+.pt-hero {
+  margin-bottom: 32px;
+}
+
+.pt-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #76a9ff;
+  margin-bottom: 8px;
+}
+
+.pt-hero h1 {
+  margin: 0 0 6px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #e5eefc;
+}
+
+.pt-hero p {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: #8da1bf;
+}
+
+/* ── Buttons ── */
+.pt-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s;
+}
+
+.pt-btn:hover { opacity: 0.85; }
+
+.pt-btn-primary {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* ── Summary cards ── */
+.pt-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.pt-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.pt-card-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8da1bf;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+.pt-card-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #e5eefc;
+}
+
+/* ── Panel ── */
+.pt-panel {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(148, 163, 184, 0.10);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.pt-panel-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.pt-panel-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #a8bdd4;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Chart ── */
+.pt-chart-wrap {
+  position: relative;
+  height: 220px;
+}
+
+/* ── Table ── */
+.pt-table-wrap {
+  overflow-x: auto;
+}
+
+.pt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.pt-table th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #8da1bf;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  white-space: nowrap;
+}
+
+.pt-table td {
+  padding: 9px 12px;
+  color: #c8d8ec;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.07);
+  white-space: nowrap;
+}
+
+.pt-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.pt-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.pt-placeholder {
+  text-align: center;
+  color: #8da1bf;
+  padding: 24px 0 !important;
+}
+
+/* positive / negative values */
+.pt-pos { color: #34d399; }
+.pt-neg { color: #f87171; }
+
+/* ── Recap ── */
+.pt-recap-toolbar {
+  margin-left: auto;
+}
+
+.pt-recap-toolbar select {
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 8px;
+  color: #e5eefc;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+.pt-recap-toolbar select option {
+  background: #0e1627;
+}
+
+.pt-recap-content {
+  margin: 0;
+  padding: 4px 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #c8d8ec;
+  max-height: 560px;
+  overflow-y: auto;
+}
+
+.pt-recap-section {
+  margin: 20px 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #76a9ff;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid rgba(118, 169, 255, 0.2);
+  padding-bottom: 4px;
+}
+
+.pt-recap-text, .pt-recap-line {
+  margin: 4px 0;
+  color: #c8d8ec;
+}
+
+.pt-recap-none {
+  margin: 4px 0;
+  color: #8da1bf;
+  font-style: italic;
+}
+
+.pt-recap-file-header {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: rgba(118, 169, 255, 0.18);
+  border: 1px solid rgba(118, 169, 255, 0.35);
+  border-radius: 6px;
+  padding: 3px 10px;
+  margin-bottom: 12px;
+}
+
+.pt-recap-sep {
+  border: none;
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
+  margin: 20px 0;
+}
+
+.pt-recap-table-wrap {
+  overflow-x: auto;
+  margin: 8px 0;
+}
+
+.pt-recap-table th, .pt-recap-table td {
+  white-space: nowrap;
+}
+
+/* ── Hub embed: override standalone body styles ── */
+#tab-trading .pt-standalone {
+  background: transparent;
+  min-height: unset;
+}
+
+#tab-trading .pt-shell {
+  padding-top: 24px;
+}
