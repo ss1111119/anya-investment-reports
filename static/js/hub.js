@@ -2,7 +2,7 @@
   'use strict';
 
   const REPORTS_BASE = 'https://ss1111119.github.io/anya-investment-reports/';
-  const TABS = ['workbench', 'ops', 'reports', 'trading'];
+  const TABS = ['workbench', 'ops', 'reports', 'trading', 'stockroom'];
   const DEFAULT_TAB = 'workbench';
 
   function today() {
@@ -32,6 +32,11 @@
     // Reload paper trading dashboard when trading tab becomes active
     if (name === 'trading' && typeof window.ptDashboardLoad === 'function') {
       window.ptDashboardLoad();
+    }
+
+    // Load stock control room when stockroom tab becomes active
+    if (name === 'stockroom' && typeof window.scLoad === 'function') {
+      window.scLoad();
     }
   }
 
