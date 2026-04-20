@@ -2,7 +2,7 @@
   'use strict';
 
   const REPORTS_BASE = 'https://ss1111119.github.io/anya-investment-reports/';
-  const TABS = ['workbench', 'ops', 'reports', 'trading', 'stockroom'];
+  const TABS = ['workbench', 'ops', 'reports', 'trading', 'stockroom', 'kol', 'news'];
   const DEFAULT_TAB = 'workbench';
 
   function today() {
@@ -37,6 +37,16 @@
     // Load stock control room when stockroom tab becomes active
     if (name === 'stockroom' && typeof window.scLoad === 'function') {
       window.scLoad();
+    }
+
+    // Load KOL dashboard when kol tab becomes active
+    if (name === 'kol' && typeof window.kolLoad === 'function') {
+      window.kolLoad();
+    }
+
+    // Load news dashboard when news tab becomes active
+    if (name === 'news' && typeof window.newsLoad === 'function') {
+      window.newsLoad();
     }
   }
 

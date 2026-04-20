@@ -19,6 +19,48 @@
     return Number(n) >= 0 ? 'pt-pos' : 'pt-neg';
   }
 
+  function renderHealthBar(h) {
+    var bar = document.getElementById('pt-health-bar');
+    var badges = document.getElementById('pt-health-badges');
+    if (!bar || !badges) return;
+
+    var items = [];
+    var hasAlert = false;
+
+    // Circuit Breaker
+    if (h.circuit_breaker) {
+      hasAlert = true;
+      var since = h.circuit_breaker_since ? h.circuit_breaker_since.slice(0, 10) : '';
+      items.push('<span class="pt-hbadge pt-hbadge--crit">⛔ Circuit Breaker ON' + (since ? ' (' + since + ')' : '') + '</span>');
+    } else {
+      items.push('<span class="pt-hbadge pt-hbadge--ok">✓ 交易正常</span>');
+    }
+
+    // 回撤
+    if (h.drawdown_pct < -5) {
+      hasAlert = true;
+      items.push('<span class="pt-hbadge pt-hbadge--warn">回撤 ' + h.drawdown_pct + '%</span>');
+    }
+
+    // 閒置天數
+    if (h.days_since_last_trade >= 7) {
+      hasAlert = true;
+      items.push('<span class="pt-hbadge pt-hbadge--warn">⏸ ' + h.days_since_last_trade + ' 天無交易</span>');
+    } else if (h.days_since_last_trade >= 0) {
+      items.push('<span class="pt-hbadge pt-hbadge--muted">距上次交易 ' + h.days_since_last_trade + ' 天</span>');
+    }
+
+    // 貸款逾期
+    if (h.loan_overdue) {
+      hasAlert = true;
+      items.push('<span class="pt-hbadge pt-hbadge--crit">💳 貸款逾期 (' + (h.next_payment_date || '').slice(0, 10) + ')</span>');
+    }
+
+    badges.innerHTML = items.join('');
+    bar.style.display = '';
+    bar.className = 'pt-health-bar' + (hasAlert ? ' pt-health-bar--alert' : '');
+  }
+
   function loadSummary() {
     fetch('/api/paper-trading/summary')
       .then(function (r) { return r.json(); })
@@ -29,6 +71,7 @@
         el('pt-total-assets') && (el('pt-total-assets').textContent = '$' + fmt(d.total_assets));
         el('pt-stock-value') && (el('pt-stock-value').textContent = '$' + fmt(d.stock_value));
         el('pt-position-count') && (el('pt-position-count').textContent = d.position_count);
+        if (d.health) renderHealthBar(d.health);
       })
       .catch(function () {});
   }
@@ -197,6 +240,7 @@
     loadTransactions();
     loadBalanceChart();
     loadRecaps();
+    loadPerformance();
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -211,6 +255,137 @@
 
     loadAll();
   });
+
+  // ── Strategy Performance ─────────────────────────────────────────────────
+
+  var _perfCharts = {};
+
+  function destroyChart(id) {
+    if (_perfCharts[id]) { _perfCharts[id].destroy(); delete _perfCharts[id]; }
+  }
+
+  function stockBar(item) {
+    var sign = item.pnl >= 0 ? 'pt-pos' : 'pt-neg';
+    var wr = item.trades > 0 ? Math.round(item.wins / item.trades * 100) : 0;
+    return '<div class="pt-perf-stock-row">' +
+      '<span class="pt-perf-stock-code">' + item.code + '</span>' +
+      '<span class="' + sign + '">' + (item.pnl >= 0 ? '+' : '') + item.pnl.toLocaleString() + '</span>' +
+      '<span class="pt-perf-stock-wr">' + item.trades + '筆 ' + wr + '%</span>' +
+      '</div>';
+  }
+
+  function loadPerformance() {
+    fetch('/api/paper-trading/performance')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.error) return;
+        var s = d.summary || {};
+
+        // Summary bar
+        var sumEl = document.getElementById('pt-perf-summary');
+        if (sumEl) {
+          var pnlClass = (s.total_realized_pnl || 0) >= 0 ? 'pt-pos' : 'pt-neg';
+          sumEl.innerHTML =
+            '<span class="pt-perf-stat">總交易 <b>' + (s.total_trades || 0) + '</b> 筆</span>' +
+            '<span class="pt-perf-stat">整體勝率 <b>' + (s.overall_win_rate || 0) + '%</b></span>' +
+            '<span class="pt-perf-stat">已實現損益 <b class="' + pnlClass + '">' +
+              ((s.total_realized_pnl || 0) >= 0 ? '+' : '') + (s.total_realized_pnl || 0).toLocaleString() + '</b></span>';
+        }
+
+        // Cumulative PnL
+        var cum = d.cumulative_pnl || [];
+        destroyChart('cumulative');
+        var cumCtx = document.getElementById('pt-cumulative-chart');
+        if (cumCtx && cum.length) {
+          _perfCharts['cumulative'] = new Chart(cumCtx, {
+            type: 'line',
+            data: {
+              labels: cum.map(function (p) { return p.date; }),
+              datasets: [{
+                data: cum.map(function (p) { return p.cumulative_pnl; }),
+                borderColor: '#76a9ff', backgroundColor: 'rgba(118,169,255,0.08)',
+                pointRadius: 0, tension: 0.3, fill: true,
+              }]
+            },
+            options: {
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { ticks: { color: '#8da1bf', font: { size: 10 }, maxTicksLimit: 6 }, grid: { display: false } },
+                y: { ticks: { color: '#8da1bf', font: { size: 10 }, callback: function(v) { return (v>=0?'+':'')+v.toLocaleString(); } }, grid: { color: 'rgba(148,163,184,0.08)' } }
+              }
+            }
+          });
+        }
+
+        // Monthly PnL
+        var mon = d.monthly || [];
+        destroyChart('monthly');
+        var monCtx = document.getElementById('pt-monthly-chart');
+        if (monCtx && mon.length) {
+          _perfCharts['monthly'] = new Chart(monCtx, {
+            type: 'bar',
+            data: {
+              labels: mon.map(function (m) { return m.month; }),
+              datasets: [{
+                data: mon.map(function (m) { return m.pnl; }),
+                backgroundColor: mon.map(function (m) { return m.pnl >= 0 ? 'rgba(74,222,128,0.6)' : 'rgba(251,113,133,0.6)'; }),
+                borderRadius: 4,
+              }]
+            },
+            options: {
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { ticks: { color: '#8da1bf', font: { size: 10 } }, grid: { display: false } },
+                y: { ticks: { color: '#8da1bf', font: { size: 10 }, callback: function(v) { return (v>=0?'+':'')+v.toLocaleString(); } }, grid: { color: 'rgba(148,163,184,0.08)' } }
+              }
+            }
+          });
+        }
+
+        // Rolling win rate
+        var roll = d.rolling_win_rate || [];
+        destroyChart('winrate');
+        var wrCtx = document.getElementById('pt-winrate-chart');
+        if (wrCtx && roll.length) {
+          _perfCharts['winrate'] = new Chart(wrCtx, {
+            type: 'line',
+            data: {
+              labels: roll.map(function (r) { return r.date; }),
+              datasets: [{
+                data: roll.map(function (r) { return r.win_rate; }),
+                borderColor: '#f6c453', backgroundColor: 'rgba(246,196,83,0.08)',
+                pointRadius: 2, tension: 0.3, fill: true,
+              }]
+            },
+            options: {
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { ticks: { color: '#8da1bf', font: { size: 10 }, maxTicksLimit: 6 }, grid: { display: false } },
+                y: { min: 0, max: 100, ticks: { color: '#8da1bf', font: { size: 10 }, callback: function(v) { return v + '%'; } }, grid: { color: 'rgba(148,163,184,0.08)' } }
+              }
+            }
+          });
+        }
+
+        // Top / Bottom stocks
+        var topEl = document.getElementById('pt-top-stocks');
+        var botEl = document.getElementById('pt-bottom-stocks');
+        if (topEl) topEl.innerHTML = (d.top_stocks || []).map(stockBar).join('');
+        if (botEl) botEl.innerHTML = (d.bottom_stocks || []).map(stockBar).join('');
+
+        // Key events
+        var evEl = document.getElementById('pt-key-events');
+        if (evEl && (d.key_events || []).length) {
+          evEl.innerHTML = '<div class="pt-perf-chart-title" style="margin-top:16px">關鍵事件</div>' +
+            (d.key_events || []).map(function (e) {
+              return '<div class="pt-perf-event"><span class="pt-perf-event-date">' + e.date + '</span>' +
+                '<span class="pt-perf-event-label">' + e.event + '</span>' +
+                '<span class="pt-muted">×' + e.count + '</span></div>';
+            }).join('');
+        }
+      })
+      .catch(function () {});
+  }
 
   // Expose for hub.js to call when tab activates
   window.ptDashboardLoad = loadAll;
