@@ -105,30 +105,227 @@ async function loadInterpretation(symbol) {
 }
 
 // ---------------------------------------------------------------------------
-// Research panel — orchestrator (Task 4.1)
+// Research Tab System
 // ---------------------------------------------------------------------------
+let _tabCache = {};     // key: `${symbol}__${tabName}`
+let _klineChart = null; // ECharts instance for K-line
+
+function _tabCacheKey(symbol, tabName) {
+  return `${symbol}__${tabName}`;
+}
+
+function _showPanel(tabName) {
+  document.querySelectorAll(".wb-panel").forEach(p => p.style.display = "none");
+  const panel = el(`wb-panel-${tabName}`);
+  if (panel) panel.style.display = "";
+}
+
+function _setActiveTab(tabName) {
+  document.querySelectorAll(".wb-tab-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.tab === tabName);
+  });
+}
+
+async function loadResearchTab(symbol, tabName) {
+  _setActiveTab(tabName);
+  _showPanel(tabName);
+
+  const key = _tabCacheKey(symbol, tabName);
+
+  // ── Existing 4 panels (load directly, no API route needed for render) ──
+  if (tabName === "kline") {
+    if (_tabCache[key]) {
+      renderKlineChart(_tabCache[key]);
+    } else {
+      el("wb-kline-container").innerHTML = '<div class="wb-loading">K 線載入中…</div>';
+      try {
+        const data = await apiFetch(`/api/workbench/taiex-chart?symbol=${encodeURIComponent(symbol)}&days=120`);
+        _tabCache[key] = data;
+        renderKlineChart(data);
+      } catch (e) {
+        el("wb-kline-container").innerHTML = `<div class="wb-error">K 線資料無法取得：${e.message}</div>`;
+      }
+    }
+    return;
+  }
+
+  if (tabName === "fundamentals") {
+    if (!_tabCache[key]) {
+      renderFundamentalsLoading();
+      try {
+        const data = await apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/fundamentals`);
+        _tabCache[key] = data;
+        renderFundamentals(data);
+      } catch (e) { renderFundamentals({ error: e.message }); }
+    } else {
+      renderFundamentals(_tabCache[key]);
+    }
+    return;
+  }
+
+  if (tabName === "institutional") {
+    if (!_tabCache[key]) {
+      renderInstitutionalLoading();
+      try {
+        const data = await apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/institutional`);
+        _tabCache[key] = data;
+        renderInstitutional(data);
+      } catch (e) { renderInstitutional({ error: e.message }); }
+    } else {
+      renderInstitutional(_tabCache[key]);
+    }
+    return;
+  }
+
+  if (tabName === "ai-summary") {
+    if (!_tabCache[key]) {
+      renderAiSummaryLoading();
+      try {
+        const data = await apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/ai-summary`);
+        _tabCache[key] = data;
+        renderAiSummary(data);
+      } catch (e) { renderAiSummary({ error: e.message }); }
+    } else {
+      renderAiSummary(_tabCache[key]);
+    }
+    return;
+  }
+
+  // ── Extended panels (text/image from new endpoints) ──
+  const bodyEl = el(`wb-body-${tabName}`);
+  if (!bodyEl) return;
+
+  if (_tabCache[key] !== undefined) {
+    renderExtendedTab(tabName, bodyEl, _tabCache[key]);
+    return;
+  }
+
+  bodyEl.innerHTML = '<div class="wb-loading">分析中，請稍候…</div>';
+
+  try {
+    const data = await apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/${tabName}`);
+    _tabCache[key] = data;
+    renderExtendedTab(tabName, bodyEl, data);
+  } catch (e) {
+    bodyEl.innerHTML = `<div class="wb-error">無法取得資料：${e.message}</div>`;
+  }
+}
+
+function renderExtendedTab(tabName, bodyEl, data) {
+  if (data.error && !data.report && !data.image_url && !data.name) {
+    bodyEl.innerHTML = `<div class="wb-error">資料暫時無法取得。</div>`;
+    return;
+  }
+
+  if (tabName === "pe-river") {
+    if (data.image_url) {
+      bodyEl.innerHTML = `<img class="wb-pe-river-img" src="${data.image_url}" alt="PE River Chart">`;
+    } else {
+      bodyEl.innerHTML = `<div class="wb-error">本益比河流圖目前無法生成。</div>`;
+    }
+    return;
+  }
+
+  if (tabName === "company-info") {
+    const rows = [
+      ["公司名稱", data.name || ""],
+      ["產業", data.industry || ""],
+      ["主要產品", data.products || ""],
+      ["員工人數", data.employees || ""],
+      ["官網", data.website ? `<a href="${data.website}" target="_blank" rel="noopener">${data.website}</a>` : ""],
+      ["簡介", data.description || ""],
+    ].filter(r => r[1]).map(r =>
+      `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`
+    ).join("");
+    bodyEl.innerHTML = `<table class="wb-company-table">${rows}</table>`;
+    return;
+  }
+
+  // Default: text report
+  const report = data.report || "";
+  if (!report) {
+    bodyEl.innerHTML = `<div class="wb-error">此分析目前無資料。</div>`;
+    return;
+  }
+  bodyEl.innerHTML = `<div class="wb-report-body">${report.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>`;
+}
+
+// ── K-line ECharts renderer (uses taiex-chart data) ──
+function renderKlineChart(d) {
+  if (!d || d.error || !d.dates) {
+    el("wb-kline-container").innerHTML = '<div class="wb-error">K 線資料無法取得。</div>';
+    return;
+  }
+
+  const sharpeBadge = el("wb-kline-sharpe");
+  if (sharpeBadge && d.sharpe != null) {
+    sharpeBadge.textContent = `Sharpe: ${d.sharpe}`;
+  }
+
+  const container = el("wb-kline-container");
+  container.innerHTML = "";
+
+  if (typeof echarts === "undefined") {
+    container.innerHTML = '<div class="wb-error">ECharts 尚未載入。</div>';
+    return;
+  }
+  if (_klineChart) { _klineChart.dispose(); _klineChart = null; }
+  _klineChart = echarts.init(container, "dark");
+
+  const up = "#34d399", dn = "#f87171";
+  const itemColor = data => data[1] >= data[0] ? up : dn;
+
+  const option = {
+    backgroundColor: "transparent",
+    animation: false,
+    tooltip: { trigger: "axis", axisPointer: { type: "cross" }, backgroundColor: "#0e1627", borderColor: "rgba(148,163,184,0.2)", textStyle: { color: "#c8d8ec", fontSize: 12 } },
+    legend: { data: ["K線", "MA5", "MA20", "BB上軌", "BB下軌"], top: 0, textStyle: { color: "#8da1bf", fontSize: 11 }, inactiveColor: "#3a4a60" },
+    axisPointer: { link: [{ xAxisIndex: "all" }] },
+    dataZoom: [
+      { type: "inside", xAxisIndex: [0,1,2,3], start: 50, end: 100 },
+      { type: "slider", xAxisIndex: [0,1,2,3], start: 50, end: 100, bottom: 2, height: 18, borderColor: "transparent", fillerColor: "rgba(118,169,255,0.12)", textStyle: { color: "#8da1bf", fontSize: 10 } },
+    ],
+    grid: [
+      { left: 60, right: 16, top: 32, height: "38%" },
+      { left: 60, right: 16, top: "46%", height: "10%" },
+      { left: 60, right: 16, top: "60%", height: "12%" },
+      { left: 60, right: 16, top: "76%", height: "10%" },
+    ],
+    xAxis: [0,1,2,3].map(i => ({ type: "category", data: d.dates, gridIndex: i, axisLabel: { show: i===3, color: "#8da1bf", fontSize: 10 }, axisLine: { lineStyle: { color: "#2a3a50" } } })),
+    yAxis: [
+      { scale: true, gridIndex: 0, splitLine: { lineStyle: { color: "rgba(148,163,184,0.08)" } }, axisLabel: { color: "#8da1bf", fontSize: 10 } },
+      { scale: true, gridIndex: 1, splitNumber: 2, splitLine: { lineStyle: { color: "rgba(148,163,184,0.08)" } }, axisLabel: { color: "#8da1bf", fontSize: 10 } },
+      { scale: true, gridIndex: 2, max: 100, min: 0, splitNumber: 3, splitLine: { lineStyle: { color: "rgba(148,163,184,0.08)" } }, axisLabel: { color: "#8da1bf", fontSize: 10 } },
+      { scale: true, gridIndex: 3, splitNumber: 2, splitLine: { lineStyle: { color: "rgba(148,163,184,0.08)" } }, axisLabel: { color: "#8da1bf", fontSize: 10 } },
+    ],
+    series: [
+      { name: "K線", type: "candlestick", xAxisIndex: 0, yAxisIndex: 0, data: d.ohlcv, itemStyle: { color: up, color0: dn, borderColor: up, borderColor0: dn } },
+      { name: "MA5",  type: "line", xAxisIndex: 0, yAxisIndex: 0, data: d.ma5,  smooth: true, lineStyle: { width: 1, color: "#fbbf24" }, showSymbol: false },
+      { name: "MA20", type: "line", xAxisIndex: 0, yAxisIndex: 0, data: d.ma20, smooth: true, lineStyle: { width: 1, color: "#38bdf8" }, showSymbol: false },
+      ...(d.bband ? [
+        { name: "BB上軌", type: "line", xAxisIndex: 0, yAxisIndex: 0, data: d.bband.upper, smooth: true, lineStyle: { width: 1, color: "#a78bfa", type: "dashed" }, showSymbol: false },
+        { name: "BB下軌", type: "line", xAxisIndex: 0, yAxisIndex: 0, data: d.bband.lower, smooth: true, lineStyle: { width: 1, color: "#a78bfa", type: "dashed" }, showSymbol: false },
+      ] : []),
+      { name: "成交量", type: "bar", xAxisIndex: 1, yAxisIndex: 1, data: d.volumes.map((v,i) => ({ value: v, itemStyle: { color: itemColor(d.ohlcv[i]) } })) },
+      ...(d.rsi ? [
+        { name: "RSI14", type: "line", xAxisIndex: 2, yAxisIndex: 2, data: d.rsi, smooth: true, lineStyle: { width: 1.5, color: "#fb923c" }, showSymbol: false },
+        { name: "RSI 70", type: "line", xAxisIndex: 2, yAxisIndex: 2, data: d.dates.map(() => 70), lineStyle: { width: 0.8, color: "#f87171", type: "dashed" }, showSymbol: false },
+        { name: "RSI 30", type: "line", xAxisIndex: 2, yAxisIndex: 2, data: d.dates.map(() => 30), lineStyle: { width: 0.8, color: "#34d399", type: "dashed" }, showSymbol: false },
+      ] : []),
+      { name: "OSC", type: "bar", xAxisIndex: 3, yAxisIndex: 3, data: d.macd.histogram.map(v => ({ value: v, itemStyle: { color: v >= 0 ? up : dn } })) },
+      { name: "DIF", type: "line", xAxisIndex: 3, yAxisIndex: 3, data: d.macd.dif, smooth: true, lineStyle: { width: 1, color: "#38bdf8" }, showSymbol: false },
+      { name: "DEA", type: "line", xAxisIndex: 3, yAxisIndex: 3, data: d.macd.dea, smooth: true, lineStyle: { width: 1, color: "#fb923c" }, showSymbol: false },
+    ],
+  };
+
+  _klineChart.setOption(option);
+  window.addEventListener("resize", () => _klineChart && _klineChart.resize());
+}
+
+// Legacy loading functions (still used by some code paths)
 function loadResearchPanel(symbol) {
-  // Fire all four in parallel; each renders independently
-  renderPriceChartLoading();
-  renderFundamentalsLoading();
-  renderInstitutionalLoading();
-  renderAiSummaryLoading();
-
-  apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/price-history`)
-    .then(renderPriceChart)
-    .catch(e => renderPriceChart({ error: "fetch_failed", detail: e.message }));
-
-  apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/fundamentals`)
-    .then(renderFundamentals)
-    .catch(e => renderFundamentals({ error: "fetch_failed", detail: e.message }));
-
-  apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/institutional`)
-    .then(renderInstitutional)
-    .catch(e => renderInstitutional({ error: "fetch_failed", detail: e.message }));
-
-  apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/ai-summary`)
-    .then(renderAiSummary)
-    .catch(e => renderAiSummary({ error: "fetch_failed", detail: e.message }));
+  // Legacy: now delegates to tab system; load default (kline) tab
+  loadResearchTab(symbol, "kline");
 }
 
 // ---------------------------------------------------------------------------
@@ -334,14 +531,26 @@ function renderAiSummary(data) {
 }
 
 // ---------------------------------------------------------------------------
-// loadSymbol — wire up research panel (Task 4.6)
+// loadSymbol — clear cache on new symbol, load active tab
 // ---------------------------------------------------------------------------
 function loadSymbol(symbol) {
+  const prev = currentSymbol;
   currentSymbol = symbol.toUpperCase();
   el("symbol-display").textContent = currentSymbol;
+
+  // Clear tab cache when symbol changes
+  if (prev !== currentSymbol) {
+    _tabCache = {};
+    if (_klineChart) { _klineChart.dispose(); _klineChart = null; }
+  }
+
   loadQuote(currentSymbol);
   loadInterpretation(currentSymbol);
-  loadResearchPanel(currentSymbol);
+
+  // Load whichever tab is currently active
+  const activeBtn = document.querySelector(".wb-tab-btn.active");
+  const activeTab = activeBtn ? activeBtn.dataset.tab : "kline";
+  loadResearchTab(currentSymbol, activeTab);
 }
 
 // ---------------------------------------------------------------------------
@@ -496,6 +705,17 @@ document.addEventListener("DOMContentLoaded", () => {
   el("watchlist-input").addEventListener("keydown", e => { if (e.key === "Enter") addToWatchlist(); });
 
   el("alert-create-btn").addEventListener("click", createAlert);
+
+  // Tab bar event delegation
+  const tabBar = document.querySelector(".wb-tab-bar");
+  if (tabBar) {
+    tabBar.addEventListener("click", e => {
+      const btn = e.target.closest(".wb-tab-btn");
+      if (btn && btn.dataset.tab) {
+        loadResearchTab(currentSymbol, btn.dataset.tab);
+      }
+    });
+  }
 
   loadSymbol(currentSymbol);
   loadWatchlist();
