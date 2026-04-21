@@ -1,0 +1,2930 @@
+{
+  "date": "2026-04-22",
+  "report_type": "morning",
+  "generated_at": "2026-04-22T07:42:40",
+  "us_macro": [
+    {
+      "symbol": "SP500",
+      "name": "S&P 500",
+      "value": 7064.009765625,
+      "change_pct": -0.63,
+      "date": "2026-04-21"
+    },
+    {
+      "symbol": "Nasdaq",
+      "name": "Nasdaq",
+      "value": 24259.96484375,
+      "change_pct": -0.59,
+      "date": "2026-04-21"
+    },
+    {
+      "symbol": "SOX",
+      "name": "費半 (SOX)",
+      "value": 9647.2138671875,
+      "change_pct": 0.5,
+      "date": "2026-04-21"
+    },
+    {
+      "symbol": "DJI",
+      "name": "道瓊",
+      "value": 49149.37890625,
+      "change_pct": -0.59,
+      "date": "2026-04-21"
+    },
+    {
+      "symbol": "Nasdaq_Fut",
+      "name": "Nasdaq 期貨",
+      "value": 26748.25,
+      "change_pct": -0.22,
+      "date": "2026-04-21"
+    },
+    {
+      "symbol": "VIX",
+      "name": "VIX",
+      "value": 19.5,
+      "change_pct": 3.34,
+      "date": "2026-04-21"
+    },
+    {
+      "symbol": "TSM",
+      "name": "台積電 ADR",
+      "value": 368.0799865722656,
+      "change_pct": 0.5,
+      "date": "2026-04-21"
+    },
+    {
+      "symbol": "EWT",
+      "name": "台灣 ETF",
+      "value": 83.52999877929688,
+      "change_pct": -0.07,
+      "date": "2026-04-21"
+    },
+    {
+      "symbol": "Gold",
+      "name": "黃金期貨",
+      "value": 4734.10009765625,
+      "change_pct": -2.4,
+      "date": "2026-04-21"
+    },
+    {
+      "symbol": "Crude_Oil",
+      "name": "布蘭特原油",
+      "value": 93.91999816894531,
+      "change_pct": -0.93,
+      "date": "2026-04-21"
+    },
+    {
+      "symbol": "DXY",
+      "name": "美元指數",
+      "value": 98.40799713134766,
+      "change_pct": 0.36,
+      "date": "2026-04-21"
+    }
+  ],
+  "asia_market": {
+    "indices": [
+      {
+        "symbol": "^N225",
+        "name": "日經225",
+        "region": "Japan",
+        "currency": "JPY",
+        "value": 58824.89,
+        "change_pct": 0.6
+      },
+      {
+        "symbol": "^KS11",
+        "name": "KOSPI",
+        "region": "Korea",
+        "currency": "KRW",
+        "value": 6219.09,
+        "change_pct": 0.44
+      }
+    ],
+    "summary": "日經225 58824.89 (+0.60%)；KOSPI 6219.09 (+0.44%)",
+    "source": "yfinance"
+  },
+  "sentiment": {
+    "cnn": {
+      "value": 67,
+      "label": "Greed"
+    },
+    "crypto": {
+      "value": 33,
+      "label": "Fear"
+    },
+    "tw_market": {
+      "gainers": 556,
+      "losers": 425,
+      "total": 1070
+    },
+    "tw_greed": {
+      "value": 67,
+      "label": "貪婪 (Greed)"
+    },
+    "tw_index": {
+      "price": 37605.11,
+      "change": 646.31,
+      "change_pct": 1.75,
+      "up_count": 556,
+      "down_count": 425,
+      "unchanged_count": 89,
+      "total_stocks": 1070,
+      "source": "market_stats_twse"
+    }
+  },
+  "sa_consensus": {
+    "source": "seeking_alpha",
+    "benchmark": "Magnificent 7",
+    "report_date": "2026-04-22",
+    "coverage": 7,
+    "as_of": "2026-04-21",
+    "summary": "Seeking Alpha 目前覆蓋 7 檔 Mag 7，共識較強的是 TSLA，相對偏弱的是 AMZN。",
+    "items": [
+      {
+        "symbol": "TSLA",
+        "as_of": "2026-04-21",
+        "quant_rating": 3.25,
+        "authors_rating": 2.45,
+        "wall_street_rating": 3.6,
+        "consensus_score": 3.1,
+        "factor_grades": {
+          "value": "F",
+          "growth": "A-",
+          "profitability": "A+",
+          "momentum": "C+",
+          "revisions": "C"
+        }
+      },
+      {
+        "symbol": "AAPL",
+        "as_of": "2026-04-21",
+        "quant_rating": 3.48,
+        "authors_rating": 3.55,
+        "wall_street_rating": 4.11,
+        "consensus_score": 3.71,
+        "factor_grades": {
+          "value": "F",
+          "growth": "D",
+          "profitability": "A+",
+          "momentum": "B",
+          "revisions": "B"
+        }
+      },
+      {
+        "symbol": "META",
+        "as_of": "2026-04-21",
+        "quant_rating": 3.41,
+        "authors_rating": 3.86,
+        "wall_street_rating": 4.64,
+        "consensus_score": 3.97,
+        "factor_grades": {
+          "value": "F",
+          "growth": "B-",
+          "profitability": "A+",
+          "momentum": "B-",
+          "revisions": "C+"
+        }
+      },
+      {
+        "symbol": "NVDA",
+        "as_of": "2026-04-21",
+        "quant_rating": 3.49,
+        "authors_rating": 3.81,
+        "wall_street_rating": 4.71,
+        "consensus_score": 4.0,
+        "factor_grades": {
+          "value": "F",
+          "growth": "A-",
+          "profitability": "A+",
+          "momentum": "B",
+          "revisions": "B+"
+        }
+      },
+      {
+        "symbol": "GOOGL",
+        "as_of": "2026-04-21",
+        "quant_rating": 3.48,
+        "authors_rating": 4.0,
+        "wall_street_rating": 4.63,
+        "consensus_score": 4.04,
+        "factor_grades": {
+          "value": "F",
+          "growth": "B",
+          "profitability": "A+",
+          "momentum": "A",
+          "revisions": "B+"
+        }
+      },
+      {
+        "symbol": "MSFT",
+        "as_of": "2026-04-21",
+        "quant_rating": 3.48,
+        "authors_rating": 3.94,
+        "wall_street_rating": 4.71,
+        "consensus_score": 4.04,
+        "factor_grades": {
+          "value": "D-",
+          "growth": "C",
+          "profitability": "A+",
+          "momentum": "C",
+          "revisions": "B+"
+        }
+      },
+      {
+        "symbol": "AMZN",
+        "as_of": "2026-04-21",
+        "quant_rating": 3.45,
+        "authors_rating": 4.14,
+        "wall_street_rating": 4.64,
+        "consensus_score": 4.08,
+        "factor_grades": {
+          "value": "D",
+          "growth": "A-",
+          "profitability": "A+",
+          "momentum": "B+",
+          "revisions": "C+"
+        }
+      }
+    ],
+    "top_picks": [
+      {
+        "symbol": "TSLA",
+        "as_of": "2026-04-21",
+        "quant_rating": 3.25,
+        "authors_rating": 2.45,
+        "wall_street_rating": 3.6,
+        "consensus_score": 3.1,
+        "factor_grades": {
+          "value": "F",
+          "growth": "A-",
+          "profitability": "A+",
+          "momentum": "C+",
+          "revisions": "C"
+        }
+      },
+      {
+        "symbol": "AAPL",
+        "as_of": "2026-04-21",
+        "quant_rating": 3.48,
+        "authors_rating": 3.55,
+        "wall_street_rating": 4.11,
+        "consensus_score": 3.71,
+        "factor_grades": {
+          "value": "F",
+          "growth": "D",
+          "profitability": "A+",
+          "momentum": "B",
+          "revisions": "B"
+        }
+      },
+      {
+        "symbol": "META",
+        "as_of": "2026-04-21",
+        "quant_rating": 3.41,
+        "authors_rating": 3.86,
+        "wall_street_rating": 4.64,
+        "consensus_score": 3.97,
+        "factor_grades": {
+          "value": "F",
+          "growth": "B-",
+          "profitability": "A+",
+          "momentum": "B-",
+          "revisions": "C+"
+        }
+      },
+      {
+        "symbol": "NVDA",
+        "as_of": "2026-04-21",
+        "quant_rating": 3.49,
+        "authors_rating": 3.81,
+        "wall_street_rating": 4.71,
+        "consensus_score": 4.0,
+        "factor_grades": {
+          "value": "F",
+          "growth": "A-",
+          "profitability": "A+",
+          "momentum": "B",
+          "revisions": "B+"
+        }
+      },
+      {
+        "symbol": "GOOGL",
+        "as_of": "2026-04-21",
+        "quant_rating": 3.48,
+        "authors_rating": 4.0,
+        "wall_street_rating": 4.63,
+        "consensus_score": 4.04,
+        "factor_grades": {
+          "value": "F",
+          "growth": "B",
+          "profitability": "A+",
+          "momentum": "A",
+          "revisions": "B+"
+        }
+      }
+    ]
+  },
+  "tw_premarket": {
+    "sgx_fut": {
+      "value": 3055.3,
+      "change_pct": 0.97,
+      "stale": false,
+      "latest_date": "2026-04-22"
+    },
+    "rich_fut": {
+      "value": 37621.0,
+      "change_pct": -0.32,
+      "stale": false,
+      "latest_date": "2026-04-21"
+    },
+    "regime": "BULL_HIGH",
+    "trend_state": "BULL",
+    "vol_state": "HIGH",
+    "pc_ratio": 1.1915,
+    "pc_ratio_date": "2026-04-21",
+    "pc_ratio_source": "market_stats_pc_ratio",
+    "margin_balance": 433163894000,
+    "maintenance_ratio": 195.43642809712114
+  },
+  "taiex_history": [
+    {
+      "date": "2026-04-08",
+      "close": 34761.38,
+      "change": 1531.56,
+      "change_pct": 4.61,
+      "foreign_net": 1177.7,
+      "trust_net": 42.8,
+      "dealer_net": 358.7
+    },
+    {
+      "date": "2026-04-09",
+      "close": 34861.16,
+      "change": 99.78,
+      "change_pct": 0.29,
+      "foreign_net": 317.8,
+      "trust_net": 14.6,
+      "dealer_net": 62.0
+    },
+    {
+      "date": "2026-04-10",
+      "close": 35417.83,
+      "change": 556.67,
+      "change_pct": 1.6,
+      "foreign_net": 288.1,
+      "trust_net": -31.7,
+      "dealer_net": 122.6
+    },
+    {
+      "date": "2026-04-13",
+      "close": 35457.29,
+      "change": 39.46,
+      "change_pct": 0.11,
+      "foreign_net": -161.3,
+      "trust_net": 71.4,
+      "dealer_net": 39.9
+    },
+    {
+      "date": "2026-04-14",
+      "close": 36296.12,
+      "change": 838.83,
+      "change_pct": 2.37,
+      "foreign_net": 689.1,
+      "trust_net": -56.7,
+      "dealer_net": 55.2
+    },
+    {
+      "date": "2026-04-15",
+      "close": 36722.14,
+      "change": 426.02,
+      "change_pct": 1.17,
+      "foreign_net": 557.1,
+      "trust_net": -91.3,
+      "dealer_net": -53.9
+    },
+    {
+      "date": "2026-04-16",
+      "close": 37132.02,
+      "change": 409.88,
+      "change_pct": 1.12,
+      "foreign_net": 440.1,
+      "trust_net": -43.3,
+      "dealer_net": 118.5
+    },
+    {
+      "date": "2026-04-17",
+      "close": 36804.34,
+      "change": -327.68,
+      "change_pct": -0.88,
+      "foreign_net": -20.4,
+      "trust_net": -103.1,
+      "dealer_net": -35.6
+    },
+    {
+      "date": "2026-04-20",
+      "close": 36958.8,
+      "change": 154.46,
+      "change_pct": 0.42,
+      "foreign_net": 43.5,
+      "trust_net": -16.1,
+      "dealer_net": -48.4
+    },
+    {
+      "date": "2026-04-21",
+      "close": 37605.11,
+      "change": 646.31,
+      "change_pct": 1.75,
+      "foreign_net": 601.5,
+      "trust_net": 82.2,
+      "dealer_net": -7.1
+    }
+  ],
+  "commodity_history": {
+    "series": [
+      {
+        "symbol": "Crude_Oil",
+        "name": "Brent 原油",
+        "values": [
+          {
+            "date": "2026-03-18",
+            "raw": 105.0,
+            "normalized": 100.0
+          },
+          {
+            "date": "2026-03-19",
+            "raw": 102.91999816894531,
+            "normalized": 98.02
+          },
+          {
+            "date": "2026-03-20",
+            "raw": 106.41000366210938,
+            "normalized": 101.34
+          },
+          {
+            "date": "2026-03-22",
+            "raw": 105.94999694824219,
+            "normalized": 100.9
+          },
+          {
+            "date": "2026-03-23",
+            "raw": 100.43000030517578,
+            "normalized": 95.65
+          },
+          {
+            "date": "2026-03-24",
+            "raw": 100.05999755859375,
+            "normalized": 95.3
+          },
+          {
+            "date": "2026-03-25",
+            "raw": 97.91999816894531,
+            "normalized": 93.26
+          },
+          {
+            "date": "2026-03-26",
+            "raw": 100.87999725341797,
+            "normalized": 96.08
+          },
+          {
+            "date": "2026-03-27",
+            "raw": 112.56999969482422,
+            "normalized": 107.21
+          },
+          {
+            "date": "2026-03-29",
+            "raw": 107.98999786376953,
+            "normalized": 102.85
+          },
+          {
+            "date": "2026-03-30",
+            "raw": 108.9000015258789,
+            "normalized": 103.71
+          },
+          {
+            "date": "2026-03-31",
+            "raw": 104.58000183105469,
+            "normalized": 99.6
+          },
+          {
+            "date": "2026-04-01",
+            "raw": 100.5999984741211,
+            "normalized": 95.81
+          },
+          {
+            "date": "2026-04-02",
+            "raw": 109.02999877929688,
+            "normalized": 103.84
+          },
+          {
+            "date": "2026-04-05",
+            "raw": 111.2699966430664,
+            "normalized": 105.97
+          },
+          {
+            "date": "2026-04-06",
+            "raw": 109.9000015258789,
+            "normalized": 104.67
+          },
+          {
+            "date": "2026-04-07",
+            "raw": 97.48999786376953,
+            "normalized": 92.85
+          },
+          {
+            "date": "2026-04-08",
+            "raw": 96.51000213623047,
+            "normalized": 91.91
+          },
+          {
+            "date": "2026-04-09",
+            "raw": 96.98999786376953,
+            "normalized": 92.37
+          },
+          {
+            "date": "2026-04-10",
+            "raw": 95.19999694824219,
+            "normalized": 90.67
+          },
+          {
+            "date": "2026-04-12",
+            "raw": 102.3499984741211,
+            "normalized": 97.48
+          },
+          {
+            "date": "2026-04-13",
+            "raw": 98.25,
+            "normalized": 93.57
+          },
+          {
+            "date": "2026-04-14",
+            "raw": 95.1500015258789,
+            "normalized": 90.62
+          },
+          {
+            "date": "2026-04-15",
+            "raw": 94.86000061035156,
+            "normalized": 90.34
+          },
+          {
+            "date": "2026-04-16",
+            "raw": 98.13999938964844,
+            "normalized": 93.47
+          },
+          {
+            "date": "2026-04-17",
+            "raw": 90.37999725341797,
+            "normalized": 86.08
+          },
+          {
+            "date": "2026-04-20",
+            "raw": 94.80000305175781,
+            "normalized": 90.29
+          },
+          {
+            "date": "2026-04-21",
+            "raw": 93.91999816894531,
+            "normalized": 89.45
+          }
+        ],
+        "latest": 93.91999816894531,
+        "change_pct": -0.93
+      },
+      {
+        "symbol": "Gold",
+        "name": "黃金",
+        "values": [
+          {
+            "date": "2026-03-18",
+            "raw": 4834.0,
+            "normalized": 100.0
+          },
+          {
+            "date": "2026-03-19",
+            "raw": 4648.0,
+            "normalized": 96.15
+          },
+          {
+            "date": "2026-03-20",
+            "raw": 4574.89990234375,
+            "normalized": 94.64
+          },
+          {
+            "date": "2026-03-22",
+            "raw": 4509.60009765625,
+            "normalized": 93.29
+          },
+          {
+            "date": "2026-03-23",
+            "raw": 4416.10009765625,
+            "normalized": 91.35
+          },
+          {
+            "date": "2026-03-24",
+            "raw": 4478.2998046875,
+            "normalized": 92.64
+          },
+          {
+            "date": "2026-03-25",
+            "raw": 4517.60009765625,
+            "normalized": 93.45
+          },
+          {
+            "date": "2026-03-26",
+            "raw": 4403.7998046875,
+            "normalized": 91.1
+          },
+          {
+            "date": "2026-03-27",
+            "raw": 4492.0,
+            "normalized": 92.93
+          },
+          {
+            "date": "2026-03-29",
+            "raw": 4514.60009765625,
+            "normalized": 93.39
+          },
+          {
+            "date": "2026-03-30",
+            "raw": 4540.60009765625,
+            "normalized": 93.93
+          },
+          {
+            "date": "2026-03-31",
+            "raw": 4700.10009765625,
+            "normalized": 97.23
+          },
+          {
+            "date": "2026-04-01",
+            "raw": 4804.5,
+            "normalized": 99.39
+          },
+          {
+            "date": "2026-04-02",
+            "raw": 4651.5,
+            "normalized": 96.22
+          },
+          {
+            "date": "2026-04-05",
+            "raw": 4671.2998046875,
+            "normalized": 96.63
+          },
+          {
+            "date": "2026-04-06",
+            "raw": 4687.7001953125,
+            "normalized": 96.97
+          },
+          {
+            "date": "2026-04-07",
+            "raw": 4798.7998046875,
+            "normalized": 99.27
+          },
+          {
+            "date": "2026-04-08",
+            "raw": 4739.2998046875,
+            "normalized": 98.04
+          },
+          {
+            "date": "2026-04-09",
+            "raw": 4783.5,
+            "normalized": 98.96
+          },
+          {
+            "date": "2026-04-10",
+            "raw": 4761.89990234375,
+            "normalized": 98.51
+          },
+          {
+            "date": "2026-04-12",
+            "raw": 4680.7001953125,
+            "normalized": 96.83
+          },
+          {
+            "date": "2026-04-13",
+            "raw": 4776.89990234375,
+            "normalized": 98.82
+          },
+          {
+            "date": "2026-04-14",
+            "raw": 4861.39990234375,
+            "normalized": 100.57
+          },
+          {
+            "date": "2026-04-15",
+            "raw": 4844.0,
+            "normalized": 100.21
+          },
+          {
+            "date": "2026-04-16",
+            "raw": 4816.10009765625,
+            "normalized": 99.63
+          },
+          {
+            "date": "2026-04-17",
+            "raw": 4857.60009765625,
+            "normalized": 100.49
+          },
+          {
+            "date": "2026-04-20",
+            "raw": 4850.7001953125,
+            "normalized": 100.35
+          },
+          {
+            "date": "2026-04-21",
+            "raw": 4734.10009765625,
+            "normalized": 97.93
+          }
+        ],
+        "latest": 4734.10009765625,
+        "change_pct": -2.4
+      },
+      {
+        "symbol": "DXY",
+        "name": "美元指數",
+        "values": [
+          {
+            "date": "2026-03-18",
+            "raw": 100.23400115966797,
+            "normalized": 100.0
+          },
+          {
+            "date": "2026-03-19",
+            "raw": 99.16000366210938,
+            "normalized": 98.93
+          },
+          {
+            "date": "2026-03-20",
+            "raw": 99.50299835205078,
+            "normalized": 99.27
+          },
+          {
+            "date": "2026-03-22",
+            "raw": 99.59200286865234,
+            "normalized": 99.36
+          },
+          {
+            "date": "2026-03-23",
+            "raw": 99.14700317382812,
+            "normalized": 98.92
+          },
+          {
+            "date": "2026-03-24",
+            "raw": 99.18299865722656,
+            "normalized": 98.95
+          },
+          {
+            "date": "2026-03-25",
+            "raw": 99.63800048828125,
+            "normalized": 99.41
+          },
+          {
+            "date": "2026-03-26",
+            "raw": 99.86499786376953,
+            "normalized": 99.63
+          },
+          {
+            "date": "2026-03-27",
+            "raw": 100.1500015258789,
+            "normalized": 99.92
+          },
+          {
+            "date": "2026-03-29",
+            "raw": 100.3290023803711,
+            "normalized": 100.09
+          },
+          {
+            "date": "2026-03-30",
+            "raw": 100.49099731445312,
+            "normalized": 100.26
+          },
+          {
+            "date": "2026-03-31",
+            "raw": 99.85700225830078,
+            "normalized": 99.62
+          },
+          {
+            "date": "2026-04-01",
+            "raw": 99.552001953125,
+            "normalized": 99.32
+          },
+          {
+            "date": "2026-04-02",
+            "raw": 100.01699829101562,
+            "normalized": 99.78
+          },
+          {
+            "date": "2026-04-05",
+            "raw": 100.22000122070312,
+            "normalized": 99.99
+          },
+          {
+            "date": "2026-04-06",
+            "raw": 99.98999786376953,
+            "normalized": 99.76
+          },
+          {
+            "date": "2026-04-07",
+            "raw": 99.51699829101562,
+            "normalized": 99.28
+          },
+          {
+            "date": "2026-04-08",
+            "raw": 98.99800109863281,
+            "normalized": 98.77
+          },
+          {
+            "date": "2026-04-09",
+            "raw": 98.79399871826172,
+            "normalized": 98.56
+          },
+          {
+            "date": "2026-04-10",
+            "raw": 98.6500015258789,
+            "normalized": 98.42
+          },
+          {
+            "date": "2026-04-12",
+            "raw": 99.12999725341797,
+            "normalized": 98.9
+          },
+          {
+            "date": "2026-04-13",
+            "raw": 98.3740005493164,
+            "normalized": 98.14
+          },
+          {
+            "date": "2026-04-14",
+            "raw": 98.10600280761719,
+            "normalized": 97.88
+          },
+          {
+            "date": "2026-04-15",
+            "raw": 98.01699829101562,
+            "normalized": 97.79
+          },
+          {
+            "date": "2026-04-16",
+            "raw": 98.18000030517578,
+            "normalized": 97.95
+          },
+          {
+            "date": "2026-04-17",
+            "raw": 98.0999984741211,
+            "normalized": 97.87
+          },
+          {
+            "date": "2026-04-20",
+            "raw": 98.05400085449219,
+            "normalized": 97.83
+          },
+          {
+            "date": "2026-04-21",
+            "raw": 98.40799713134766,
+            "normalized": 98.18
+          }
+        ],
+        "latest": 98.40799713134766,
+        "change_pct": 0.36
+      }
+    ],
+    "dates": [
+      "2026-03-18",
+      "2026-03-19",
+      "2026-03-20",
+      "2026-03-22",
+      "2026-03-23",
+      "2026-03-24",
+      "2026-03-25",
+      "2026-03-26",
+      "2026-03-27",
+      "2026-03-29",
+      "2026-03-30",
+      "2026-03-31",
+      "2026-04-01",
+      "2026-04-02",
+      "2026-04-05",
+      "2026-04-06",
+      "2026-04-07",
+      "2026-04-08",
+      "2026-04-09",
+      "2026-04-10",
+      "2026-04-12",
+      "2026-04-13",
+      "2026-04-14",
+      "2026-04-15",
+      "2026-04-16",
+      "2026-04-17",
+      "2026-04-20",
+      "2026-04-21"
+    ],
+    "source": "macro_economic_data"
+  },
+  "yield_oil_history": {
+    "series": [
+      {
+        "symbol": "US10Y",
+        "name": "美國10年期公債殖利率",
+        "values": [
+          {
+            "date": "2025-08-05",
+            "raw": 4.22,
+            "normalized": 100.0
+          },
+          {
+            "date": "2025-08-06",
+            "raw": 4.22,
+            "normalized": 100.0
+          },
+          {
+            "date": "2025-08-07",
+            "raw": 4.23,
+            "normalized": 100.24
+          },
+          {
+            "date": "2025-08-08",
+            "raw": 4.27,
+            "normalized": 101.18
+          },
+          {
+            "date": "2025-08-11",
+            "raw": 4.27,
+            "normalized": 101.18
+          },
+          {
+            "date": "2025-08-12",
+            "raw": 4.29,
+            "normalized": 101.66
+          },
+          {
+            "date": "2025-08-13",
+            "raw": 4.24,
+            "normalized": 100.47
+          },
+          {
+            "date": "2025-08-14",
+            "raw": 4.29,
+            "normalized": 101.66
+          },
+          {
+            "date": "2025-08-15",
+            "raw": 4.33,
+            "normalized": 102.61
+          },
+          {
+            "date": "2025-08-18",
+            "raw": 4.34,
+            "normalized": 102.84
+          },
+          {
+            "date": "2025-08-19",
+            "raw": 4.3,
+            "normalized": 101.9
+          },
+          {
+            "date": "2025-08-20",
+            "raw": 4.29,
+            "normalized": 101.66
+          },
+          {
+            "date": "2025-08-21",
+            "raw": 4.33,
+            "normalized": 102.61
+          },
+          {
+            "date": "2025-08-22",
+            "raw": 4.26,
+            "normalized": 100.95
+          },
+          {
+            "date": "2025-08-26",
+            "raw": 4.26,
+            "normalized": 100.95
+          },
+          {
+            "date": "2025-08-27",
+            "raw": 4.24,
+            "normalized": 100.47
+          },
+          {
+            "date": "2025-08-28",
+            "raw": 4.22,
+            "normalized": 100.0
+          },
+          {
+            "date": "2025-08-29",
+            "raw": 4.23,
+            "normalized": 100.24
+          },
+          {
+            "date": "2025-09-02",
+            "raw": 4.28,
+            "normalized": 101.42
+          },
+          {
+            "date": "2025-09-03",
+            "raw": 4.22,
+            "normalized": 100.0
+          },
+          {
+            "date": "2025-09-04",
+            "raw": 4.17,
+            "normalized": 98.82
+          },
+          {
+            "date": "2025-09-05",
+            "raw": 4.1,
+            "normalized": 97.16
+          },
+          {
+            "date": "2025-09-08",
+            "raw": 4.05,
+            "normalized": 95.97
+          },
+          {
+            "date": "2025-09-09",
+            "raw": 4.08,
+            "normalized": 96.68
+          },
+          {
+            "date": "2025-09-10",
+            "raw": 4.04,
+            "normalized": 95.73
+          },
+          {
+            "date": "2025-09-11",
+            "raw": 4.01,
+            "normalized": 95.02
+          },
+          {
+            "date": "2025-09-12",
+            "raw": 4.06,
+            "normalized": 96.21
+          },
+          {
+            "date": "2025-09-15",
+            "raw": 4.05,
+            "normalized": 95.97
+          },
+          {
+            "date": "2025-09-16",
+            "raw": 4.04,
+            "normalized": 95.73
+          },
+          {
+            "date": "2025-09-17",
+            "raw": 4.06,
+            "normalized": 96.21
+          },
+          {
+            "date": "2025-09-18",
+            "raw": 4.11,
+            "normalized": 97.39
+          },
+          {
+            "date": "2025-09-19",
+            "raw": 4.14,
+            "normalized": 98.1
+          },
+          {
+            "date": "2025-09-22",
+            "raw": 4.15,
+            "normalized": 98.34
+          },
+          {
+            "date": "2025-09-23",
+            "raw": 4.12,
+            "normalized": 97.63
+          },
+          {
+            "date": "2025-09-24",
+            "raw": 4.16,
+            "normalized": 98.58
+          },
+          {
+            "date": "2025-09-25",
+            "raw": 4.18,
+            "normalized": 99.05
+          },
+          {
+            "date": "2025-09-26",
+            "raw": 4.2,
+            "normalized": 99.53
+          },
+          {
+            "date": "2025-09-29",
+            "raw": 4.15,
+            "normalized": 98.34
+          },
+          {
+            "date": "2025-09-30",
+            "raw": 4.16,
+            "normalized": 98.58
+          },
+          {
+            "date": "2025-10-01",
+            "raw": 4.12,
+            "normalized": 97.63
+          },
+          {
+            "date": "2025-10-02",
+            "raw": 4.1,
+            "normalized": 97.16
+          },
+          {
+            "date": "2025-10-03",
+            "raw": 4.13,
+            "normalized": 97.87
+          },
+          {
+            "date": "2025-10-06",
+            "raw": 4.18,
+            "normalized": 99.05
+          },
+          {
+            "date": "2025-10-07",
+            "raw": 4.14,
+            "normalized": 98.1
+          },
+          {
+            "date": "2025-10-08",
+            "raw": 4.13,
+            "normalized": 97.87
+          },
+          {
+            "date": "2025-10-09",
+            "raw": 4.14,
+            "normalized": 98.1
+          },
+          {
+            "date": "2025-10-10",
+            "raw": 4.05,
+            "normalized": 95.97
+          },
+          {
+            "date": "2025-10-14",
+            "raw": 4.03,
+            "normalized": 95.5
+          },
+          {
+            "date": "2025-10-15",
+            "raw": 4.05,
+            "normalized": 95.97
+          },
+          {
+            "date": "2025-10-16",
+            "raw": 3.99,
+            "normalized": 94.55
+          },
+          {
+            "date": "2025-10-17",
+            "raw": 4.02,
+            "normalized": 95.26
+          },
+          {
+            "date": "2025-10-20",
+            "raw": 4.0,
+            "normalized": 94.79
+          },
+          {
+            "date": "2025-10-21",
+            "raw": 3.98,
+            "normalized": 94.31
+          },
+          {
+            "date": "2025-10-22",
+            "raw": 3.97,
+            "normalized": 94.08
+          },
+          {
+            "date": "2025-10-23",
+            "raw": 4.01,
+            "normalized": 95.02
+          },
+          {
+            "date": "2025-10-24",
+            "raw": 4.02,
+            "normalized": 95.26
+          },
+          {
+            "date": "2025-10-27",
+            "raw": 4.01,
+            "normalized": 95.02
+          },
+          {
+            "date": "2025-10-28",
+            "raw": 3.99,
+            "normalized": 94.55
+          },
+          {
+            "date": "2025-10-29",
+            "raw": 4.08,
+            "normalized": 96.68
+          },
+          {
+            "date": "2025-10-30",
+            "raw": 4.11,
+            "normalized": 97.39
+          },
+          {
+            "date": "2025-10-31",
+            "raw": 4.11,
+            "normalized": 97.39
+          },
+          {
+            "date": "2025-11-03",
+            "raw": 4.13,
+            "normalized": 97.87
+          },
+          {
+            "date": "2025-11-10",
+            "raw": 4.13,
+            "normalized": 97.87
+          },
+          {
+            "date": "2025-11-12",
+            "raw": 4.08,
+            "normalized": 96.68
+          },
+          {
+            "date": "2025-11-13",
+            "raw": 4.11,
+            "normalized": 97.39
+          },
+          {
+            "date": "2025-11-14",
+            "raw": 4.14,
+            "normalized": 98.1
+          },
+          {
+            "date": "2025-11-17",
+            "raw": 4.13,
+            "normalized": 97.87
+          },
+          {
+            "date": "2025-11-18",
+            "raw": 4.12,
+            "normalized": 97.63
+          },
+          {
+            "date": "2025-11-19",
+            "raw": 4.13,
+            "normalized": 97.87
+          },
+          {
+            "date": "2025-11-20",
+            "raw": 4.1,
+            "normalized": 97.16
+          },
+          {
+            "date": "2025-11-21",
+            "raw": 4.06,
+            "normalized": 96.21
+          },
+          {
+            "date": "2025-11-24",
+            "raw": 4.04,
+            "normalized": 95.73
+          },
+          {
+            "date": "2025-11-25",
+            "raw": 4.01,
+            "normalized": 95.02
+          },
+          {
+            "date": "2025-11-26",
+            "raw": 4.0,
+            "normalized": 94.79
+          },
+          {
+            "date": "2025-11-28",
+            "raw": 4.02,
+            "normalized": 95.26
+          },
+          {
+            "date": "2025-12-01",
+            "raw": 4.09,
+            "normalized": 96.92
+          },
+          {
+            "date": "2025-12-02",
+            "raw": 4.09,
+            "normalized": 96.92
+          },
+          {
+            "date": "2025-12-03",
+            "raw": 4.06,
+            "normalized": 96.21
+          },
+          {
+            "date": "2025-12-04",
+            "raw": 4.11,
+            "normalized": 97.39
+          },
+          {
+            "date": "2025-12-05",
+            "raw": 4.14,
+            "normalized": 98.1
+          },
+          {
+            "date": "2025-12-08",
+            "raw": 4.17,
+            "normalized": 98.82
+          },
+          {
+            "date": "2025-12-09",
+            "raw": 4.18,
+            "normalized": 99.05
+          },
+          {
+            "date": "2025-12-10",
+            "raw": 4.13,
+            "normalized": 97.87
+          },
+          {
+            "date": "2025-12-11",
+            "raw": 4.14,
+            "normalized": 98.1
+          },
+          {
+            "date": "2025-12-12",
+            "raw": 4.19,
+            "normalized": 99.29
+          },
+          {
+            "date": "2025-12-15",
+            "raw": 4.18,
+            "normalized": 99.05
+          },
+          {
+            "date": "2025-12-16",
+            "raw": 4.15,
+            "normalized": 98.34
+          },
+          {
+            "date": "2025-12-17",
+            "raw": 4.16,
+            "normalized": 98.58
+          },
+          {
+            "date": "2025-12-18",
+            "raw": 4.12,
+            "normalized": 97.63
+          },
+          {
+            "date": "2025-12-19",
+            "raw": 4.16,
+            "normalized": 98.58
+          },
+          {
+            "date": "2025-12-22",
+            "raw": 4.17,
+            "normalized": 98.82
+          },
+          {
+            "date": "2025-12-23",
+            "raw": 4.18,
+            "normalized": 99.05
+          },
+          {
+            "date": "2025-12-24",
+            "raw": 4.15,
+            "normalized": 98.34
+          },
+          {
+            "date": "2025-12-29",
+            "raw": 4.12,
+            "normalized": 97.63
+          },
+          {
+            "date": "2025-12-30",
+            "raw": 4.14,
+            "normalized": 98.1
+          },
+          {
+            "date": "2026-01-02",
+            "raw": 4.19,
+            "normalized": 99.29
+          },
+          {
+            "date": "2026-01-05",
+            "raw": 4.17,
+            "normalized": 98.82
+          },
+          {
+            "date": "2026-01-06",
+            "raw": 4.18,
+            "normalized": 99.05
+          },
+          {
+            "date": "2026-01-07",
+            "raw": 4.15,
+            "normalized": 98.34
+          },
+          {
+            "date": "2026-01-08",
+            "raw": 4.19,
+            "normalized": 99.29
+          },
+          {
+            "date": "2026-01-09",
+            "raw": 4.18,
+            "normalized": 99.05
+          },
+          {
+            "date": "2026-01-12",
+            "raw": 4.19,
+            "normalized": 99.29
+          },
+          {
+            "date": "2026-01-13",
+            "raw": 4.18,
+            "normalized": 99.05
+          },
+          {
+            "date": "2026-01-14",
+            "raw": 4.15,
+            "normalized": 98.34
+          },
+          {
+            "date": "2026-01-15",
+            "raw": 4.17,
+            "normalized": 98.82
+          },
+          {
+            "date": "2026-01-16",
+            "raw": 4.24,
+            "normalized": 100.47
+          },
+          {
+            "date": "2026-01-20",
+            "raw": 4.3,
+            "normalized": 101.9
+          },
+          {
+            "date": "2026-01-21",
+            "raw": 4.26,
+            "normalized": 100.95
+          },
+          {
+            "date": "2026-01-22",
+            "raw": 4.26,
+            "normalized": 100.95
+          },
+          {
+            "date": "2026-01-23",
+            "raw": 4.24,
+            "normalized": 100.47
+          },
+          {
+            "date": "2026-01-26",
+            "raw": 4.22,
+            "normalized": 100.0
+          }
+        ],
+        "latest": 4.22,
+        "change_pct": -0.47
+      },
+      {
+        "symbol": "Crude_Oil",
+        "name": "Brent 原油",
+        "values": [
+          {
+            "date": "2025-08-05",
+            "raw": 69.14,
+            "normalized": 100.0
+          },
+          {
+            "date": "2025-08-06",
+            "raw": 67.97,
+            "normalized": 98.31
+          },
+          {
+            "date": "2025-08-07",
+            "raw": 66.99,
+            "normalized": 96.89
+          },
+          {
+            "date": "2025-08-08",
+            "raw": 67.17,
+            "normalized": 97.15
+          },
+          {
+            "date": "2025-08-11",
+            "raw": 67.36,
+            "normalized": 97.43
+          },
+          {
+            "date": "2025-08-12",
+            "raw": 66.8,
+            "normalized": 96.62
+          },
+          {
+            "date": "2025-08-13",
+            "raw": 66.25,
+            "normalized": 95.82
+          },
+          {
+            "date": "2025-08-14",
+            "raw": 68.12,
+            "normalized": 98.52
+          },
+          {
+            "date": "2025-08-15",
+            "raw": 67.3,
+            "normalized": 97.34
+          },
+          {
+            "date": "2025-08-18",
+            "raw": 68.18,
+            "normalized": 98.61
+          },
+          {
+            "date": "2025-08-19",
+            "raw": 66.62,
+            "normalized": 96.36
+          },
+          {
+            "date": "2025-08-20",
+            "raw": 67.61,
+            "normalized": 97.79
+          },
+          {
+            "date": "2025-08-21",
+            "raw": 68.41,
+            "normalized": 98.94
+          },
+          {
+            "date": "2025-08-22",
+            "raw": 68.29,
+            "normalized": 98.77
+          },
+          {
+            "date": "2025-08-26",
+            "raw": 66.89,
+            "normalized": 96.75
+          },
+          {
+            "date": "2025-08-27",
+            "raw": 67.75,
+            "normalized": 97.99
+          },
+          {
+            "date": "2025-08-28",
+            "raw": 68.61,
+            "normalized": 99.23
+          },
+          {
+            "date": "2025-08-29",
+            "raw": 67.83,
+            "normalized": 98.11
+          },
+          {
+            "date": "2025-09-02",
+            "raw": 68.09,
+            "normalized": 98.48
+          },
+          {
+            "date": "2025-09-03",
+            "raw": 67.76,
+            "normalized": 98.0
+          },
+          {
+            "date": "2025-09-04",
+            "raw": 66.41,
+            "normalized": 96.05
+          },
+          {
+            "date": "2025-09-05",
+            "raw": 64.92,
+            "normalized": 93.9
+          },
+          {
+            "date": "2025-09-08",
+            "raw": 65.44,
+            "normalized": 94.65
+          },
+          {
+            "date": "2025-09-09",
+            "raw": 67.97,
+            "normalized": 98.31
+          },
+          {
+            "date": "2025-09-10",
+            "raw": 67.62,
+            "normalized": 97.8
+          },
+          {
+            "date": "2025-09-11",
+            "raw": 67.25,
+            "normalized": 97.27
+          },
+          {
+            "date": "2025-09-12",
+            "raw": 67.87,
+            "normalized": 98.16
+          },
+          {
+            "date": "2025-09-15",
+            "raw": 67.88,
+            "normalized": 98.18
+          },
+          {
+            "date": "2025-09-16",
+            "raw": 69.69,
+            "normalized": 100.8
+          },
+          {
+            "date": "2025-09-17",
+            "raw": 69.19,
+            "normalized": 100.07
+          },
+          {
+            "date": "2025-09-18",
+            "raw": 67.83,
+            "normalized": 98.11
+          },
+          {
+            "date": "2025-09-19",
+            "raw": 67.05,
+            "normalized": 96.98
+          },
+          {
+            "date": "2025-09-22",
+            "raw": 66.87,
+            "normalized": 96.72
+          },
+          {
+            "date": "2025-09-23",
+            "raw": 67.96,
+            "normalized": 98.29
+          },
+          {
+            "date": "2025-09-24",
+            "raw": 69.64,
+            "normalized": 100.72
+          },
+          {
+            "date": "2025-09-25",
+            "raw": 70.48,
+            "normalized": 101.94
+          },
+          {
+            "date": "2025-09-26",
+            "raw": 71.15,
+            "normalized": 102.91
+          },
+          {
+            "date": "2025-09-29",
+            "raw": 69.0,
+            "normalized": 99.8
+          },
+          {
+            "date": "2025-09-30",
+            "raw": 68.52,
+            "normalized": 99.1
+          },
+          {
+            "date": "2025-10-01",
+            "raw": 66.67,
+            "normalized": 96.43
+          },
+          {
+            "date": "2025-10-02",
+            "raw": 65.44,
+            "normalized": 94.65
+          },
+          {
+            "date": "2025-10-03",
+            "raw": 66.13,
+            "normalized": 95.65
+          },
+          {
+            "date": "2025-10-06",
+            "raw": 67.09,
+            "normalized": 97.04
+          },
+          {
+            "date": "2025-10-07",
+            "raw": 67.1,
+            "normalized": 97.05
+          },
+          {
+            "date": "2025-10-08",
+            "raw": 67.42,
+            "normalized": 97.51
+          },
+          {
+            "date": "2025-10-09",
+            "raw": 67.23,
+            "normalized": 97.24
+          },
+          {
+            "date": "2025-10-10",
+            "raw": 64.41,
+            "normalized": 93.16
+          },
+          {
+            "date": "2025-10-14",
+            "raw": 63.0,
+            "normalized": 91.12
+          },
+          {
+            "date": "2025-10-15",
+            "raw": 62.33,
+            "normalized": 90.15
+          },
+          {
+            "date": "2025-10-16",
+            "raw": 61.08,
+            "normalized": 88.34
+          },
+          {
+            "date": "2025-10-17",
+            "raw": 61.23,
+            "normalized": 88.56
+          },
+          {
+            "date": "2025-10-20",
+            "raw": 60.71,
+            "normalized": 87.81
+          },
+          {
+            "date": "2025-10-21",
+            "raw": 61.0,
+            "normalized": 88.23
+          },
+          {
+            "date": "2025-10-22",
+            "raw": 62.28,
+            "normalized": 90.08
+          },
+          {
+            "date": "2025-10-23",
+            "raw": 66.32,
+            "normalized": 95.92
+          },
+          {
+            "date": "2025-10-24",
+            "raw": 65.8,
+            "normalized": 95.17
+          },
+          {
+            "date": "2025-10-27",
+            "raw": 65.52,
+            "normalized": 94.76
+          },
+          {
+            "date": "2025-10-28",
+            "raw": 64.03,
+            "normalized": 92.61
+          },
+          {
+            "date": "2025-10-29",
+            "raw": 65.01,
+            "normalized": 94.03
+          },
+          {
+            "date": "2025-10-30",
+            "raw": 65.11,
+            "normalized": 94.17
+          },
+          {
+            "date": "2025-10-31",
+            "raw": 65.44,
+            "normalized": 94.65
+          },
+          {
+            "date": "2025-11-03",
+            "raw": 65.79,
+            "normalized": 95.15
+          },
+          {
+            "date": "2025-11-10",
+            "raw": 63.01,
+            "normalized": 91.13
+          },
+          {
+            "date": "2025-11-12",
+            "raw": 61.88,
+            "normalized": 89.5
+          },
+          {
+            "date": "2025-11-13",
+            "raw": 62.14,
+            "normalized": 89.88
+          },
+          {
+            "date": "2025-11-14",
+            "raw": 63.45,
+            "normalized": 91.77
+          },
+          {
+            "date": "2025-11-17",
+            "raw": 63.16,
+            "normalized": 91.35
+          },
+          {
+            "date": "2025-11-18",
+            "raw": 64.86,
+            "normalized": 93.81
+          },
+          {
+            "date": "2025-11-19",
+            "raw": 63.78,
+            "normalized": 92.25
+          },
+          {
+            "date": "2025-11-20",
+            "raw": 63.64,
+            "normalized": 92.05
+          },
+          {
+            "date": "2025-11-21",
+            "raw": 62.78,
+            "normalized": 90.8
+          },
+          {
+            "date": "2025-11-24",
+            "raw": 64.83,
+            "normalized": 93.77
+          },
+          {
+            "date": "2025-11-25",
+            "raw": 63.99,
+            "normalized": 92.55
+          },
+          {
+            "date": "2025-11-26",
+            "raw": 64.81,
+            "normalized": 93.74
+          },
+          {
+            "date": "2025-11-28",
+            "raw": 64.07,
+            "normalized": 92.67
+          },
+          {
+            "date": "2025-12-01",
+            "raw": 64.22,
+            "normalized": 92.88
+          },
+          {
+            "date": "2025-12-02",
+            "raw": 63.37,
+            "normalized": 91.65
+          },
+          {
+            "date": "2025-12-03",
+            "raw": 63.75,
+            "normalized": 92.2
+          },
+          {
+            "date": "2025-12-04",
+            "raw": 64.15,
+            "normalized": 92.78
+          },
+          {
+            "date": "2025-12-05",
+            "raw": 64.42,
+            "normalized": 93.17
+          },
+          {
+            "date": "2025-12-08",
+            "raw": 63.3,
+            "normalized": 91.55
+          },
+          {
+            "date": "2025-12-09",
+            "raw": 62.62,
+            "normalized": 90.57
+          },
+          {
+            "date": "2025-12-10",
+            "raw": 63.12,
+            "normalized": 91.29
+          },
+          {
+            "date": "2025-12-11",
+            "raw": 61.87,
+            "normalized": 89.49
+          },
+          {
+            "date": "2025-12-12",
+            "raw": 62.11,
+            "normalized": 89.83
+          },
+          {
+            "date": "2025-12-15",
+            "raw": 61.55,
+            "normalized": 89.02
+          },
+          {
+            "date": "2025-12-16",
+            "raw": 59.93,
+            "normalized": 86.68
+          },
+          {
+            "date": "2025-12-17",
+            "raw": 60.61,
+            "normalized": 87.66
+          },
+          {
+            "date": "2025-12-18",
+            "raw": 60.69,
+            "normalized": 87.78
+          },
+          {
+            "date": "2025-12-19",
+            "raw": 61.35,
+            "normalized": 88.73
+          },
+          {
+            "date": "2025-12-22",
+            "raw": 62.22,
+            "normalized": 89.99
+          },
+          {
+            "date": "2025-12-23",
+            "raw": 63.7,
+            "normalized": 92.13
+          },
+          {
+            "date": "2025-12-24",
+            "raw": 63.7,
+            "normalized": 92.13
+          },
+          {
+            "date": "2025-12-29",
+            "raw": 63.1,
+            "normalized": 91.26
+          },
+          {
+            "date": "2025-12-30",
+            "raw": 62.3,
+            "normalized": 90.11
+          },
+          {
+            "date": "2026-01-02",
+            "raw": 61.98,
+            "normalized": 89.64
+          },
+          {
+            "date": "2026-01-05",
+            "raw": 63.0,
+            "normalized": 91.12
+          },
+          {
+            "date": "2026-01-06",
+            "raw": 62.1,
+            "normalized": 89.82
+          },
+          {
+            "date": "2026-01-07",
+            "raw": 61.08,
+            "normalized": 88.34
+          },
+          {
+            "date": "2026-01-08",
+            "raw": 63.34,
+            "normalized": 91.61
+          },
+          {
+            "date": "2026-01-09",
+            "raw": 65.11,
+            "normalized": 94.17
+          },
+          {
+            "date": "2026-01-12",
+            "raw": 65.4,
+            "normalized": 94.59
+          },
+          {
+            "date": "2026-01-13",
+            "raw": 67.58,
+            "normalized": 97.74
+          },
+          {
+            "date": "2026-01-14",
+            "raw": 68.87,
+            "normalized": 99.61
+          },
+          {
+            "date": "2026-01-15",
+            "raw": 66.16,
+            "normalized": 95.69
+          },
+          {
+            "date": "2026-01-16",
+            "raw": 66.97,
+            "normalized": 96.86
+          },
+          {
+            "date": "2026-01-20",
+            "raw": 67.68,
+            "normalized": 97.89
+          },
+          {
+            "date": "2026-01-21",
+            "raw": 66.72,
+            "normalized": 96.5
+          },
+          {
+            "date": "2026-01-22",
+            "raw": 65.46,
+            "normalized": 94.68
+          },
+          {
+            "date": "2026-01-23",
+            "raw": 68.16,
+            "normalized": 98.58
+          },
+          {
+            "date": "2026-01-26",
+            "raw": 67.7,
+            "normalized": 97.92
+          }
+        ],
+        "latest": 67.7,
+        "change_pct": -0.67
+      }
+    ],
+    "dates": [
+      "2025-08-05",
+      "2025-08-06",
+      "2025-08-07",
+      "2025-08-08",
+      "2025-08-11",
+      "2025-08-12",
+      "2025-08-13",
+      "2025-08-14",
+      "2025-08-15",
+      "2025-08-18",
+      "2025-08-19",
+      "2025-08-20",
+      "2025-08-21",
+      "2025-08-22",
+      "2025-08-26",
+      "2025-08-27",
+      "2025-08-28",
+      "2025-08-29",
+      "2025-09-02",
+      "2025-09-03",
+      "2025-09-04",
+      "2025-09-05",
+      "2025-09-08",
+      "2025-09-09",
+      "2025-09-10",
+      "2025-09-11",
+      "2025-09-12",
+      "2025-09-15",
+      "2025-09-16",
+      "2025-09-17",
+      "2025-09-18",
+      "2025-09-19",
+      "2025-09-22",
+      "2025-09-23",
+      "2025-09-24",
+      "2025-09-25",
+      "2025-09-26",
+      "2025-09-29",
+      "2025-09-30",
+      "2025-10-01",
+      "2025-10-02",
+      "2025-10-03",
+      "2025-10-06",
+      "2025-10-07",
+      "2025-10-08",
+      "2025-10-09",
+      "2025-10-10",
+      "2025-10-14",
+      "2025-10-15",
+      "2025-10-16",
+      "2025-10-17",
+      "2025-10-20",
+      "2025-10-21",
+      "2025-10-22",
+      "2025-10-23",
+      "2025-10-24",
+      "2025-10-27",
+      "2025-10-28",
+      "2025-10-29",
+      "2025-10-30",
+      "2025-10-31",
+      "2025-11-03",
+      "2025-11-10",
+      "2025-11-12",
+      "2025-11-13",
+      "2025-11-14",
+      "2025-11-17",
+      "2025-11-18",
+      "2025-11-19",
+      "2025-11-20",
+      "2025-11-21",
+      "2025-11-24",
+      "2025-11-25",
+      "2025-11-26",
+      "2025-11-28",
+      "2025-12-01",
+      "2025-12-02",
+      "2025-12-03",
+      "2025-12-04",
+      "2025-12-05",
+      "2025-12-08",
+      "2025-12-09",
+      "2025-12-10",
+      "2025-12-11",
+      "2025-12-12",
+      "2025-12-15",
+      "2025-12-16",
+      "2025-12-17",
+      "2025-12-18",
+      "2025-12-19",
+      "2025-12-22",
+      "2025-12-23",
+      "2025-12-24",
+      "2025-12-29",
+      "2025-12-30",
+      "2026-01-02",
+      "2026-01-05",
+      "2026-01-06",
+      "2026-01-07",
+      "2026-01-08",
+      "2026-01-09",
+      "2026-01-12",
+      "2026-01-13",
+      "2026-01-14",
+      "2026-01-15",
+      "2026-01-16",
+      "2026-01-20",
+      "2026-01-21",
+      "2026-01-22",
+      "2026-01-23",
+      "2026-01-26"
+    ],
+    "source": "macro_data"
+  },
+  "market_news": {
+    "news_list": [
+      {
+        "title": "1.群益印美戰略多重資產基金三月...",
+        "url": "https://www.moneydj.com/kmdj/report/reportviewer.aspx?a=22b5b62c-a4e4-4e92-b8de-1f8c4f1ec4db",
+        "source": "MoneyDJ",
+        "date": "",
+        "category": "熱門排行",
+        "summary": "1.群益印美戰略多重資產基金三月...",
+        "published_at": null,
+        "bucket": "tw"
+      },
+      {
+        "title": "2.群益全球地產入息基金三月市場...",
+        "url": "https://www.moneydj.com/kmdj/report/reportviewer.aspx?a=e8df4227-ea0e-4e21-8ff7-d4d9cbcbca48",
+        "source": "MoneyDJ",
+        "date": "",
+        "category": "熱門排行",
+        "summary": "2.群益全球地產入息基金三月市場...",
+        "published_at": null,
+        "bucket": "tw"
+      },
+      {
+        "title": "3.群益中小型股基金三月市場綜合...",
+        "url": "https://www.moneydj.com/kmdj/report/reportviewer.aspx?a=9080b2c0-5173-47a6-be20-42b203b57d6f",
+        "source": "MoneyDJ",
+        "date": "",
+        "category": "熱門排行",
+        "summary": "3.群益中小型股基金三月市場綜合...",
+        "published_at": null,
+        "bucket": "tw"
+      },
+      {
+        "title": "4.全球投資專家富蘭克林 理柏台...",
+        "url": "https://www.moneydj.com/kmdj/report/reportviewer.aspx?a=171ecff9-8755-4c1a-9615-ae410c2ff754",
+        "source": "MoneyDJ",
+        "date": "",
+        "category": "熱門排行",
+        "summary": "4.全球投資專家富蘭克林 理柏台...",
+        "published_at": null,
+        "bucket": "tw"
+      },
+      {
+        "title": "5.台中銀數位時代基金三月份市場...",
+        "url": "https://www.moneydj.com/kmdj/report/reportviewer.aspx?a=0b8ab594-aaea-4d23-94a8-91c5a8131f13",
+        "source": "MoneyDJ",
+        "date": "",
+        "category": "熱門排行",
+        "summary": "5.台中銀數位時代基金三月份市場...",
+        "published_at": null,
+        "bucket": "tw"
+      },
+      {
+        "title": "2.群益印度中小基金三月市場綜合評論",
+        "url": "https://www.moneydj.com/kmdj/report/reportviewer.aspx?a=26096a54-9748-4cf4-a4cd-4ae5eedd174b",
+        "source": "MoneyDJ",
+        "date": "",
+        "category": "熱門排行",
+        "summary": "2.群益印度中小基金三月市場綜合評論",
+        "published_at": null,
+        "bucket": "tw"
+      },
+      {
+        "id": "6428356",
+        "title": "庫克卸任不謝幕！轉任執行董事長扛起蘋果「全球大使」重擔 斡旋美中印地緣政治",
+        "summary": "庫克卸任不謝幕！轉任執行董事長扛起蘋果「全球大使」重擔 斡旋美中印地緣政治",
+        "url": "https://news.cnyes.com/news/id/6428356",
+        "published_at": 1776814446,
+        "source": "cnyes",
+        "category": "us_stock",
+        "bucket": "us"
+      },
+      {
+        "id": "6428307",
+        "title": "AI代理時代來臨！Meta拿員工鍵盤、滑鼠操作數據訓練模型 引爆隱私爭議",
+        "summary": "Meta 啟動新一波 AI 轉型，透過蒐集員工滑鼠與鍵盤操作數據訓練模型，目標打造可自主工作的 AI 代理。然而，此舉在提升效率的同時，也引發對職場監控與隱私權的廣泛關注，科技業變革進一步升溫。",
+        "url": "https://news.cnyes.com/news/id/6428307",
+        "published_at": 1776814205,
+        "source": "cnyes",
+        "category": "us_stock",
+        "bucket": "us"
+      },
+      {
+        "id": "6428362",
+        "title": "穆吉塔巴：將動用無人機、飛彈攻擊美以軍隊",
+        "summary": "伊朗最高領袖穆吉塔巴．哈米尼 (Mojtaba Khamenei) 透過官方 Telegram 帳號於週二 (21 日) 晚間發出強硬訊息，揚言將動用無人機與飛彈攻擊美國與以色列部隊",
+        "url": "https://news.cnyes.com/news/id/6428362",
+        "published_at": 1776813603,
+        "source": "cnyes",
+        "category": "us_stock",
+        "bucket": "us"
+      },
+      {
+        "id": "6428342",
+        "title": "蘋果此時公布接班人 可能透露財報關鍵訊號",
+        "summary": "觀察蘋果這次高層異動，宣布時機讓部分華爾街人士感到意外，這或許也是周二 (21 日) 股價下跌近 3% 原因之一。分析師指出一個重點：蘋果很可能在 4 月 30 日公布一份強勁的財報。",
+        "url": "https://news.cnyes.com/news/id/6428342",
+        "published_at": 1776813003,
+        "source": "cnyes",
+        "category": "us_stock",
+        "bucket": "us"
+      }
+    ],
+    "themes": [
+      {
+        "name": "AI 監管與隱私擔憂升溫",
+        "insight": "Meta 透過蒐集員工鍵盤與滑鼠操作數據訓練 AI 模型，引發對職場監控和隱私權的廣泛擔憂，顯示 AI 發展伴隨著的倫理與監管問題日益受到關注。",
+        "score": 85,
+        "sources": [
+          "鉅亨網台灣"
+        ],
+        "evidence": [
+          "AI代理時代來臨！Meta拿員工鍵盤、滑鼠操作數據訓練模型 引爆隱私爭議"
+        ]
+      },
+      {
+        "name": "地緣政治緊張局勢加劇",
+        "insight": "伊朗領導人揚言將動用無人機與飛彈攻擊美以軍隊，加劇了地區緊張局勢，這可能對全球市場帶來不確定性與波動。",
+        "score": 75,
+        "sources": [
+          "鉅亨網台灣"
+        ],
+        "evidence": [
+          "穆吉塔巴：將動用無人機、飛彈攻擊美以軍隊"
+        ]
+      },
+      {
+        "name": "蘋果高層異動與財報預期",
+        "insight": "蘋果公司高層人事變動，庫克轉任執行董事長，此時機點的宣布可能暗示著強勁的財報表現，但也影響了股價短期表現。",
+        "score": 70,
+        "sources": [
+          "鉅亨網台灣"
+        ],
+        "evidence": [
+          "庫克卸任不謝幕！轉任執行董事長扛起蘋果「全球大使」重擔 斡旋美中印地緣政治",
+          "蘋果此時公布接班人 可能透露財報關鍵訊號"
+        ]
+      },
+      {
+        "name": "多檔基金聚焦特定區域與資產",
+        "insight": "市場上有多檔基金關注特定區域（如印度、印尼）或特定資產類別（如地產、全球戰略、中小型股），顯示投資者對多元化配置和特定市場機會的興趣。",
+        "score": 65,
+        "sources": [
+          "MoneyDJ 熱門排行"
+        ],
+        "evidence": [
+          "1.群益印美戰略多重資產基金三月...",
+          "2.群益全球地產入息基金三月市場...",
+          "3.群益中小型股基金三月市場綜合...",
+          "2.群益印度中小基金三月市場綜合評論"
+        ]
+      }
+    ],
+    "source_groups": [
+      {
+        "name": "MoneyDJ 熱門排行",
+        "subtitle": "台灣盤面與主題彙整",
+        "icon": "🇹🇼",
+        "items": [
+          {
+            "title": "1.群益印美戰略多重資產基金三月...",
+            "url": "https://www.moneydj.com/kmdj/report/reportviewer.aspx?a=22b5b62c-a4e4-4e92-b8de-1f8c4f1ec4db",
+            "source": "MoneyDJ",
+            "date": "",
+            "category": "熱門排行",
+            "summary": "1.群益印美戰略多重資產基金三月...",
+            "published_at": null,
+            "bucket": "tw"
+          },
+          {
+            "title": "2.群益全球地產入息基金三月市場...",
+            "url": "https://www.moneydj.com/kmdj/report/reportviewer.aspx?a=e8df4227-ea0e-4e21-8ff7-d4d9cbcbca48",
+            "source": "MoneyDJ",
+            "date": "",
+            "category": "熱門排行",
+            "summary": "2.群益全球地產入息基金三月市場...",
+            "published_at": null,
+            "bucket": "tw"
+          },
+          {
+            "title": "3.群益中小型股基金三月市場綜合...",
+            "url": "https://www.moneydj.com/kmdj/report/reportviewer.aspx?a=9080b2c0-5173-47a6-be20-42b203b57d6f",
+            "source": "MoneyDJ",
+            "date": "",
+            "category": "熱門排行",
+            "summary": "3.群益中小型股基金三月市場綜合...",
+            "published_at": null,
+            "bucket": "tw"
+          },
+          {
+            "title": "4.全球投資專家富蘭克林 理柏台...",
+            "url": "https://www.moneydj.com/kmdj/report/reportviewer.aspx?a=171ecff9-8755-4c1a-9615-ae410c2ff754",
+            "source": "MoneyDJ",
+            "date": "",
+            "category": "熱門排行",
+            "summary": "4.全球投資專家富蘭克林 理柏台...",
+            "published_at": null,
+            "bucket": "tw"
+          }
+        ],
+        "count": 6
+      },
+      {
+        "name": "鉅亨網台灣",
+        "subtitle": "CNYES 台股新聞",
+        "icon": "🗞️",
+        "items": [
+          {
+            "id": "6428281",
+            "title": "〈台股盤前要聞〉台股飛上天 千金股發威 市值排名大洗牌、外銷訂單衝破900億美元",
+            "summary": "台股盤前要聞",
+            "url": "https://news.cnyes.com/news/id/6428281",
+            "published_at": 1776805802,
+            "source": "cnyes",
+            "category": "tw_stock",
+            "bucket": "tw_cnyes"
+          }
+        ],
+        "count": 1
+      },
+      {
+        "name": "美股 / 宏觀",
+        "subtitle": "CNYES 美股新聞",
+        "icon": "🇺🇸",
+        "items": [
+          {
+            "id": "6428356",
+            "title": "庫克卸任不謝幕！轉任執行董事長扛起蘋果「全球大使」重擔 斡旋美中印地緣政治",
+            "summary": "庫克卸任不謝幕！轉任執行董事長扛起蘋果「全球大使」重擔 斡旋美中印地緣政治",
+            "url": "https://news.cnyes.com/news/id/6428356",
+            "published_at": 1776814446,
+            "source": "cnyes",
+            "category": "us_stock",
+            "bucket": "us"
+          },
+          {
+            "id": "6428307",
+            "title": "AI代理時代來臨！Meta拿員工鍵盤、滑鼠操作數據訓練模型 引爆隱私爭議",
+            "summary": "Meta 啟動新一波 AI 轉型，透過蒐集員工滑鼠與鍵盤操作數據訓練模型，目標打造可自主工作的 AI 代理。然而，此舉在提升效率的同時，也引發對職場監控與隱私權的廣泛關注，科技業變革進一步升溫。",
+            "url": "https://news.cnyes.com/news/id/6428307",
+            "published_at": 1776814205,
+            "source": "cnyes",
+            "category": "us_stock",
+            "bucket": "us"
+          },
+          {
+            "id": "6428362",
+            "title": "穆吉塔巴：將動用無人機、飛彈攻擊美以軍隊",
+            "summary": "伊朗最高領袖穆吉塔巴．哈米尼 (Mojtaba Khamenei) 透過官方 Telegram 帳號於週二 (21 日) 晚間發出強硬訊息，揚言將動用無人機與飛彈攻擊美國與以色列部隊",
+            "url": "https://news.cnyes.com/news/id/6428362",
+            "published_at": 1776813603,
+            "source": "cnyes",
+            "category": "us_stock",
+            "bucket": "us"
+          },
+          {
+            "id": "6428342",
+            "title": "蘋果此時公布接班人 可能透露財報關鍵訊號",
+            "summary": "觀察蘋果這次高層異動，宣布時機讓部分華爾街人士感到意外，這或許也是周二 (21 日) 股價下跌近 3% 原因之一。分析師指出一個重點：蘋果很可能在 4 月 30 日公布一份強勁的財報。",
+            "url": "https://news.cnyes.com/news/id/6428342",
+            "published_at": 1776813003,
+            "source": "cnyes",
+            "category": "us_stock",
+            "bucket": "us"
+          }
+        ],
+        "count": 16
+      },
+      {
+        "name": "全球頭條",
+        "subtitle": "Bloomberg / Reuters / CNBC",
+        "icon": "🌍",
+        "items": [
+          {
+            "id": "gn_cnbc_tech_1776811986_2514",
+            "title": "Jim Cramer says these stocks show why you need to trade on fundamentals, not fear",
+            "summary": "Jim Cramer says these stocks show why you need to trade on fundamentals, not fear",
+            "url": "https://www.cnbc.com/2026/04/21/jim-cramer-these-stocks-show-why-you-trade-on-fundamentals-not-fear.html",
+            "published_at": 1776810992,
+            "source": "global_cnbc_tech",
+            "category": "headline",
+            "bucket": "global"
+          },
+          {
+            "id": "gn_cnbc_tech_1776811986_6640",
+            "title": "Apple's elevation of silicon head Johny Srouji signals sprint to build in-house chips for all devices",
+            "summary": "Apple's elevation of silicon head Johny Srouji signals sprint to build in-house chips for all devices",
+            "url": "https://www.cnbc.com/2026/04/21/apple-promotes-chip-lead-srouji-as-it-corners-silicon-in-iphones-macs.html",
+            "published_at": 1776810510,
+            "source": "global_cnbc_tech",
+            "category": "headline",
+            "bucket": "global"
+          },
+          {
+            "id": "gn_bloomberg_1776814848_1048",
+            "title": "US Stock Futures Rise as Trump Extends Iran Truce: Markets Wrap",
+            "summary": "US Stock Futures Rise as Trump Extends Iran Truce: Markets Wrap",
+            "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQczczZ25ncGNCQS1qN3JEamVBZlpxZ1dYbVgyeTBXdU95UDlEUnVSR2RzaDZJUFFDdzdfNGhldHpaWTAxcXpXczd4cmY3OTRNRkJMQ3lCVGRHZDQyOG13ZUYtQ2tZOVQ2TU9ZMWtsUEdMb2w3YzVaMFpWclUyeGlMdWdYa2FMakVjMlVHd3hhdzM5b283?oc=5",
+            "published_at": 1776809633,
+            "source": "global_bloomberg",
+            "category": "headline",
+            "bucket": "global"
+          },
+          {
+            "id": "gn_cnbc_top_1776804760_4076",
+            "title": "Analysis: Warsh emerges from a difficult hearing with his Fed 'regime-change' plan intact",
+            "summary": "Analysis: Warsh emerges from a difficult hearing with his Fed 'regime-change' plan intact",
+            "url": "https://www.cnbc.com/2026/04/21/kevin-warsh-fed-regime-change-senate-confirmation-hearing.html",
+            "published_at": 1776801476,
+            "source": "global_cnbc_top",
+            "category": "headline",
+            "bucket": "global"
+          }
+        ],
+        "count": 11
+      },
+      {
+        "name": "API 新聞",
+        "subtitle": "NewsAPI.ai / Finnhub / AI 專區",
+        "icon": "🔌",
+        "items": [
+          {
+            "id": "6428379",
+            "title": "全球市場面臨不確定性：英特爾股價飆升、油價上漲及伊朗談判僵局影響經濟前景",
+            "summary": "全球市場面臨不確定性：英特爾股價飆升、油價上漲及伊朗談判僵局影響經濟前景",
+            "url": "https://news.cnyes.com/news/id/6428379",
+            "published_at": 1776811803,
+            "source": "cnyes",
+            "category": "ai_news",
+            "bucket": "api"
+          },
+          {
+            "id": "6428378",
+            "title": "美股動態：英特爾飆升、亞馬遜進軍減重藥、川普延長伊朗停火引不確定性",
+            "summary": "美股動態：英特爾飆升、亞馬遜進軍減重藥、川普延長伊朗停火引不確定性",
+            "url": "https://news.cnyes.com/news/id/6428378",
+            "published_at": 1776811802,
+            "source": "cnyes",
+            "category": "ai_news",
+            "bucket": "api"
+          },
+          {
+            "id": "6428376",
+            "title": "台股持續上揚，權值股強勁及政策變革影響市場動態",
+            "summary": "台股持續上揚，權值股強勁及政策變革影響市場動態",
+            "url": "https://news.cnyes.com/news/id/6428376",
+            "published_at": 1776811209,
+            "source": "cnyes",
+            "category": "ai_news",
+            "bucket": "api"
+          },
+          {
+            "id": "6428374",
+            "title": "英特爾股價暴漲50%，油價上升，全球市場因地緣政治緊張而謹慎應對",
+            "summary": "英特爾股價暴漲50%，油價上升，全球市場因地緣政治緊張而謹慎應對",
+            "url": "https://news.cnyes.com/news/id/6428374",
+            "published_at": 1776810905,
+            "source": "cnyes",
+            "category": "ai_news",
+            "bucket": "api"
+          }
+        ],
+        "count": 32
+      }
+    ],
+    "source_summary": [
+      {
+        "label": "MoneyDJ 熱門排行",
+        "count": 6,
+        "icon": "🇹🇼"
+      },
+      {
+        "label": "鉅亨網台灣",
+        "count": 1,
+        "icon": "🗞️"
+      },
+      {
+        "label": "美股 / 宏觀",
+        "count": 16,
+        "icon": "🇺🇸"
+      },
+      {
+        "label": "全球頭條",
+        "count": 11,
+        "icon": "🌍"
+      },
+      {
+        "label": "API 新聞",
+        "count": 32,
+        "icon": "🔌"
+      }
+    ],
+    "highlights": [
+      "🇹🇼 MoneyDJ 熱門排行 6 則",
+      "🗞️ 鉅亨網台灣 1 則",
+      "🇺🇸 美股 / 宏觀 16 則",
+      "🌍 全球頭條 11 則"
+    ]
+  },
+  "social_topic_heatmap": {
+    "source": "stock_social",
+    "benchmark": "PTT Stock / Google Trends（商業與財經）",
+    "report_date": "2026-04-22",
+    "coverage": 6,
+    "as_of": "2026-04-22T07:41:33.618245",
+    "summary": "社群熱度聚焦在 法國電力公司、cpo 概念 股、華城電機股份有限公司，共有 6 個上升主題。",
+    "topics": [
+      {
+        "topic": "法國電力公司",
+        "source": "google_trends_finance",
+        "score": 5000.0,
+        "velocity": 1000.0,
+        "timestamp": "2026-04-22T07:41:33.618245",
+        "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
+        "direction": "rising",
+        "is_rising": true
+      },
+      {
+        "topic": "cpo 概念 股",
+        "source": "google_trends_finance",
+        "score": 5000.0,
+        "velocity": 1000.0,
+        "timestamp": "2026-04-22T07:41:33.618245",
+        "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
+        "direction": "rising",
+        "is_rising": true
+      },
+      {
+        "topic": "華城電機股份有限公司",
+        "source": "google_trends_finance",
+        "score": 2000.0,
+        "velocity": 1000.0,
+        "timestamp": "2026-04-22T07:41:33.618245",
+        "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
+        "direction": "rising",
+        "is_rising": true
+      },
+      {
+        "topic": "金 居 違約 交割",
+        "source": "google_trends_finance",
+        "score": 2000.0,
+        "velocity": 700.0,
+        "timestamp": "2026-04-22T07:41:33.618245",
+        "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
+        "direction": "rising",
+        "is_rising": true
+      },
+      {
+        "topic": "日本經濟新聞",
+        "source": "google_trends_finance",
+        "score": 2000.0,
+        "velocity": 600.0,
+        "timestamp": "2026-04-22T07:41:33.618245",
+        "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
+        "direction": "rising",
+        "is_rising": true
+      },
+      {
+        "topic": "電源供應",
+        "source": "google_trends_finance",
+        "score": 1000.0,
+        "velocity": 1000.0,
+        "timestamp": "2026-04-22T07:41:33.618245",
+        "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
+        "direction": "rising",
+        "is_rising": true
+      }
+    ],
+    "source_summary": [
+      {
+        "source": "google_trends_finance",
+        "count": 6
+      }
+    ]
+  },
+  "tech_topic_heatmap": {
+    "source": "market_news",
+    "benchmark": "科技主題 / 新聞主線",
+    "report_date": "2026-04-22",
+    "coverage": 4,
+    "as_of": "2026-04-22",
+    "summary": "科技主題熱度集中在 AI 監管與隱私擔憂升溫、地緣政治緊張局勢加劇、蘋果高層異動與財報預期，主線仍由新聞主題驅動。",
+    "topics": [
+      {
+        "topic": "AI 監管與隱私擔憂升溫",
+        "summary": "Meta 透過蒐集員工鍵盤與滑鼠操作數據訓練 AI 模型，引發對職場監控和隱私權的廣泛擔憂，顯示 AI 發展伴隨著的倫理與監管問題日益受到關注。",
+        "score": 85,
+        "sources": [
+          "鉅亨網台灣"
+        ],
+        "evidence": [
+          "AI代理時代來臨！Meta拿員工鍵盤、滑鼠操作數據訓練模型 引爆隱私爭議"
+        ]
+      },
+      {
+        "topic": "地緣政治緊張局勢加劇",
+        "summary": "伊朗領導人揚言將動用無人機與飛彈攻擊美以軍隊，加劇了地區緊張局勢，這可能對全球市場帶來不確定性與波動。",
+        "score": 75,
+        "sources": [
+          "鉅亨網台灣"
+        ],
+        "evidence": [
+          "穆吉塔巴：將動用無人機、飛彈攻擊美以軍隊"
+        ]
+      },
+      {
+        "topic": "蘋果高層異動與財報預期",
+        "summary": "蘋果公司高層人事變動，庫克轉任執行董事長，此時機點的宣布可能暗示著強勁的財報表現，但也影響了股價短期表現。",
+        "score": 70,
+        "sources": [
+          "鉅亨網台灣"
+        ],
+        "evidence": [
+          "庫克卸任不謝幕！轉任執行董事長扛起蘋果「全球大使」重擔 斡旋美中印地緣政治",
+          "蘋果此時公布接班人 可能透露財報關鍵訊號"
+        ]
+      },
+      {
+        "topic": "多檔基金聚焦特定區域與資產",
+        "summary": "市場上有多檔基金關注特定區域（如印度、印尼）或特定資產類別（如地產、全球戰略、中小型股），顯示投資者對多元化配置和特定市場機會的興趣。",
+        "score": 65,
+        "sources": [
+          "MoneyDJ 熱門排行"
+        ],
+        "evidence": [
+          "1.群益印美戰略多重資產基金三月...",
+          "2.群益全球地產入息基金三月市場...",
+          "3.群益中小型股基金三月市場綜合...",
+          "2.群益印度中小基金三月市場綜合評論"
+        ]
+      }
+    ]
+  },
+  "ai_analysis": {
+    "full_text": "2026-04-22 盤前晨報：台積電 ADR 高溢價考驗市場承接力道\n【今日結論】\n今日台股開盤將聚焦於台積電 ADR 13.24% 的歷史性高溢價是否引發修正，此為盤面首要觀察指標。若溢價能有效消化，盤勢有望維持多頭格局，並留意 CPO 及測試相關族群的表現；反之，若台積電 ADR 走勢疲弱，恐牽動整體市場士氣，並對指數帶來壓力。\n【新聞驅動】\n全球地緣政治緊張情緒因伊朗拒絕出席第二輪談判而再次升溫，同時川普的停火消息也為市場帶來不確定性。此外，亞馬遜進軍 GLP-1 減重管理服務，可能對生技與遠距醫療產業產生衝擊。英特爾 CPU 需求強勁帶動股價走強，為科技股注入一線生機；而蘋果 CEO 庫克即將卸任的傳聞，雖肯定其任內貢獻，但也再次引發對蘋果未來創新動力的討論。\n【國際與台股】\n昨夜美股三大指數收低，S&P 500 下跌 0.63%，Nasdaq 下跌 0.59%，費半則逆勢上漲 0.50%。台積電 ADR 雖上漲 0.50%，但換算後對比台灣現貨的高溢價幅度成為關鍵警訊。夜盤台指期小幅下跌，富台指期則表現相對強勁。東北亞股市日經 225 和 KOSPI 皆呈現上漲，為台股開盤提供一定支撐。\n【KOL與情緒】\n社群熱搜關鍵字顯示散戶情緒正轉向，對 CPO、電力、特定個股（聯茂、華城、金居）及 ETF（0056）的關注度提升，但「金居違約交割」等負面消息的出現，預示著市場雜訊增加，投資人決策空間受限，容易受短期情緒干擾。近期外資期貨連日賣超，亦顯示市場存在不確定性。\n【操作含意】\n今日操作上，首要應觀察台積電 ADR 高溢價的消化情況，若出現顯著拉回，則建議謹慎操作，避開可能受到拖累的權重股。若溢價能夠維持或小幅回落，則可伺機布局 CPO、測試等具有話題性的族群，並留意個股的籌碼動態。同時，需留意新增非農就業數據不如預期所暗示的宏觀經濟潛在風險，以及地緣政治事件的後續發展。",
+    "generated_at": "2026-04-22T07:44:06"
+  },
+  "chart_orchestration": {
+    "family": "Midweek Risk",
+    "report_type": "morning",
+    "report_date": "2026-04-22",
+    "chart_budget": 4,
+    "source": "gemini",
+    "generated_at": "2026-04-22T07:44:37",
+    "selected_charts": [
+      {
+        "id": "social_topic_heatmap_panel",
+        "title": "社群熱度圖",
+        "description": "PTT / Dcard / Google Trends 的熱門主題、速度與升溫強度。",
+        "families": [
+          "Pre-open",
+          "Close Summary",
+          "Midweek Risk",
+          "Weekend Macro",
+          "Next Week Preview"
+        ],
+        "takeaway": "社群熱度聚焦在 法國電力公司、cpo 概念 股、華城電機股份有限公司，顯示這些話題在社群媒體上受到關注，可能影響相關族群的短期表現。",
+        "action": "關注社群熱門話題對相關概念股的影響。",
+        "priority": "medium"
+      },
+      {
+        "id": "tech_topic_heatmap_panel",
+        "title": "科技主題熱度圖",
+        "description": "科技新聞主題與市場主線的熱度排名與來源證據。",
+        "families": [
+          "Pre-open",
+          "Close Summary",
+          "Midweek Risk",
+          "Weekend Macro",
+          "Next Week Preview"
+        ],
+        "takeaway": "科技主題熱度由新聞驅動，AI 監管、地緣政治及蘋果相關消息是近期市場關注焦點，需留意其對科技股的潛在影響。",
+        "action": "關注科技新聞主題的發展，特別是 AI 監管與地緣政治對科技產業的影響。",
+        "priority": "medium"
+      },
+      {
+        "id": "news_theme_strip",
+        "title": "多來源新聞主題",
+        "description": "Gemini 整合後的 3 到 5 個核心新聞主題與來源證據。",
+        "families": [
+          "Pre-open",
+          "Close Summary",
+          "Midweek Risk",
+          "Weekend Macro",
+          "Next Week Preview"
+        ],
+        "takeaway": "地緣政治緊張升溫，伊朗拒絕談判及川普的停火消息為市場帶來不確定性；亞馬遜進軍減重管理服務可能衝擊生技遠距醫療；英特爾 CPU 需求強勁帶動股價。",
+        "action": "關注地緣政治動態、亞馬遜新業務以及英特爾的市場表現。",
+        "priority": "medium"
+      }
+    ],
+    "chart_order": [
+      "social_topic_heatmap_panel",
+      "tech_topic_heatmap_panel",
+      "news_theme_strip"
+    ],
+    "chart_commentary": [
+      {
+        "chart_id": "social_topic_heatmap_panel",
+        "takeaway": "社群熱度聚焦在 法國電力公司、cpo 概念 股、華城電機股份有限公司，顯示這些話題在社群媒體上受到關注，可能影響相關族群的短期表現。",
+        "action": "關注社群熱門話題對相關概念股的影響。"
+      },
+      {
+        "chart_id": "tech_topic_heatmap_panel",
+        "takeaway": "科技主題熱度由新聞驅動，AI 監管、地緣政治及蘋果相關消息是近期市場關注焦點，需留意其對科技股的潛在影響。",
+        "action": "關注科技新聞主題的發展，特別是 AI 監管與地緣政治對科技產業的影響。"
+      },
+      {
+        "chart_id": "news_theme_strip",
+        "takeaway": "地緣政治緊張升溫，伊朗拒絕談判及川普的停火消息為市場帶來不確定性；亞馬遜進軍減重管理服務可能衝擊生技遠距醫療；英特爾 CPU 需求強勁帶動股價。",
+        "action": "關注地緣政治動態、亞馬遜新業務以及英特爾的市場表現。"
+      }
+    ],
+    "overall_summary": "今日台股盤勢將聚焦於台積電 ADR 13.24% 的歷史性高溢價，這將是影響市場情緒的關鍵指標。若溢價能有效消化，CPO 及測試相關族群有望受惠；反之，則可能對大盤造成壓力。地緣政治緊張局勢加劇、AI 監管與隱私擔憂升溫、以及蘋果高層人事變動是近期市場關注的焦點。社群熱度則集中在法國電力公司、cpo 概念股及華城電機等話題。",
+    "news_themes": [
+      {
+        "label": "地緣政治緊張局勢加劇",
+        "summary": "伊朗領導人揚言將動用無人機與飛彈攻擊美以軍隊，加劇了地區緊張局勢，這可能對全球市場帶來不確定性與波動。",
+        "sources": [
+          "鉅亨網台灣"
+        ],
+        "evidence": [
+          "穆吉塔巴：將動用無人機、飛彈攻擊美以軍隊"
+        ]
+      },
+      {
+        "label": "AI 監管與隱私擔憂升溫",
+        "summary": "Meta 透過蒐集員工鍵盤與滑鼠操作數據訓練 AI 模型，引發對職場監控和隱私權的廣泛擔憂，顯示 AI 發展伴隨著的倫理與監管問題日益受到關注。",
+        "sources": [
+          "鉅亨網台灣"
+        ],
+        "evidence": [
+          "AI代理時代來臨！Meta拿員工鍵盤、滑鼠操作數據訓練模型 引爆隱私爭議"
+        ]
+      },
+      {
+        "label": "蘋果高層異動與財報預期",
+        "summary": "蘋果公司高層人事變動，庫克轉任執行董事長，此時機點的宣布可能暗示著強勁的財報表現，但也影響了股價短期表現。",
+        "sources": [
+          "鉅亨網台灣"
+        ],
+        "evidence": [
+          "庫克卸任不謝幕！轉任執行董事長扛起蘋果「全球大使」重擔 斡旋美中印地緣政治",
+          "蘋果此時公布接班人 可能透露財報關鍵訊號"
+        ]
+      },
+      {
+        "label": "亞馬遜拓展減重管理服務",
+        "summary": "亞馬遜進軍 GLP-1 減重管理服務，此舉可能對現有的生技及遠距醫療產業帶來新的競爭壓力與市場變動。",
+        "sources": [],
+        "evidence": []
+      },
+      {
+        "label": "英特爾 CPU 需求強勁",
+        "summary": "英特爾 CPU 需求強勁，帶動其股價走勢，顯示在特定科技領域的需求仍然穩健。",
+        "sources": [],
+        "evidence": []
+      }
+    ],
+    "chart_gap_suggestions": [
+      {
+        "chart_name": "地緣政治風險圖 (ACLED)",
+        "why_needed": "把衝突事件數、致死數與未來風險預測可視化，讓地緣政治對市場的影響更直觀。",
+        "data_needed": [
+          "recent conflict count",
+          "fatalities",
+          "forecast hotspots",
+          "date range"
+        ],
+        "which_report_types": [
+          "morning",
+          "evening",
+          "weekend_morning",
+          "weekend_evening",
+          "weekly_review"
+        ],
+        "priority": "high",
+        "evidence": "專案已有 ACLED service，但目前未做成可視化圖表。"
+      },
+      {
+        "chart_name": "社群熱度圖 (PTT / Dcard)",
+        "why_needed": "把 PTT 與 Dcard 的熱門討論、看多看空比與主題熱度做成圖，補足市場情緒面。",
+        "data_needed": [
+          "top posts",
+          "bullish/bearish ratio",
+          "topic themes",
+          "engagement score"
+        ],
+        "which_report_types": [
+          "morning",
+          "evening",
+          "weekend_morning",
+          "weekend_evening"
+        ],
+        "priority": "medium",
+        "evidence": "現有 trend_pulse 與社群抓取已能提供底層資料。"
+      },
+      {
+        "chart_name": "科技主題熱度圖",
+        "why_needed": "晨報常聚焦 AI / 半導體 / 科技權值，將科技主題與新聞來源拆開呈現會更清楚。",
+        "data_needed": [
+          "topic score",
+          "news source mix",
+          "trend velocity"
+        ],
+        "which_report_types": [
+          "morning",
+          "weekend_morning"
+        ],
+        "priority": "low",
+        "evidence": "目前科技內容散落在新聞主題與 AI 分析中，尚未獨立成圖。"
+      }
+    ]
+  },
+  "data_health": {
+    "us_macro": {
+      "state": "OK",
+      "source": "research.db/macro_economic_data",
+      "updated_at": "2026-04-21",
+      "age_days": 1,
+      "max_age_days": 1,
+      "reason": null,
+      "freshness_label": "current"
+    },
+    "asia_market": {
+      "state": "OK",
+      "source": "yfinance",
+      "updated_at": "2026-04-22",
+      "age_days": 0,
+      "max_age_days": 1,
+      "reason": null,
+      "freshness_label": "current"
+    },
+    "sentiment": {
+      "state": "OK",
+      "source": "research.db / stock.db",
+      "updated_at": "2026-04-22",
+      "age_days": 0,
+      "max_age_days": 1,
+      "reason": null,
+      "freshness_label": "current"
+    },
+    "market_news": {
+      "state": "MISSING",
+      "source": "None",
+      "updated_at": null,
+      "age_days": null,
+      "max_age_days": 1,
+      "reason": "last updated timestamp missing",
+      "freshness_label": "missing"
+    },
+    "ai_analysis": {
+      "state": "OK",
+      "source": "gemini",
+      "updated_at": "2026-04-22",
+      "age_days": 0,
+      "max_age_days": 0,
+      "reason": null,
+      "freshness_label": "current"
+    }
+  },
+  "headline": {
+    "teaser": "**2026-04-22 盤前晨報：高溢價下的盤勢變數**",
+    "signal": "bullish",
+    "action": "逢低佈局"
+  }
+}

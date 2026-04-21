@@ -569,6 +569,98 @@ function renderAiSummary(data) {
 }
 
 // ---------------------------------------------------------------------------
+// TDCC 集保籌碼
+// ---------------------------------------------------------------------------
+let _tdccChart = null;
+
+async function loadTdcc(symbol) {
+  const body = el("tdcc-body");
+  const canvas = el("tdcc-chart");
+  if (body) body.innerHTML = '<div class="skeleton" style="width:80%"></div><div class="skeleton" style="width:60%"></div>';
+  if (canvas) canvas.style.display = "none";
+
+  try {
+    const data = await apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/tdcc`);
+    renderTdcc(data);
+  } catch (e) {
+    if (body) body.innerHTML = `<div class="section-error">集保資料暫時無法取得。</div>`;
+  }
+}
+
+function renderTdcc(data) {
+  const body = el("tdcc-body");
+  const canvas = el("tdcc-chart");
+  if (!body) return;
+
+  if (data.error) {
+    body.innerHTML = `<div class="section-error">集保資料暫時無法取得（${data.detail || data.error}）。</div>`;
+    if (canvas) canvas.style.display = "none";
+    return;
+  }
+
+  const trendMap = {
+    up_strong: { label: "強力增持 ▲▲", color: "#4ade80" },
+    up:        { label: "增持 ▲",       color: "#86efac" },
+    flat:      { label: "持平 →",       color: "#94a3b8" },
+    down:      { label: "減持 ▼",       color: "#fca5a5" },
+    down_strong:{ label: "大幅減持 ▼▼", color: "#f87171" },
+  };
+  const trend = trendMap[data.trend] || { label: data.trend, color: "#94a3b8" };
+  const changeSign = data.big_hands_change > 0 ? "+" : "";
+  const changeCls  = data.big_hands_change > 0 ? "pos" : data.big_hands_change < 0 ? "neg" : "zero";
+
+  body.innerHTML = `
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+      <div>
+        <div style="font-size:11px;color:var(--muted)">大戶持股比例</div>
+        <div style="font-size:22px;font-weight:700;color:var(--fg)">${data.big_hands_ratio.toFixed(2)}%</div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--muted)">較上期</div>
+        <div class="inst-val ${changeCls}" style="font-size:16px;font-weight:600">${changeSign}${data.big_hands_change.toFixed(2)}%</div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--muted)">趨勢</div>
+        <div style="font-size:14px;font-weight:600;color:${trend.color}">${trend.label}</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px">資料日期：${data.latest_date} · 持股 > 1000 張</div>`;
+
+  if (canvas && data.history && data.history.length > 0) {
+    canvas.style.display = "block";
+    if (_tdccChart) { _tdccChart.destroy(); _tdccChart = null; }
+    const labels = data.history.map(r => String(r.date).slice(5));
+    const values = data.history.map(r => r.big_hands_ratio);
+    _tdccChart = new Chart(canvas, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [{
+          label: "大戶持股%",
+          data: values,
+          borderColor: "#76a9ff",
+          backgroundColor: "rgba(118,169,255,0.08)",
+          borderWidth: 2,
+          pointRadius: 3,
+          tension: 0.3,
+          fill: true,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        aspectRatio: 5,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: "#8da1bf", font: { size: 10 } }, grid: { color: "rgba(148,163,184,0.08)" } },
+          y: { ticks: { color: "#8da1bf", font: { size: 10 }, callback: v => v + "%" }, grid: { color: "rgba(148,163,184,0.08)" } },
+        },
+      },
+    });
+  }
+}
+
+// ---------------------------------------------------------------------------
 // loadSymbol — clear cache on new symbol, load active tab
 // ---------------------------------------------------------------------------
 function loadSymbol(symbol) {
@@ -580,10 +672,12 @@ function loadSymbol(symbol) {
   if (prev !== currentSymbol) {
     _tabCache = {};
     if (_klineChart) { _klineChart.dispose(); _klineChart = null; }
+    if (_tdccChart) { _tdccChart.destroy(); _tdccChart = null; }
   }
 
   loadQuote(currentSymbol);
   loadInterpretation(currentSymbol);
+  loadTdcc(currentSymbol);
 
   // Load whichever tab is currently active
   const activeBtn = document.querySelector(".wb-tab-btn.active");
