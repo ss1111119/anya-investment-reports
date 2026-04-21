@@ -1,0 +1,487 @@
+/* market_dashboard.css */
+
+/* ── Sub-tab bar (reuses wb-tab-bar pattern) ─────────────────────────────── */
+.mkt-tab-bar {
+  display: flex;
+  overflow-x: auto;
+  gap: 2px;
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.mkt-tab-btn {
+  flex-shrink: 0;
+  padding: 5px 14px;
+  border-radius: 6px 6px 0 0;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.12s;
+}
+
+.mkt-tab-btn:hover { color: var(--fg); }
+.mkt-tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); font-weight: 700; }
+
+/* ── Panel toolbar ────────────────────────────────────────────────────────── */
+.mkt-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.mkt-refresh-btn {
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.mkt-refresh-btn:hover { background: var(--surface2); }
+.mkt-refresh-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Filter pill bar (like news) ─────────────────────────────────────────── */
+.mkt-flow-filter,
+.mkt-scan-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.mkt-filter-btn {
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mkt-filter-btn:hover { color: var(--fg); }
+.mkt-filter-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #07101c;
+  font-weight: 600;
+}
+
+/* ── States ───────────────────────────────────────────────────────────────── */
+.mkt-loading {
+  padding: 40px 0;
+  color: var(--muted);
+  text-align: center;
+  font-size: 14px;
+}
+
+.mkt-error {
+  padding: 16px;
+  color: #f87171;
+  font-size: 13px;
+}
+
+.mkt-empty {
+  padding: 40px 0;
+  color: var(--muted);
+  text-align: center;
+  font-size: 13px;
+}
+
+.mkt-date-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+/* ── Table ────────────────────────────────────────────────────────────────── */
+.mkt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.mkt-table th {
+  text-align: left;
+  padding: 6px 10px;
+  color: var(--muted);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+}
+
+.mkt-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mkt-table-full { width: 100%; }
+
+.mkt-up { color: #4ade80; }
+.mkt-dn { color: #f87171; }
+
+/* ── Flow grid ────────────────────────────────────────────────────────────── */
+.mkt-flow-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.mkt-flow-card {
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.mkt-flow-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--fg);
+}
+
+/* ── Overview grid ────────────────────────────────────────────────────────── */
+.mkt-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.mkt-overview-card {
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.mkt-overview-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mkt-overview-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--fg);
+}
+
+/* ── Macro ────────────────────────────────────────────────────────────────── */
+.mkt-macro-header {
+  margin-bottom: 16px;
+}
+
+.mkt-level-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.mkt-level-green { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+.mkt-level-yellow { background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250,204,21,0.3); }
+.mkt-level-red { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+
+.mkt-reasons {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+}
+
+.mkt-reasons li {
+  font-size: 13px;
+  color: var(--fg);
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.5;
+}
+
+/* ── Calendar ─────────────────────────────────────────────────────────────── */
+.mkt-impact-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.mkt-impact-high { background: rgba(248,113,113,0.15); color: #f87171; }
+.mkt-impact-med  { background: rgba(250,204,21,0.15);  color: #facc15; }
+.mkt-impact-low  { background: var(--surface2); color: var(--muted); }
+
+/* ── Overview — sentiment ─────────────────────────────────────────────────── */
+.mkt-sentiment-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mkt-score-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 3px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.mkt-regime-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+/* ── Overview — smart money ───────────────────────────────────────────────── */
+.mkt-smart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mkt-smart-item {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.mkt-smart-val {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.mkt-smart-key {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* ── Scan cards ──────────────────────────────────────────────────────────── */
+.mkt-scan-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.mkt-scan-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.mkt-scan-date {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.mkt-scan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.mkt-scan-card {
+  background: var(--surface2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.mkt-scan-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mkt-scan-rank {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #07101c;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mkt-scan-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mkt-scan-code {
+  font-size: 11px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.mkt-scan-card-body {
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mkt-scan-detail {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.mkt-scan-detail.mkt-scan-full {
+  color: var(--muted);
+}
+
+.mkt-scan-key {
+  color: var(--muted);
+}
+
+.mkt-scan-val {
+  color: var(--fg);
+  font-weight: 500;
+  text-align: right;
+}
+
+/* ── Trend ────────────────────────────────────────────────────────────────── */
+.mkt-trend-card {
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.mkt-trend-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.mkt-trend-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fg);
+  flex: 1;
+}
+
+.mkt-trend-signal {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mkt-score-pill {
+  flex-shrink: 0;
+  padding: 2px 10px;
+  border-radius: 20px;
+  border: 1.5px solid;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.mkt-trend-insight {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--fg);
+  margin-bottom: 6px;
+}
+
+.mkt-trend-evidence {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.mkt-trend-summary {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--surface2);
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--fg);
+  border-left: 3px solid var(--accent);
+}
+
+/* ── Threads ──────────────────────────────────────────────────────────────── */
+.mkt-thread-presets {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.mkt-thread-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.mkt-thread-input {
+  flex: 1;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--fg);
+  font-size: 13px;
+  outline: none;
+}
+
+.mkt-thread-input:focus { border-color: var(--accent); }
+
+.mkt-thread-report {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--fg);
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.mkt-thread-hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 8px 0;
+}
+
+/* ── Pre-formatted text (scan results) ───────────────────────────────────── */
+.mkt-pretext {
+  font-family: 'Noto Sans TC', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--fg);
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0;
+}

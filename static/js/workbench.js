@@ -69,14 +69,14 @@ function updateMarketBadge() {
 
 let _quoteRefreshTimer = null;
 
-function startQuoteAutoRefresh() {
-  if (_quoteRefreshTimer) return;
-  _quoteRefreshTimer = setInterval(() => {
-    if (isTaiwanMarketOpen() && currentSymbol) {
-      loadQuote(currentSymbol);
-    }
-  }, 60000); // every 60s
-}
+// function startQuoteAutoRefresh() {
+//   if (_quoteRefreshTimer) return;
+//   _quoteRefreshTimer = setInterval(() => {
+//     if (isTaiwanMarketOpen() && currentSymbol) {
+//       loadQuote(currentSymbol);
+//     }
+//   }, 90000); // every 90s — backend cache TTL is 60s, this gives breathing room
+// }
 
 // ---------------------------------------------------------------------------
 // Quote + Interpretation
@@ -747,10 +747,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Market badge + auto-refresh
+  // Market badge
   updateMarketBadge();
   setInterval(updateMarketBadge, 60000);
-  startQuoteAutoRefresh();
+  // startQuoteAutoRefresh(); // disabled — use manual refresh to avoid IP rate-limiting
 
   el("watchlist-add-btn").addEventListener("click", addToWatchlist);
   el("watchlist-input").addEventListener("keydown", e => { if (e.key === "Enter") addToWatchlist(); });
