@@ -41,6 +41,44 @@ function fmtNet(v) {
 }
 
 // ---------------------------------------------------------------------------
+// Market status helpers
+// ---------------------------------------------------------------------------
+function isTaiwanMarketOpen() {
+  const now = new Date();
+  // Convert to Taiwan time (UTC+8)
+  const tw = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Taipei" }));
+  const day  = tw.getDay(); // 0=Sun, 6=Sat
+  const hour = tw.getHours();
+  const min  = tw.getMinutes();
+  const mins = hour * 60 + min;
+  if (day === 0 || day === 6) return false;
+  return mins >= 9 * 60 && mins < 13 * 60 + 30;
+}
+
+function updateMarketBadge() {
+  const badge = el("market-status-badge");
+  if (!badge) return;
+  if (isTaiwanMarketOpen()) {
+    badge.style.display = "";
+    badge.className = "meta-chip live";
+    badge.textContent = "開盤中";
+  } else {
+    badge.style.display = "none";
+  }
+}
+
+let _quoteRefreshTimer = null;
+
+function startQuoteAutoRefresh() {
+  if (_quoteRefreshTimer) return;
+  _quoteRefreshTimer = setInterval(() => {
+    if (isTaiwanMarketOpen() && currentSymbol) {
+      loadQuote(currentSymbol);
+    }
+  }, 60000); // every 60s
+}
+
+// ---------------------------------------------------------------------------
 // Quote + Interpretation
 // ---------------------------------------------------------------------------
 async function loadQuote(symbol) {
@@ -700,6 +738,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (sym) loadSymbol(sym);
   });
   inp.addEventListener("keydown", e => { if (e.key === "Enter") el("lookup-btn").click(); });
+
+  // Quote refresh button
+  const refreshBtn = el("quote-refresh-btn");
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", () => {
+      if (currentSymbol) loadQuote(currentSymbol);
+    });
+  }
+
+  // Market badge + auto-refresh
+  updateMarketBadge();
+  setInterval(updateMarketBadge, 60000);
+  startQuoteAutoRefresh();
 
   el("watchlist-add-btn").addEventListener("click", addToWatchlist);
   el("watchlist-input").addEventListener("keydown", e => { if (e.key === "Enter") addToWatchlist(); });
