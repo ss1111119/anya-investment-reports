@@ -60,10 +60,12 @@ function updateMarketBadge() {
   if (!badge) return;
   if (isTaiwanMarketOpen()) {
     badge.style.display = "";
-    badge.className = "meta-chip live";
+    badge.className = "hub-hero-pill hub-hero-pill-open";
     badge.textContent = "開盤中";
   } else {
-    badge.style.display = "none";
+    badge.style.display = "";
+    badge.className = "hub-hero-pill hub-hero-pill-closed";
+    badge.textContent = "休市中";
   }
 }
 

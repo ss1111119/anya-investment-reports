@@ -1,32 +1,11 @@
 /* ── Design Tokens ─────────────────────────────────────────── */
-    :root {
-      --bg:         #0a0e17;
-      --surface:    #141922;
-      --surface-2:  #1a2133;
-      --surface-3:  #202a3d;
-      --card-bg:    var(--surface-2);
-      --primary:    var(--accent);
-      --border:     #2a3448;
-      --text:       #e2e8f5;
-      --muted:      #7a8ba8;
-      --accent:     #4f9eff;
-      --accent-glow:rgba(79,158,255,.15);
-      --green:      #34d058;
-      --red:        #f25e5e;
-      --yellow:     #f0c34a;
-      --purple:     #a37cff;
-      --teal:       #38d9c0;
-      --radius:     14px;
-      --radius-sm:  8px;
-      --shadow:     0 8px 32px rgba(0,0,0,.45);
-      --glow-green: 0 0 16px rgba(52,208,88,.25);
-      --glow-red:   0 0 16px rgba(242,94,94,.25);
-    }
+    @import url("./tokens.css");
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
       font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg);
+      background: var(--page-gradient);
       color: var(--text);
       min-height: 100vh;
       line-height: 1.6;

@@ -1,0 +1,90 @@
+/* ─────────────────────────────────────────────────────────────
+   Shared production tokens for Anya static pages
+   ───────────────────────────────────────────────────────────── */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@400;600;700;800;900&display=swap");
+
+:root {
+  --bg: #07101c;
+  --bg-2: #09111d;
+  --bg-3: #0c1627;
+  --bg-navbar: rgba(7, 16, 28, 0.96);
+  --surface: #141922;
+  --surface-2: #1a2133;
+  --surface-3: #202a3d;
+  --panel: rgba(16, 24, 41, 0.9);
+  --panel-2: rgba(21, 32, 55, 0.92);
+  --card: rgba(255, 255, 255, 0.03);
+  --card-hover: rgba(255, 255, 255, 0.06);
+  --border: rgba(148, 163, 184, 0.16);
+  --border-strong: rgba(148, 163, 184, 0.26);
+  --border-soft: rgba(148, 163, 184, 0.07);
+  --text: #e5eefc;
+  --text-alt: #e2e8f5;
+  --text-soft: #c8d8ec;
+  --muted: #8da1bf;
+  --muted-2: #7a8ba8;
+  --text-muted: #8da1bf;
+  --accent: #76a9ff;
+  --accent-2: #4f9eff;
+  --accent-light: rgba(118, 169, 255, 0.15);
+  --accent-glow: rgba(118, 169, 255, 0.15);
+  --primary: var(--accent);
+  --purple: #a37cff;
+  --teal: #38d9c0;
+  --ok: #4ade80;
+  --green: #34d058;
+  --warn: #f6c453;
+  --yellow: #f0c34a;
+  --crit: #fb7185;
+  --red: #f25e5e;
+  --up: var(--ok);
+  --down: var(--crit);
+  --neutral: var(--warn);
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --glow-green: 0 0 16px rgba(52, 208, 88, 0.25);
+  --glow-red: 0 0 16px rgba(242, 94, 94, 0.25);
+  --glow-accent: 0 0 16px rgba(118, 169, 255, 0.25);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-hero: 24px;
+  --r-pill: 999px;
+  --card-bg: var(--surface-2);
+  --page-gradient:
+    radial-gradient(circle at top left, rgba(118, 169, 255, 0.15), transparent 28%),
+    radial-gradient(circle at right 20%, rgba(76, 222, 128, 0.08), transparent 24%),
+    linear-gradient(180deg, #07101c 0%, #09111d 40%, #0c1627 100%);
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  color: var(--text);
+  font-family: "Inter", "Noto Sans TC", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.anya,
+body.anya-surface {
+  min-height: 100vh;
+  background: var(--page-gradient);
+}
+
+.anya-focusable:focus-visible,
+a.anya:focus-visible,
+button.anya:focus-visible,
+input.anya:focus-visible,
+select.anya:focus-visible,
+textarea.anya:focus-visible {
+  outline: 2px solid rgba(118, 169, 255, 0.75);
+  outline-offset: 2px;
+}

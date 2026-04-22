@@ -1,4 +1,6 @@
 /* ── Hub layout ── */
+@import url("./tokens.css");
+
 * { box-sizing: border-box; }
 
 body {
@@ -74,7 +76,7 @@ body {
 
 /* ── Scope workbench shell width ── */
 #tab-workbench .shell {
-  width: min(1200px, calc(100% - 32px));
+  width: min(1360px, calc(100% - 32px));
 }
 
 /* ── Scope ops shell width ── */

@@ -1,3 +1,5 @@
+@import url("./tokens.css");
+
 :root {
   --bg: #09111d;
   --bg-2: #0e1627;
@@ -75,6 +77,118 @@ a { color: inherit; text-decoration: none; }
   position: relative;
 }
 
+.hub-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.hub-hero-copy,
+.hub-hero-rail {
+  position: relative;
+  z-index: 1;
+}
+
+.hub-hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hub-hero h1 {
+  font-size: 1.9rem;
+  letter-spacing: -0.03em;
+}
+
+.hub-hero p {
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.hub-hero-hint {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 240px;
+}
+
+.hub-hero-rail {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.hub-hero-card {
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.hub-hero-card-accent {
+  background: linear-gradient(135deg, rgba(118, 169, 255, 0.14), rgba(255, 255, 255, 0.04));
+  border-color: rgba(118, 169, 255, 0.24);
+}
+
+.hub-hero-card-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.hub-hero-card-value {
+  font-family: "Outfit", "Inter", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.hub-hero-card-sub {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.hub-hero-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(118, 169, 255, 0.25);
+  background: rgba(118, 169, 255, 0.12);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.hub-hero-pill-open {
+  border-color: rgba(74, 222, 128, 0.24);
+  background: rgba(74, 222, 128, 0.12);
+  color: var(--ok);
+}
+
+.hub-hero-pill-closed {
+  border-color: rgba(246, 196, 83, 0.24);
+  background: rgba(246, 196, 83, 0.12);
+  color: var(--warn);
+}
+
+.symbol-bar {
+  flex-wrap: wrap;
+}
+
+.symbol-bar input {
+  max-width: 220px;
+  min-width: 180px;
+}
+
 /* ── Symbol bar ── */
 .symbol-bar {
   display: flex;
@@ -117,6 +231,62 @@ a { color: inherit; text-decoration: none; }
   gap: 16px;
 }
 @media (max-width: 720px) { .main-grid { grid-template-columns: 1fr; } }
+
+.hub-workbench-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.85fr);
+  gap: 16px;
+  align-items: start;
+  margin-top: 16px;
+}
+
+.hub-workbench-main,
+.hub-workbench-rail {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hub-rail-note {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03));
+}
+
+.hub-rail-copy {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+@media (max-width: 1120px) {
+  .hub-hero,
+  .hub-workbench-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hub-hero-rail {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .hub-hero-rail {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .symbol-bar input {
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+  }
+
+  .hub-hero-card-value {
+    font-size: 1.1rem;
+  }
+}
 
 /* ── Panel ── */
 .panel {

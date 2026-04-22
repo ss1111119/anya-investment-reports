@@ -1,21 +1,9 @@
-:root {
-      --accent: #3f51b5;
-      --accent-light: #e8eaf6;
-      --up: #c62828;
-      --down: #2e7d32;
-      --neutral: #546e7a;
-      --bg: #f5f7fa;
-      --card: #ffffff;
-      --border: #e0e4ee;
-      --text: #1a202c;
-      --text-muted: #64748b;
-      --shadow: 0 2px 12px rgba(0,0,0,0.07);
-      --radius: 14px;
-    }
+    @import url("./tokens.css");
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Noto Sans TC', 'Inter', sans-serif;
-      background: var(--bg);
+      background: var(--page-gradient);
       color: var(--text);
       font-size: 14px;
       line-height: 1.6;
@@ -23,7 +11,7 @@
 
     /* ── HEADER ── */
     .site-header {
-      background: linear-gradient(135deg, #1a237e 0%, #3f51b5 60%, #5c6bc0 100%);
+      background: linear-gradient(135deg, rgba(16,24,41,0.98) 0%, rgba(21,32,55,0.98) 60%, rgba(12,20,34,1) 100%);
       color: #fff;
       padding: 32px 24px 28px;
       text-align: center;
@@ -48,7 +36,7 @@
 
     /* ── NAV ── */
     .nav-bar {
-      background: var(--card);
+      background: var(--panel);
       border-bottom: 1px solid var(--border);
       padding: 10px 24px;
       display: flex;
@@ -87,7 +75,7 @@
       margin-bottom: 28px;
     }
     .summary-card {
-      background: var(--card);
+      background: var(--panel);
       border-radius: var(--radius);
       padding: 16px;
       box-shadow: var(--shadow);
@@ -136,17 +124,17 @@
       font-size: 11px;
       color: var(--text-muted);
       font-weight: 600;
-      background: #f8f9fe;
+      background: var(--surface-2);
       border-bottom: 1px solid var(--border);
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
     .data-table thead th:not(:first-child) { text-align: right; }
-    .data-table tbody tr { border-bottom: 1px solid #f0f2f8; transition: background 0.1s; }
-    .data-table tbody tr:hover { background: #f8f9fe; }
+    .data-table tbody tr { border-bottom: 1px solid var(--border-soft); transition: background 0.1s; }
+    .data-table tbody tr:hover { background: rgba(255,255,255,0.03); }
     .data-table td { padding: 9px 10px; }
     .data-table td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
-    .sym { font-weight: 700; font-size: 12px; color: #1a237e; }
+    .sym { font-weight: 700; font-size: 12px; color: var(--accent); }
     .name-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
 
     /* ── BADGES ── */
@@ -182,7 +170,7 @@
       white-space: pre-wrap;
       font-size: 14px;
       line-height: 1.75;
-      color: #2d3748;
+      color: var(--text);
     }
 
     /* ── BRIEF (morning) ── */
@@ -190,7 +178,7 @@
       white-space: pre-wrap;
       font-size: 15px;
       line-height: 2;
-      color: #1a202c;
+      color: var(--text);
     }
 
     /* ── FOOTER ── */
