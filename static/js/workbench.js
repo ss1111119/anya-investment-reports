@@ -202,15 +202,26 @@ async function loadResearchTab(symbol, tabName) {
   }
 
   if (tabName === "institutional") {
+    const chipKey = _tabCacheKey(symbol, "chip-direction");
     if (!_tabCache[key]) {
       renderInstitutionalLoading();
+      renderChipDirectionLoading();
       try {
-        const data = await apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/institutional`);
-        _tabCache[key] = data;
-        renderInstitutional(data);
-      } catch (e) { renderInstitutional({ error: e.message }); }
+        const [instData, chipData] = await Promise.all([
+          apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/institutional`),
+          apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/chip-direction`).catch(() => null),
+        ]);
+        _tabCache[key] = instData;
+        _tabCache[chipKey] = chipData;
+        renderInstitutional(instData);
+        renderChipDirectionRadar(chipData);
+      } catch (e) {
+        renderInstitutional({ error: e.message });
+        renderChipDirectionRadar(null);
+      }
     } else {
       renderInstitutional(_tabCache[key]);
+      renderChipDirectionRadar(_tabCache[chipKey] || null);
     }
     return;
   }
@@ -534,6 +545,97 @@ function renderInstitutional(data) {
       <span class="meta-chip ${data.freshness}" style="padding:2px 7px">${freshnessLabel(data.freshness)}</span>
       ${data.latest_date ? "· 最新: " + data.latest_date : ""}
     </div>`;
+}
+
+// ---------------------------------------------------------------------------
+// Chip Direction Radar（籌碼方向雷達）
+// ---------------------------------------------------------------------------
+function renderChipDirectionLoading() {
+  const gauge = el("chip-score-gauge");
+  if (gauge) gauge.style.background = "var(--surface2)";
+  const num = el("chip-score-number");
+  if (num) num.textContent = "--";
+  const lbl = el("chip-score-label");
+  if (lbl) lbl.textContent = "載入中...";
+  const subs = el("chip-sub-scores");
+  if (subs) subs.innerHTML = '<div class="skeleton" style="width:90%"></div><div class="skeleton" style="width:80%"></div>';
+  const ai = el("chip-ai-text");
+  if (ai) ai.textContent = "";
+  const dates = el("chip-data-dates");
+  if (dates) dates.textContent = "";
+}
+
+function renderChipDirectionRadar(data) {
+  const gauge  = el("chip-score-gauge");
+  const numEl  = el("chip-score-number");
+  const lblEl  = el("chip-score-label");
+  const subsEl = el("chip-sub-scores");
+  const aiEl   = el("chip-ai-text");
+  const datesEl = el("chip-data-dates");
+  if (!gauge) return;
+
+  // 無資料情況（score: null 或 fetch 失敗）
+  if (!data || data.score == null) {
+    gauge.style.background = "var(--surface2)";
+    numEl.textContent = "--";
+    lblEl.textContent = "此股票無籌碼資料";
+    subsEl.innerHTML = "";
+    aiEl.textContent = "";
+    datesEl.textContent = "";
+    return;
+  }
+
+  // 分數顏色
+  const score = data.score;
+  let color;
+  if (score >= 60)      color = "#22c55e";
+  else if (score >= 40) color = "#f59e0b";
+  else                  color = "#ef4444";
+
+  gauge.style.background = `radial-gradient(circle, ${color}22 0%, var(--surface2) 100%)`;
+  gauge.style.borderLeft = `3px solid ${color}`;
+  numEl.textContent = score;
+  numEl.style.color = color;
+  lblEl.textContent = data.label || "";
+
+  // 子分數條
+  const dimNames = {
+    foreign_cumulative: "外資累積",
+    foreign_streak:     "外資連勢",
+    trust_cumulative:   "投信方向",
+    tdcc_big_holder:    "大戶增減",
+    margin_trend:       "融資健康",
+  };
+  const subs = data.sub_scores || {};
+  subsEl.innerHTML = Object.entries(dimNames).map(([key, name]) => {
+    const val = subs[key];
+    if (val == null) return `<div class="chip-sub-row"><span class="chip-sub-name">${name}</span><span class="chip-sub-na">無資料</span></div>`;
+    const barColor = val >= 60 ? "#22c55e" : val >= 40 ? "#f59e0b" : "#ef4444";
+    return `
+      <div class="chip-sub-row">
+        <span class="chip-sub-name">${name}</span>
+        <div class="chip-sub-bar-track">
+          <div class="chip-sub-bar-fill" style="width:${val}%;background:${barColor}"></div>
+        </div>
+        <span class="chip-sub-val">${val}</span>
+      </div>`;
+  }).join("");
+
+  // AI 解讀
+  if (data.ai_text) {
+    aiEl.textContent = data.ai_text;
+  } else {
+    aiEl.textContent = "AI 解讀暫時無法取得";
+    aiEl.style.color = "var(--muted)";
+  }
+
+  // 資料日期
+  const dd = data.data_dates || {};
+  const parts = [];
+  if (dd.chips)  parts.push(`法人 ${dd.chips}`);
+  if (dd.tdcc)   parts.push(`集保 ${dd.tdcc}`);
+  if (dd.margin) parts.push(`融資 ${dd.margin}`);
+  datesEl.textContent = parts.length ? "資料截至：" + parts.join(" · ") : "";
 }
 
 // ---------------------------------------------------------------------------
