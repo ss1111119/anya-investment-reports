@@ -71,6 +71,7 @@
         el('pt-total-assets') && (el('pt-total-assets').textContent = '$' + fmt(d.total_assets));
         el('pt-stock-value') && (el('pt-stock-value').textContent = '$' + fmt(d.stock_value));
         el('pt-position-count') && (el('pt-position-count').textContent = d.position_count);
+        el('pt-position-count-hero') && (el('pt-position-count-hero').textContent = d.position_count);
         if (d.health) renderHealthBar(d.health);
       })
       .catch(function () {});

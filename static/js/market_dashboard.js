@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const SUBTABS = ['flow', 'calendar', 'overview', 'macro', 'scan', 'trend', 'thread'];
+  const SUBTABS = ['flow', 'calendar', 'us-macro', 'tw-macro', 'macro', 'overview', 'scan', 'trend', 'thread'];
   let _activeSubtab = 'flow';
   let _flowType = 'listed';
   let _scanType = 'strong';
@@ -28,6 +28,8 @@
   function loadSubtab(name) {
     if (name === 'flow') loadFlow();
     else if (name === 'calendar') loadCalendar();
+    else if (name === 'us-macro') loadMacroDataPanel('us-macro', '/api/market/us-macro');
+    else if (name === 'tw-macro') loadMacroDataPanel('tw-macro', '/api/market/tw-macro');
     else if (name === 'overview') loadOverview();
     else if (name === 'macro') loadMacro();
     else if (name === 'scan') loadScan();
@@ -144,6 +146,25 @@
 
   // ── 財經日曆 ───────────────────────────────────────────────────────────────
 
+  async function buildCalendarCache(contentId) {
+    const panel = el(contentId);
+    if (panel) panel.innerHTML = '<div class="mkt-loading">⏳ 正在抓取財經日曆資料，請稍候…</div>';
+    lockRefresh('mkt-calendar-refresh');
+    try {
+      const res = await fetch('/api/market/calendar/refresh', { method: 'POST' });
+      const result = await res.json();
+      if (result.ok) {
+        await loadCalendar();
+      } else {
+        if (panel) panel.innerHTML = '<div class="mkt-error">❌ 建立失敗：' + (result.error || '未知錯誤') + '</div>';
+        unlockRefresh('mkt-calendar-refresh');
+      }
+    } catch (e) {
+      if (panel) panel.innerHTML = '<div class="mkt-error">❌ 請求失敗：' + e.message + '</div>';
+      unlockRefresh('mkt-calendar-refresh');
+    }
+  }
+
   async function loadCalendar() {
     const contentId = 'mkt-calendar-content';
     setLoading(contentId);
@@ -169,7 +190,13 @@
       : (data.events || data.upcoming || data.items || null);
 
     if (data && data.note === 'no_cache') {
-      panel.innerHTML = '<div class="mkt-empty">日曆快取尚未建立，請等待下次定期更新或透過 LINE bot /cal 指令觸發。</div>';
+      panel.innerHTML =
+        '<div class="mkt-empty" style="display:flex;flex-direction:column;align-items:center;gap:0.75em">' +
+          '<span>尚無快取，點下方按鈕立即建立。</span>' +
+          '<button class="mkt-refresh-btn" id="mkt-calendar-build-btn">立即建立日曆快取</button>' +
+        '</div>';
+      const buildBtn = document.getElementById('mkt-calendar-build-btn');
+      if (buildBtn) buildBtn.addEventListener('click', function () { buildCalendarCache(containerId); });
       return;
     }
     if (!Array.isArray(data) && data.error) {
@@ -315,33 +342,224 @@
     }
   }
 
+  function renderMacroDataPanel(containerId, data) {
+    const panel = el(containerId);
+    if (!panel) return;
+
+    if (data && data.error) {
+      setError(containerId, data.error);
+      return;
+    }
+
+    const groups = Array.isArray(data.groups) ? data.groups : [];
+    const updatedAt = data.updated_at || data.generated_at || '';
+    const freshness = data.freshness || {};
+    const freshnessBits = [];
+    if (freshness.latest_date) freshnessBits.push('最新資料日：' + freshness.latest_date);
+    if (freshness.source) freshnessBits.push('來源：' + freshness.source);
+    if (freshness.note) freshnessBits.push(freshness.note);
+    if (updatedAt) freshnessBits.push('更新：' + updatedAt.replace('T', ' ').slice(0, 19));
+
+    if (!groups.length) {
+      panel.innerHTML = '<div class="mkt-empty mkt-data-empty">' + escapeHtml(data.fallback_message || '目前沒有可顯示的資料。') + '</div>';
+      return;
+    }
+
+    function renderMetricCard(item) {
+      const value = item.value === null || item.value === undefined || item.value === '' ? '—' : item.value;
+      const displayValue = item.display_value === null || item.display_value === undefined || item.display_value === ''
+        ? null
+        : item.display_value;
+      const change = item.change_pct;
+      const valueText = displayValue !== null
+        ? escapeHtml(String(displayValue))
+        : (typeof value === 'number' ? (Math.abs(value) >= 1000 ? value.toLocaleString('zh-TW', { maximumFractionDigits: 2 }) : value.toFixed(2)) : escapeHtml(String(value)));
+      const changeText = change === null || change === undefined || change === '' ? '' : (Number(change) >= 0 ? '+' : '') + Number(change).toFixed(2) + '%';
+      const changeCls = change === null || change === undefined || change === '' ? 'mkt-data-change-neutral' : (Number(change) >= 0 ? 'mkt-up' : 'mkt-dn');
+      const metaBits = [];
+      if (item.date) metaBits.push('資料日 ' + item.date);
+      if (item.source) metaBits.push(item.source);
+      return '<article class="mkt-data-item mkt-data-item-metric">'
+        + '<div class="mkt-data-item-name">' + escapeHtml(item.name || item.symbol || '') + '</div>'
+        + '<div class="mkt-data-item-value" title="' + escapeHtml(String(value)) + '">' + valueText + '</div>'
+        + (changeText ? '<div class="mkt-data-item-change ' + changeCls + '">' + changeText + '</div>' : '')
+        + (metaBits.length ? '<div class="mkt-data-item-meta">' + escapeHtml(metaBits.join(' · ')) + '</div>' : '')
+        + '</article>';
+    }
+
+    function renderStatusCard(item) {
+      const metaBits = [];
+      if (item.date) metaBits.push('資料日 ' + item.date);
+      if (item.note) metaBits.push(item.note);
+      return '<article class="mkt-data-item mkt-data-item-status">'
+        + '<div class="mkt-data-item-name">' + escapeHtml(item.name || item.symbol || '') + '</div>'
+        + '<div class="mkt-data-status-pill">' + escapeHtml(item.value === null || item.value === undefined || item.value === '' ? '—' : item.value) + '</div>'
+        + (metaBits.length ? '<div class="mkt-data-item-meta">' + escapeHtml(metaBits.join(' · ')) + '</div>' : '')
+        + '</article>';
+    }
+
+    function renderItem(item) {
+      if (!item) return '';
+      if (item.kind === 'status') return renderStatusCard(item);
+      return renderMetricCard(item);
+    }
+
+    const groupsHtml = groups.map(function (group) {
+      const items = Array.isArray(group.items) ? group.items : [];
+      const rendered = items.map(renderItem).filter(Boolean).join('');
+      return '<section class="mkt-data-group">'
+        + '<div class="mkt-data-group-head">'
+        + '<div>'
+        + '<div class="mkt-data-group-title">' + escapeHtml(group.label || group.key || '') + '</div>'
+        + (group.subtitle ? '<div class="mkt-data-group-subtitle">' + escapeHtml(group.subtitle) + '</div>' : '')
+        + '</div>'
+        + '</div>'
+        + (rendered ? '<div class="mkt-data-grid">' + rendered + '</div>' : '<div class="mkt-empty mkt-data-empty">目前沒有可顯示的項目。</div>')
+        + '</section>';
+    }).join('');
+
+    panel.innerHTML =
+      '<div class="mkt-data-layout">'
+      + '<section class="mkt-data-hero">'
+      + '<div class="mkt-data-hero-top">'
+      + '<span class="mkt-data-panel-pill">' + escapeHtml(data.title || '') + '</span>'
+      + (freshnessBits.length ? '<span class="mkt-data-freshness">' + escapeHtml(freshnessBits.join(' · ')) + '</span>' : '')
+      + '</div>'
+      + '<div class="mkt-data-hero-note">原始資料面板，保留來源日期與更新狀態，方便比對蒐集結果與摘要面板。</div>'
+      + '</section>'
+      + groupsHtml
+      + '</div>';
+  }
+
+  async function loadMacroDataPanel(name, url) {
+    const contentId = 'mkt-' + name + '-content';
+    const refreshId = 'mkt-' + name + '-refresh';
+    setLoading(contentId, '載入資料中…');
+    lockRefresh(refreshId);
+    _loaded[name] = false;
+    try {
+      const data = await apiFetch(url);
+      renderMacroDataPanel(contentId, data);
+      _loaded[name] = true;
+    } catch (e) {
+      setError(contentId, '資料載入失敗：' + e.message);
+    } finally {
+      unlockRefresh(refreshId);
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value === null || value === undefined ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function cleanReason(reason) {
+    return String(reason || '').replace(/\s+/g, ' ').trim().replace(/[。．.]+$/, '');
+  }
+
+  function buildMacroSummary(levelLabel, reasons) {
+    const cleaned = (reasons || []).map(cleanReason).filter(Boolean);
+    if (cleaned.length === 0) {
+      return '目前沒有足夠的異常訊號，總經風險維持在可觀察區間。';
+    }
+    const lead = cleaned.slice(0, 2).join('；');
+    return levelLabel + '｜' + lead;
+  }
+
+  function hasMacroIndicators(indicators) {
+    return indicators && Object.keys(indicators).some(function (k) {
+      return indicators[k] && typeof indicators[k] === 'object';
+    });
+  }
+
+  function renderMacroReasons(reasons) {
+    const items = (reasons || []).map(function (reason) {
+      const text = cleanReason(reason);
+      if (!text) return '';
+      return '<li class="mkt-macro-reason"><span class="mkt-macro-reason-dot"></span><span>' + escapeHtml(text) + '</span></li>';
+    }).filter(Boolean).join('');
+
+    if (!items) {
+      return '<div class="mkt-empty mkt-macro-empty">目前沒有可列出的原因訊號。</div>';
+    }
+
+    return '<ul class="mkt-macro-reasons">' + items + '</ul>';
+  }
+
+  function renderMacroIndicators(indicators) {
+    const indKeys = ['TSM', 'Nasdaq_Fut', 'SP500_Fut', 'USDTWD', 'N225'];
+    const labels = {
+      TSM: 'TSM ADR',
+      Nasdaq_Fut: 'Nasdaq 期貨',
+      SP500_Fut: 'S&P 500 期貨',
+      USDTWD: '美元/台幣',
+      N225: '日經 225',
+    };
+
+    const cards = indKeys.filter(function (key) {
+      return indicators && indicators[key];
+    }).map(function (key) {
+      const item = indicators[key];
+      const pct = item.pct_change !== undefined ? Number(item.pct_change) : null;
+      const price = item.price !== undefined ? Number(item.price) : null;
+      const pctText = pct === null || Number.isNaN(pct) ? '—' : (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+      const priceText = price === null || Number.isNaN(price) ? '—' : price.toFixed(2);
+      const cls = pct === null || Number.isNaN(pct) ? 'mkt-macro-indicator-neutral' : (pct >= 0 ? 'mkt-up' : 'mkt-dn');
+      return '<article class="mkt-macro-indicator-card">'
+        + '<div class="mkt-macro-indicator-name">' + escapeHtml(labels[key] || key) + '</div>'
+        + '<div class="mkt-macro-indicator-price">' + escapeHtml(priceText) + '</div>'
+        + '<div class="mkt-macro-indicator-pct ' + cls + '">' + escapeHtml(pctText) + '</div>'
+        + '</article>';
+    }).join('');
+
+    if (!cards) {
+      return '<div class="mkt-empty mkt-macro-empty">目前沒有可顯示的核心指標。</div>';
+    }
+
+    return '<div class="mkt-macro-indicator-grid">' + cards + '</div>';
+  }
+
   function renderMacro(containerId, data) {
     const panel = el(containerId);
     if (!panel) return;
     const levelMap = { GREEN: { label: '安全', cls: 'mkt-level-green' }, YELLOW: { label: '警戒', cls: 'mkt-level-yellow' }, RED: { label: '危險', cls: 'mkt-level-red' }, UNKNOWN: { label: '未知', cls: '' } };
     const lv = levelMap[data.level] || levelMap['UNKNOWN'];
 
-    const reasons = (data.reasons || []).map(function (r) {
-      return '<li>' + r + '</li>';
-    }).join('');
-
-    const indKeys = ['TSM', 'Nasdaq_Fut', 'SP500_Fut', 'USDTWD', 'N225'];
-    const indRows = indKeys.filter(function (k) { return data.indicators && data.indicators[k]; }).map(function (k) {
-      const v = data.indicators[k];
-      const pct = v.pct_change !== undefined ? v.pct_change : null;
-      const price = v.price !== undefined ? v.price : null;
-      const pctStr = pct !== null ? (pct >= 0 ? '+' : '') + Number(pct).toFixed(2) + '%' : '';
-      const priceStr = price !== null ? Number(price).toFixed(2) : '';
-      const cls = pct !== null ? (pct >= 0 ? 'mkt-up' : 'mkt-dn') : '';
-      return '<tr><td>' + k + '</td><td>' + priceStr + '</td><td class="' + cls + '">' + pctStr + '</td></tr>';
-    }).join('');
+    const reasons = Array.isArray(data.reasons) ? data.reasons : [];
+    const indicators = data.indicators || {};
+    const summary = buildMacroSummary(lv.label, reasons);
+    const shouldFallback = data.level === 'UNKNOWN' && reasons.length === 0 && !hasMacroIndicators(indicators);
 
     panel.innerHTML =
-      '<div class="mkt-macro-header">'
+      '<div class="mkt-macro-layout">'
+      + '<section class="mkt-macro-hero ' + (lv.cls || 'mkt-level-unknown') + '">'
+      + '<div class="mkt-macro-hero-top">'
       + '<span class="mkt-level-badge ' + lv.cls + '">' + lv.label + '</span>'
       + '</div>'
-      + '<ul class="mkt-reasons">' + reasons + '</ul>'
-      + (indRows ? '<table class="mkt-table"><thead><tr><th>指標</th><th>價格</th><th>漲跌</th></tr></thead><tbody>' + indRows + '</tbody></table>' : '');
+      + '<h3 class="mkt-macro-summary">' + escapeHtml(summary) + '</h3>'
+      + '<p class="mkt-macro-context">摘要只根據現有的總經結果與原因訊號整理，不會額外推演新結論。</p>'
+      + '</section>'
+      + '<div class="mkt-macro-sections">'
+      + '<section class="mkt-macro-section">'
+      + '<div class="mkt-macro-section-head">'
+      + '<span class="mkt-macro-section-title">判斷原因</span>'
+      + '<span class="mkt-macro-section-note">Evidence</span>'
+      + '</div>'
+      + (shouldFallback ? '<div class="mkt-empty mkt-macro-empty">目前資料不足，暫時無法整理出可靠的總經摘要。</div>' : renderMacroReasons(reasons))
+      + '</section>'
+      + '<section class="mkt-macro-section">'
+      + '<div class="mkt-macro-section-head">'
+      + '<span class="mkt-macro-section-title">核心指標</span>'
+      + '<span class="mkt-macro-section-note">Detail</span>'
+      + '</div>'
+      + renderMacroIndicators(indicators)
+      + '</section>'
+      + '</div>'
+      + '</div>';
   }
 
   // ── 強勢掃描 ───────────────────────────────────────────────────────────────
@@ -581,7 +799,7 @@
     }
 
     // Refresh buttons
-    ['flow', 'calendar', 'overview', 'macro', 'scan', 'trend'].forEach(function (name) {
+    ['flow', 'us-macro', 'tw-macro', 'overview', 'macro', 'scan', 'trend'].forEach(function (name) {
       var btn = el('mkt-' + name + '-refresh');
       if (btn) {
         btn.addEventListener('click', function () {
@@ -590,6 +808,14 @@
         });
       }
     });
+
+    // Calendar refresh — always goes through the build endpoint
+    var calRefreshBtn = el('mkt-calendar-refresh');
+    if (calRefreshBtn) {
+      calRefreshBtn.addEventListener('click', function () {
+        buildCalendarCache('mkt-calendar-content');
+      });
+    }
 
     // Threads preset buttons
     document.querySelectorAll('.mkt-thread-preset').forEach(function (btn) {

@@ -14,14 +14,45 @@
 
 /* ── Shell ── */
 .pt-shell {
-  width: min(1200px, calc(100% - 32px));
+  width: min(1380px, calc(100% - 32px));
   margin: 0 auto;
   padding: 32px 0 64px;
 }
 
 /* ── Hero ── */
 .pt-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.85fr);
+  gap: 16px;
+  align-items: stretch;
   margin-bottom: 32px;
+  padding: 28px;
+  border: 1px solid var(--border, rgba(148,163,184,0.16));
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(20, 29, 48, 0.96), rgba(14, 22, 39, 0.94));
+  box-shadow: var(--shadow, 0 20px 60px rgba(0,0,0,0.35));
+  position: relative;
+  overflow: hidden;
+}
+
+.pt-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, rgba(118, 169, 255, 0.10), transparent 30%, rgba(74, 222, 128, 0.08));
+  pointer-events: none;
+}
+
+.pt-hero-copy,
+.pt-hero-rail {
+  position: relative;
+  z-index: 1;
+}
+
+.pt-hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .pt-eyebrow {
@@ -35,8 +66,9 @@
 
 .pt-hero h1 {
   margin: 0 0 6px;
-  font-size: 28px;
-  font-weight: 800;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
   color: #e5eefc;
 }
 
@@ -44,6 +76,48 @@
   margin: 0 0 20px;
   font-size: 14px;
   color: #8da1bf;
+}
+
+.pt-hero-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pt-hero-rail {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.pt-hero-card {
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.pt-hero-label {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #9ec2ff;
+  margin-bottom: 8px;
+}
+
+.pt-hero-value {
+  font-family: "Outfit", "Inter", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.pt-hero-sub {
+  margin-top: 6px;
+  color: #8da1bf;
+  font-size: 12px;
+  line-height: 1.6;
 }
 
 /* ── Buttons ── */
@@ -102,6 +176,28 @@
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 24px;
+}
+
+.pt-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.85fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.pt-main-column,
+.pt-side-column {
+  min-width: 0;
+}
+
+.pt-main-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.pt-side-column {
+  display: flex;
+  flex-direction: column;
 }
 
 .pt-panel-head {
@@ -262,6 +358,7 @@
 
 #tab-trading .pt-shell {
   padding-top: 24px;
+  width: min(1380px, calc(100% - 32px));
 }
 
 /* ── Health Status Bar ── */
@@ -385,3 +482,34 @@
 .pt-perf-event-date { color: var(--muted, #8da1bf); white-space: nowrap; }
 .pt-perf-event-label { color: var(--text, #e5eefc); flex: 1; }
 .pt-muted { color: var(--muted, #8da1bf); }
+
+@media (max-width: 1120px) {
+  .pt-hero,
+  .pt-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .pt-shell {
+    width: min(100% - 20px, 1400px);
+    padding-top: 18px;
+  }
+
+  .pt-hero {
+    padding: 22px;
+  }
+
+  .pt-summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .pt-perf-charts,
+  .pt-perf-stocks {
+    grid-template-columns: 1fr;
+  }
+
+  .pt-panel {
+    padding: 16px;
+  }
+}

@@ -179,10 +179,6 @@
 }
 
 /* ── Macro ────────────────────────────────────────────────────────────────── */
-.mkt-macro-header {
-  margin-bottom: 16px;
-}
-
 .mkt-level-badge {
   display: inline-block;
   padding: 4px 14px;
@@ -195,18 +191,318 @@
 .mkt-level-yellow { background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250,204,21,0.3); }
 .mkt-level-red { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
 
-.mkt-reasons {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 16px;
+.mkt-macro-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.mkt-reasons li {
-  font-size: 13px;
+.mkt-macro-hero {
+  padding: 18px 18px 16px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(14, 22, 35, 0.94), rgba(11, 18, 29, 0.94));
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.mkt-macro-hero-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.mkt-macro-summary {
+  margin: 0 0 8px;
+  font-size: 20px;
+  line-height: 1.45;
+  font-weight: 800;
   color: var(--fg);
-  padding: 5px 0;
-  border-bottom: 1px solid var(--border);
+}
+
+.mkt-macro-context {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.mkt-macro-sections {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 16px;
+}
+
+.mkt-macro-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.mkt-macro-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mkt-macro-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.mkt-macro-section-note {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.mkt-macro-reasons {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mkt-macro-reason {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--fg);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.mkt-macro-reason-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.mkt-macro-empty {
+  padding: 18px 0;
+}
+
+.mkt-macro-indicator-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.mkt-macro-indicator-card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mkt-macro-indicator-name {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.mkt-macro-indicator-price {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--fg);
+  line-height: 1.2;
+}
+
+.mkt-macro-indicator-pct {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.mkt-macro-indicator-neutral {
+  color: var(--muted);
+}
+
+@media (max-width: 860px) {
+  .mkt-macro-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .mkt-macro-summary {
+    font-size: 18px;
+  }
+}
+
+/* ── Macro data panels ────────────────────────────────────────────────────── */
+.mkt-data-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mkt-data-hero {
+  padding: 16px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(16, 24, 38, 0.98), rgba(11, 18, 29, 0.98));
+}
+
+.mkt-data-hero-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.mkt-data-panel-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(99, 179, 255, 0.25);
+  color: #9fd0ff;
+  background: rgba(99, 179, 255, 0.08);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.mkt-data-freshness {
+  color: var(--muted);
+  font-size: 11px;
   line-height: 1.5;
+}
+
+.mkt-data-hero-note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.mkt-data-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--surface2);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.mkt-data-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mkt-data-group-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--fg);
+}
+
+.mkt-data-group-subtitle {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.mkt-data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.mkt-data-item {
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mkt-data-item-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.mkt-data-item-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--fg);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.mkt-data-item-change {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.mkt-data-change-neutral {
+  color: var(--muted);
+}
+
+.mkt-data-item-meta {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.mkt-data-status-pill {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(99, 179, 255, 0.12);
+  border: 1px solid rgba(99, 179, 255, 0.18);
+  color: #cfe8ff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.mkt-data-item-status .mkt-data-status-pill {
+  margin-top: 2px;
+}
+
+.mkt-data-item-metric .mkt-data-item-value {
+  margin-bottom: 1px;
+}
+
+.mkt-data-empty {
+  padding: 20px 0;
+}
+
+@media (max-width: 860px) {
+  .mkt-data-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mkt-data-group-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 /* ── Calendar ─────────────────────────────────────────────────────────────── */

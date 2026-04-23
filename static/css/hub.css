@@ -36,10 +36,22 @@ body {
 
 .hub-tabs {
   display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
   gap: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hub-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .hub-tab {
+  flex-shrink: 0;
   padding: 6px 16px;
   border: 1px solid transparent;
   border-radius: 999px;
@@ -63,6 +75,26 @@ body {
   border-color: rgba(118, 169, 255, 0.30);
 }
 
+.hub-tab:focus-visible {
+  outline: 2px solid rgba(118, 169, 255, 0.75);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1080px) {
+  .hub-nav {
+    gap: 12px;
+    padding: 0 14px;
+  }
+
+  .hub-tabs {
+    gap: 2px;
+  }
+
+  .hub-tab {
+    padding: 6px 12px;
+  }
+}
+
 /* ── Tab sections ── */
 .hub-section {
   display: none;
@@ -82,6 +114,101 @@ body {
 /* ── Scope ops shell width ── */
 #tab-ops .shell {
   width: min(1400px, calc(100% - 32px));
+}
+
+/* ── Gemini tab ── */
+#tab-gemini .shell {
+  width: min(1120px, calc(100% - 32px));
+}
+
+.gemini-panel {
+  margin-top: 18px;
+}
+
+.gemini-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.gemini-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.gemini-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: #8da1bf;
+}
+
+.gemini-label-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.gemini-source {
+  font-size: 12px;
+  color: #7f93ad;
+}
+
+.gemini-field input,
+.gemini-field select {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgba(255, 255, 255, 0.05);
+  color: #e5eefc;
+  font: inherit;
+  outline: none;
+}
+
+.gemini-field input:focus,
+.gemini-field select:focus {
+  border-color: #76a9ff;
+}
+
+.gemini-field select option {
+  background: #0e1627;
+}
+
+.gemini-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.gemini-help {
+  color: #8da1bf;
+  font-size: 13px;
+}
+
+.gemini-message {
+  min-height: 20px;
+  font-size: 13px;
+  color: #8da1bf;
+}
+
+.gemini-message[data-kind="ok"] {
+  color: #9fe3b1;
+}
+
+.gemini-message[data-kind="error"] {
+  color: #ff9b9b;
+}
+
+@media (max-width: 840px) {
+  .gemini-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ── Trading tab ── */

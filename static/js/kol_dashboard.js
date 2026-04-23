@@ -133,6 +133,60 @@
     }
   }
 
+  // ── Gooaye rerun ─────────────────────────────────────────────────────────
+
+  var _rerunPoller = null;
+
+  function setRerunStatus(text, busy) {
+    var btn = document.getElementById('kol-rerun-gooaye-btn');
+    var lbl = document.getElementById('kol-rerun-status');
+    if (btn) btn.disabled = !!busy;
+    if (lbl) lbl.textContent = text;
+  }
+
+  function pollRerunStatus() {
+    fetch('/api/kol/rerun-gooaye/status')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.status === 'running') {
+          setRerunStatus('⏳ ' + (d.message || '執行中…'), true);
+        } else if (d.status === 'done') {
+          setRerunStatus('✅ 完成', false);
+          clearInterval(_rerunPoller);
+          _rerunPoller = null;
+          _loaded = false;
+          loadStatus();
+        } else if (d.status === 'error') {
+          setRerunStatus('❌ 失敗: ' + d.message, false);
+          clearInterval(_rerunPoller);
+          _rerunPoller = null;
+        } else {
+          clearInterval(_rerunPoller);
+          _rerunPoller = null;
+        }
+      })
+      .catch(function () {
+        clearInterval(_rerunPoller);
+        _rerunPoller = null;
+      });
+  }
+
+  async function triggerRerunGooaye() {
+    setRerunStatus('⏳ 啟動中…', true);
+    try {
+      var res = await fetch('/api/kol/rerun-gooaye', { method: 'POST' });
+      var data = await res.json();
+      if (!data.ok) {
+        setRerunStatus('⚠️ ' + data.message, false);
+        return;
+      }
+      if (_rerunPoller) clearInterval(_rerunPoller);
+      _rerunPoller = setInterval(pollRerunStatus, 4000);
+    } catch (e) {
+      setRerunStatus('❌ 請求失敗', false);
+    }
+  }
+
   // ── Events ───────────────────────────────────────────────────────────────
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -142,6 +196,11 @@
         _loaded = false;
         loadStatus();
       });
+    }
+
+    var rerunBtn = document.getElementById('kol-rerun-gooaye-btn');
+    if (rerunBtn) {
+      rerunBtn.addEventListener('click', triggerRerunGooaye);
     }
 
     var closeBtn = document.getElementById('kol-detail-close');
