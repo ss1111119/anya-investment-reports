@@ -448,6 +448,28 @@
     }
   }
 
+  async function manualRefreshTwMacro() {
+    const contentId = 'mkt-tw-macro-content';
+    const refreshId = 'mkt-tw-macro-refresh';
+    const updateId = 'mkt-tw-macro-update';
+    setLoading(contentId, '手動更新台灣總經資料中，請稍候…');
+    lockRefresh(refreshId);
+    lockRefresh(updateId);
+    _loaded['tw-macro'] = false;
+    try {
+      const res = await fetch('/api/market/tw-macro/refresh', { method: 'POST' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      renderMacroDataPanel(contentId, data);
+      _loaded['tw-macro'] = true;
+    } catch (e) {
+      setError(contentId, '台灣總經手動更新失敗：' + e.message);
+    } finally {
+      unlockRefresh(refreshId);
+      unlockRefresh(updateId);
+    }
+  }
+
   function escapeHtml(value) {
     return String(value === null || value === undefined ? '' : value)
       .replace(/&/g, '&amp;')
@@ -808,6 +830,13 @@
         });
       }
     });
+
+    var twMacroUpdateBtn = el('mkt-tw-macro-update');
+    if (twMacroUpdateBtn) {
+      twMacroUpdateBtn.addEventListener('click', function () {
+        manualRefreshTwMacro();
+      });
+    }
 
     // Calendar refresh — always goes through the build endpoint
     var calRefreshBtn = el('mkt-calendar-refresh');

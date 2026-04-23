@@ -255,6 +255,13 @@
       return data[1] >= data[0] ? upColor : downColor;
     }
 
+    function fmtVolumeAxis(value) {
+      var n = Number(value) || 0;
+      if (n >= 100000000) return (n / 100000000).toFixed(1) + '億';
+      if (n >= 10000) return (n / 10000).toFixed(0) + '萬';
+      return String(Math.round(n));
+    }
+
     var option = {
       backgroundColor: 'transparent',
       animation: false,
@@ -293,7 +300,7 @@
       ],
       yAxis: [
         { scale: true, gridIndex: 0, splitLine: { lineStyle: { color: 'rgba(148,163,184,0.08)' } }, axisLabel: { color: '#8da1bf', fontSize: 10 } },
-        { scale: true, gridIndex: 1, splitNumber: 2, splitLine: { lineStyle: { color: 'rgba(148,163,184,0.08)' } }, axisLabel: { color: '#8da1bf', fontSize: 10 } },
+        { scale: true, gridIndex: 1, splitNumber: 2, splitLine: { lineStyle: { color: 'rgba(148,163,184,0.08)' } }, axisLabel: { color: '#8da1bf', fontSize: 10, formatter: fmtVolumeAxis, margin: 10 } },
         { scale: true, gridIndex: 2, splitNumber: 2, max: 100, min: 0, splitLine: { lineStyle: { color: 'rgba(148,163,184,0.08)' } }, axisLabel: { color: '#8da1bf', fontSize: 10 } },
         { scale: true, gridIndex: 3, splitNumber: 2, splitLine: { lineStyle: { color: 'rgba(148,163,184,0.08)' } }, axisLabel: { color: '#8da1bf', fontSize: 10 } },
       ],

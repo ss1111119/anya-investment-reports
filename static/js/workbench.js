@@ -325,6 +325,12 @@ function renderKlineChart(d) {
 
   const up = "#34d399", dn = "#f87171";
   const itemColor = data => data[1] >= data[0] ? up : dn;
+  const fmtVolumeAxis = value => {
+    const n = Number(value) || 0;
+    if (n >= 100000000) return `${(n / 100000000).toFixed(1)}億`;
+    if (n >= 10000) return `${Math.round(n / 10000)}萬`;
+    return `${Math.round(n)}`;
+  };
 
   const option = {
     backgroundColor: "transparent",
@@ -345,7 +351,7 @@ function renderKlineChart(d) {
     xAxis: [0,1,2,3].map(i => ({ type: "category", data: d.dates, gridIndex: i, axisLabel: { show: i===3, color: "#8da1bf", fontSize: 10 }, axisLine: { lineStyle: { color: "#2a3a50" } } })),
     yAxis: [
       { scale: true, gridIndex: 0, splitLine: { lineStyle: { color: "rgba(148,163,184,0.08)" } }, axisLabel: { color: "#8da1bf", fontSize: 10 } },
-      { scale: true, gridIndex: 1, splitNumber: 2, splitLine: { lineStyle: { color: "rgba(148,163,184,0.08)" } }, axisLabel: { color: "#8da1bf", fontSize: 10 } },
+      { scale: true, gridIndex: 1, splitNumber: 2, splitLine: { lineStyle: { color: "rgba(148,163,184,0.08)" } }, axisLabel: { color: "#8da1bf", fontSize: 10, formatter: fmtVolumeAxis, margin: 10 } },
       { scale: true, gridIndex: 2, max: 100, min: 0, splitNumber: 3, splitLine: { lineStyle: { color: "rgba(148,163,184,0.08)" } }, axisLabel: { color: "#8da1bf", fontSize: 10 } },
       { scale: true, gridIndex: 3, splitNumber: 2, splitLine: { lineStyle: { color: "rgba(148,163,184,0.08)" } }, axisLabel: { color: "#8da1bf", fontSize: 10 } },
     ],
