@@ -126,6 +126,17 @@
         '<span class="sc-market-value ' + dealerCls + '">' + fmtYi(inst.dealer_net) + '</span>' +
       '</div>' +
       (inst.date ? '<span class="sc-market-sub" style="margin-left:auto">' + inst.date + '</span>' : '');
+
+    var heroEl = document.getElementById('sc-market-hero-text');
+    if (heroEl) {
+      if (price != null) {
+        heroEl.className = 'sc-market-sub ' + priceCls;
+        heroEl.textContent = fmt(price) + '　' + fmtChg(chg) + ' (' + fmtPct(chgPct) + ')';
+      } else {
+        heroEl.className = 'sc-market-sub';
+        heroEl.textContent = '暫無資料';
+      }
+    }
   }
 
   // ── Watchlist panel with cross-reference markers ─────────────────────────────
