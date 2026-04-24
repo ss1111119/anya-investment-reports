@@ -513,13 +513,14 @@
   }
 
   function renderMacroIndicators(indicators) {
-    const indKeys = ['TSM', 'Nasdaq_Fut', 'SP500_Fut', 'USDTWD', 'N225'];
+    const indKeys = ['TSM', 'Nasdaq_Fut', 'SP500_Fut', 'USDTWD', 'N225', 'TW_PMI'];
     const labels = {
       TSM: 'TSM ADR',
       Nasdaq_Fut: 'Nasdaq 期貨',
       SP500_Fut: 'S&P 500 期貨',
       USDTWD: '美元/台幣',
       N225: '日經 225',
+      TW_PMI: '台灣 PMI',
     };
 
     const cards = indKeys.filter(function (key) {

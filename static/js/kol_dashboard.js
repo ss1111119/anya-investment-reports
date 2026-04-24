@@ -38,6 +38,7 @@
           '<div class="kol-card-header">' +
             dot(k.status_icon) +
             '<span class="kol-card-name">' + esc(k.display_name) + '</span>' +
+            '<button class="kol-rerun-btn" data-username="' + esc(k.key) + '" type="button" title="重新抓取">重跑</button>' +
           '</div>' +
           '<div class="kol-card-platform">' + esc(k.platform) + '</div>' +
           '<div class="kol-card-time">' + esc(k.time_str) + '</div>' +
@@ -187,6 +188,60 @@
     }
   }
 
+  // ── KeensPie rerun ───────────────────────────────────────────────────────
+
+  var _keenspieRerunPoller = null;
+
+  function setKeenspieRerunStatus(text, busy) {
+    var btn = document.getElementById('kol-rerun-keenspie-btn');
+    var lbl = document.getElementById('kol-rerun-keenspie-status');
+    if (btn) btn.disabled = !!busy;
+    if (lbl) lbl.textContent = text;
+  }
+
+  function pollKeenspieRerunStatus() {
+    fetch('/api/kol/rerun-keenspie/status')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.status === 'running') {
+          setKeenspieRerunStatus('⏳ ' + (d.message || '執行中…'), true);
+        } else if (d.status === 'done') {
+          setKeenspieRerunStatus('✅ 完成', false);
+          clearInterval(_keenspieRerunPoller);
+          _keenspieRerunPoller = null;
+          _loaded = false;
+          loadStatus();
+        } else if (d.status === 'error') {
+          setKeenspieRerunStatus('❌ 失敗: ' + d.message, false);
+          clearInterval(_keenspieRerunPoller);
+          _keenspieRerunPoller = null;
+        } else {
+          clearInterval(_keenspieRerunPoller);
+          _keenspieRerunPoller = null;
+        }
+      })
+      .catch(function () {
+        clearInterval(_keenspieRerunPoller);
+        _keenspieRerunPoller = null;
+      });
+  }
+
+  async function triggerRerunKeenspie() {
+    setKeenspieRerunStatus('⏳ 啟動中…', true);
+    try {
+      var res = await fetch('/api/kol/rerun-keenspie', { method: 'POST' });
+      var data = await res.json();
+      if (!data.ok) {
+        setKeenspieRerunStatus('⚠️ ' + data.message, false);
+        return;
+      }
+      if (_keenspieRerunPoller) clearInterval(_keenspieRerunPoller);
+      _keenspieRerunPoller = setInterval(pollKeenspieRerunStatus, 4000);
+    } catch (e) {
+      setKeenspieRerunStatus('❌ 請求失敗', false);
+    }
+  }
+
   // ── Events ───────────────────────────────────────────────────────────────
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -203,6 +258,11 @@
       rerunBtn.addEventListener('click', triggerRerunGooaye);
     }
 
+    var keenspieRerunBtn = document.getElementById('kol-rerun-keenspie-btn');
+    if (keenspieRerunBtn) {
+      keenspieRerunBtn.addEventListener('click', triggerRerunKeenspie);
+    }
+
     var closeBtn = document.getElementById('kol-detail-close');
     if (closeBtn) {
       closeBtn.addEventListener('click', function () {
@@ -215,7 +275,26 @@
 
     var grid = document.getElementById('kol-status-grid');
     if (grid) {
-      grid.addEventListener('click', function (e) {
+      grid.addEventListener('click', async function (e) {
+        var rerunBtn = e.target.closest('.kol-rerun-btn');
+        if (rerunBtn) {
+          e.stopPropagation();
+          var username = rerunBtn.dataset.username;
+          if (!username) return;
+          rerunBtn.disabled = true;
+          rerunBtn.textContent = '跑中...';
+          try {
+            var res = await fetch('/api/ops/kol/' + encodeURIComponent(username) + '/rerun', { method: 'POST' });
+            rerunBtn.textContent = res.ok ? '已送出' : '失敗';
+          } catch (_) {
+            rerunBtn.textContent = '失敗';
+          }
+          setTimeout(function () {
+            rerunBtn.textContent = '重跑';
+            rerunBtn.disabled = false;
+          }, 4000);
+          return;
+        }
         var card = e.target.closest('.kol-status-card');
         if (card && card.dataset.key) {
           loadSummaries(card.dataset.key);

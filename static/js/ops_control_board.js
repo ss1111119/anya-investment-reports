@@ -191,6 +191,7 @@ function renderSectionBody(section) {
                   <div class="status-card state-${stateClass(item.severity)}">
                     <div class="status-card-label">${escapeHtml(item.label)}</div>
                     <div class="status-card-value">${escapeHtml(item.last_date || "n/a")}</div>
+                    ${item.username ? `<button class="btn-rerun" data-username="${escapeHtml(item.username)}" type="button">重跑</button>` : ""}
                   </div>
                 `).join("")}
               </div>`
@@ -310,4 +311,28 @@ async function loadBoard() {
 }
 
 refreshBtn.addEventListener("click", loadBoard);
+
+sectionsEl.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".btn-rerun");
+  if (!btn) return;
+  const username = btn.dataset.username;
+  if (!username) return;
+
+  btn.disabled = true;
+  btn.textContent = "跑中...";
+
+  try {
+    const res = await fetch(`/api/ops/kol/${encodeURIComponent(username)}/rerun`, { method: "POST" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    btn.textContent = "已送出";
+    setTimeout(() => {
+      btn.textContent = "重跑";
+      btn.disabled = false;
+    }, 4000);
+  } catch (err) {
+    btn.textContent = "失敗";
+    btn.disabled = false;
+  }
+});
+
 loadBoard();

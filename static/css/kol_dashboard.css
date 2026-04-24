@@ -121,6 +121,28 @@
   font-weight: 700;
   font-size: 15px;
   color: var(--text);
+  flex: 1;
+}
+
+.kol-rerun-btn {
+  margin-left: auto;
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(118, 169, 255, 0.35);
+  background: rgba(118, 169, 255, 0.08);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.14s ease, opacity 0.14s ease;
+  white-space: nowrap;
+}
+.kol-rerun-btn:hover:not(:disabled) {
+  background: rgba(118, 169, 255, 0.2);
+}
+.kol-rerun-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .kol-card-platform,
