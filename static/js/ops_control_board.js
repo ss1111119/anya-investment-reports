@@ -246,6 +246,17 @@ function renderSections(data) {
     chip.className = `state-chip ${stateClass(section.severity || section.state)}`;
     metaRow.innerHTML = renderMetaRow(section);
     body.innerHTML = renderSectionBody(section);
+
+    // NotebookLM 認證區塊：加「驗證 session」按鈕
+    if ((section.label || "").includes("NotebookLM")) {
+      const checkBtn = document.createElement("button");
+      checkBtn.className = "btn-rerun";
+      checkBtn.id = "notebooklm-check-btn";
+      checkBtn.textContent = "驗證 session";
+      checkBtn.style.marginTop = "8px";
+      body.appendChild(checkBtn);
+    }
+
     sectionsEl.appendChild(fragment);
   }
 }
@@ -315,6 +326,30 @@ refreshBtn.addEventListener("click", loadBoard);
 sectionsEl.addEventListener("click", async (e) => {
   const btn = e.target.closest(".btn-rerun");
   if (!btn) return;
+
+  // NotebookLM session 驗證按鈕
+  if (btn.id === "notebooklm-check-btn") {
+    btn.disabled = true;
+    btn.textContent = "驗證中...";
+    try {
+      const res = await fetch("/api/ops/notebooklm/check-auth", { method: "POST" });
+      const data = await res.json();
+      btn.textContent = (data.valid ? "✓ " : "✗ ") + (data.message || (data.valid ? "有效" : "已失效"));
+      btn.title = data.message;
+      btn.style.borderColor = data.valid ? "rgba(80,200,120,0.5)" : "rgba(255,80,80,0.5)";
+      setTimeout(() => {
+        btn.textContent = "驗證 session";
+        btn.disabled = false;
+        btn.style.borderColor = "";
+        btn.title = "";
+      }, 6000);
+    } catch (_) {
+      btn.textContent = "驗證失敗";
+      btn.disabled = false;
+    }
+    return;
+  }
+
   const username = btn.dataset.username;
   if (!username) return;
 
