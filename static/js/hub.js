@@ -2,7 +2,7 @@
   'use strict';
 
   const REPORTS_BASE = 'https://ss1111119.github.io/anya-investment-reports/';
-  const TABS = ['workbench', 'ops', 'reports', 'gemini', 'trading', 'stockroom', 'kol', 'news', 'market'];
+  const TABS = ['workbench', 'ops', 'reports', 'gemini', 'trading', 'stockroom', 'kol', 'news', 'market', 'portfolio'];
   const DEFAULT_TAB = 'workbench';
   let activeTab = DEFAULT_TAB;
   let geminiSettingsSnapshot = null;
@@ -63,6 +63,11 @@
     // Load market dashboard when market tab becomes active
     if (name === 'market' && typeof window.marketLoad === 'function') {
       window.marketLoad();
+    }
+
+    // Load portfolio when portfolio tab becomes active
+    if (name === 'portfolio' && typeof window.portfolioLoad === 'function') {
+      window.portfolioLoad();
     }
   }
 
@@ -146,6 +151,7 @@
       'gemini-model': effective.gemini_model,
       'gemini-model-pro': effective.gemini_model_pro,
       'gemini-model-chat': effective.gemini_model_chat,
+      'paper-trading-gemini-model': effective.paper_trading_gemini_model,
       'gemini-queue-wait-timeout': effective.gemini_queue_wait_timeout_seconds,
       'gemini-queue-exec-timeout': effective.gemini_queue_exec_timeout_seconds,
       'gemini-queue-retry-max-attempts': effective.gemini_queue_retry_max_attempts,
@@ -154,6 +160,7 @@
       'gemini-model-source': effective.gemini_model,
       'gemini-model-pro-source': effective.gemini_model_pro,
       'gemini-model-chat-source': effective.gemini_model_chat,
+      'paper-trading-gemini-model-source': effective.paper_trading_gemini_model,
       'gemini-queue-wait-timeout-source': effective.gemini_queue_wait_timeout_seconds,
       'gemini-queue-exec-timeout-source': effective.gemini_queue_exec_timeout_seconds,
       'gemini-queue-retry-max-source': effective.gemini_queue_retry_max_attempts,
@@ -162,6 +169,7 @@
     fillGeminiSelect('gemini-model', options.gemini_model, valueMap['gemini-model'].value);
     fillGeminiSelect('gemini-model-pro', options.gemini_model_pro, valueMap['gemini-model-pro'].value);
     fillGeminiSelect('gemini-model-chat', options.gemini_model_chat, valueMap['gemini-model-chat'].value);
+    fillGeminiSelect('paper-trading-gemini-model', options.paper_trading_gemini_model, valueMap['paper-trading-gemini-model'] && valueMap['paper-trading-gemini-model'].value);
 
     const waitTimeout = document.getElementById('gemini-queue-wait-timeout');
     const execTimeout = document.getElementById('gemini-queue-exec-timeout');
@@ -199,6 +207,7 @@
       gemini_model: document.getElementById('gemini-model')?.value || null,
       gemini_model_pro: document.getElementById('gemini-model-pro')?.value || null,
       gemini_model_chat: document.getElementById('gemini-model-chat')?.value || null,
+      paper_trading_gemini_model: document.getElementById('paper-trading-gemini-model')?.value || null,
       gemini_queue_wait_timeout_seconds: Number(document.getElementById('gemini-queue-wait-timeout')?.value || 0),
       gemini_queue_exec_timeout_seconds: Number(document.getElementById('gemini-queue-exec-timeout')?.value || 0),
       gemini_queue_retry_max_attempts: Number(document.getElementById('gemini-queue-retry-max-attempts')?.value || 0),

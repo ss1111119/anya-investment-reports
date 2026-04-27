@@ -1,0 +1,472 @@
+/* ── Portfolio tab ── */
+
+.pf-shell {
+  width: min(1400px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 60px;
+}
+
+/* ── Header ── */
+.pf-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.pf-header-copy {
+  flex-shrink: 0;
+}
+
+.pf-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.pf-header h1 {
+  margin: 0 0 4px;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.15;
+}
+
+.pf-header-sub {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ── Summary section ── */
+.pf-summary-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pf-summary-cards {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pf-summary-cards-sm {
+  gap: 8px;
+}
+
+.pf-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 12px 18px;
+  min-width: 130px;
+  flex: 1;
+}
+
+.pf-card-sm {
+  padding: 8px 14px;
+  min-width: 100px;
+}
+
+.pf-card-accent {
+  border-color: rgba(118,169,255,0.28);
+  background: rgba(118,169,255,0.06);
+}
+
+.pf-card-alert {
+  border-color: rgba(246,196,83,0.28);
+  background: rgba(246,196,83,0.05);
+}
+
+.pf-card-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 3px;
+}
+
+.pf-card-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.pf-card-sm .pf-card-value {
+  font-size: 15px;
+}
+
+.pf-card-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* ── Toolbar ── */
+.pf-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.pf-sort-label {
+  font-size: 12px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.pf-sort-btns,
+.pf-filter-btns {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.pf-sort-btn,
+.pf-filter-btn {
+  padding: 4px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 0.12s, background 0.12s, border-color 0.12s;
+}
+
+.pf-sort-btn:hover,
+.pf-filter-btn:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.05);
+}
+
+.pf-sort-btn.active,
+.pf-filter-btn.active {
+  color: var(--text);
+  background: rgba(118,169,255,0.12);
+  border-color: rgba(118,169,255,0.28);
+}
+
+.pf-filter-alert {
+  color: var(--warn);
+}
+
+.pf-filter-alert.active {
+  background: rgba(246,196,83,0.12);
+  border-color: rgba(246,196,83,0.35);
+  color: var(--warn);
+}
+
+.pf-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ── Threshold inputs ── */
+.pf-threshold-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pf-threshold-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.pf-threshold-input {
+  width: 58px;
+  padding: 3px 7px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  text-align: right;
+  outline: none;
+}
+
+.pf-threshold-input:focus {
+  border-color: var(--accent);
+}
+
+.pf-note {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--muted-2);
+  flex-shrink: 0;
+}
+
+/* ── Badges ── */
+.pf-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: var(--r-pill);
+  font-size: 10px;
+  font-weight: 700;
+  vertical-align: middle;
+  letter-spacing: 0.04em;
+}
+
+.pf-badge-etf {
+  background: rgba(56,217,192,0.15);
+  color: var(--teal);
+  border: 1px solid rgba(56,217,192,0.3);
+}
+
+.pf-badge-other {
+  background: rgba(163,124,255,0.12);
+  color: var(--purple);
+  border: 1px solid rgba(163,124,255,0.28);
+}
+
+.pf-badge-sl {
+  background: rgba(242,94,94,0.14);
+  color: var(--crit);
+  border: 1px solid rgba(242,94,94,0.32);
+}
+
+.pf-badge-tp {
+  background: rgba(246,196,83,0.14);
+  color: var(--warn);
+  border: 1px solid rgba(246,196,83,0.32);
+}
+
+/* ── Table ── */
+.pf-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+}
+
+.pf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.pf-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  padding: 10px 14px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+}
+
+.pf-table thead th:first-child { text-align: left; }
+.pf-table thead th.pf-ai-head {
+  text-align: center;
+  cursor: default;
+}
+
+.pf-table thead th.sort-asc::after  { content: ' ↑'; color: var(--accent); }
+.pf-table thead th.sort-desc::after { content: ' ↓'; color: var(--accent); }
+
+.pf-table tbody tr {
+  border-bottom: 1px solid var(--border-soft);
+  transition: background 0.1s;
+}
+
+.pf-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+.pf-table tbody td {
+  padding: 9px 14px;
+  text-align: right;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+
+.pf-table tbody td:first-child {
+  text-align: left;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.pf-table tbody td.pf-ai-cell {
+  text-align: center;
+}
+
+/* Row border accents */
+.pf-table tbody tr.pf-row-profit td:first-child { border-left: 2px solid var(--green); }
+.pf-table tbody tr.pf-row-loss   td:first-child { border-left: 2px solid rgba(242,94,94,0.5); }
+.pf-table tbody tr.pf-row-sl     td:first-child { border-left: 2px solid var(--crit); }
+.pf-table tbody tr.pf-row-tp     td:first-child { border-left: 2px solid var(--warn); }
+
+/* P&L value coloring */
+.pf-up   { color: var(--ok); }
+.pf-down { color: var(--crit); }
+.pf-null { color: var(--muted-2); }
+
+/* ── Row-level AI action ── */
+.pf-row-ai-btn {
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid rgba(118,169,255,0.35);
+  background: rgba(118,169,255,0.08);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.pf-row-ai-btn:hover {
+  background: rgba(118,169,255,0.16);
+  border-color: rgba(118,169,255,0.55);
+  color: #dbeafe;
+}
+
+.pf-row-ai-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Tfoot total row ── */
+.pf-table tfoot tr {
+  background: var(--surface-2);
+  border-top: 1px solid var(--border-strong);
+}
+
+.pf-table tfoot td {
+  padding: 10px 14px;
+  font-weight: 700;
+  font-size: 13px;
+  text-align: right;
+}
+
+.pf-table tfoot td:first-child {
+  text-align: left;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── AI 診斷按鈕 ── */
+.pf-ai-btn {
+  padding: 4px 14px;
+  border-radius: var(--r-pill);
+  border: 1px solid rgba(163,124,255,0.40);
+  background: rgba(163,124,255,0.10);
+  color: var(--purple);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.pf-ai-btn:hover {
+  background: rgba(163,124,255,0.20);
+  border-color: rgba(163,124,255,0.65);
+}
+.pf-ai-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── 診斷 Panel ── */
+.pf-diag-panel {
+  margin-bottom: 14px;
+  border: 1px solid rgba(163,124,255,0.28);
+  border-radius: var(--r-md);
+  background: rgba(163,124,255,0.05);
+  overflow: hidden;
+}
+.pf-diag-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(163,124,255,0.15);
+}
+.pf-diag-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--purple);
+  letter-spacing: 0.03em;
+}
+.pf-diag-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+.pf-diag-close:hover { color: var(--text); }
+.pf-diag-body {
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text-soft);
+  white-space: pre-wrap;
+}
+.pf-diag-loading {
+  color: var(--muted);
+  font-style: italic;
+}
+.pf-diag-error { color: var(--crit); }
+
+/* ── 個股跳轉連結 ── */
+.pf-name-link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.pf-name-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .pf-header { flex-direction: column; }
+  .pf-summary-section { width: 100%; }
+}
+
+@media (max-width: 600px) {
+  .pf-card { flex: 1 1 calc(50% - 10px); }
+  .pf-table thead th,
+  .pf-table tbody td,
+  .pf-table tfoot td { padding: 7px 9px; font-size: 12px; }
+  .pf-toolbar { gap: 10px; }
+}
