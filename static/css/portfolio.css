@@ -438,7 +438,44 @@
   font-size: 13px;
   line-height: 1.8;
   color: var(--text-soft);
-  white-space: pre-wrap;
+}
+
+.pf-diag-body .pf-md-h {
+  margin: 14px 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.pf-diag-body h3.pf-md-h:first-child,
+.pf-diag-body h4.pf-md-h:first-child {
+  margin-top: 0;
+}
+
+.pf-diag-body .pf-md-p {
+  margin: 0 0 10px;
+}
+
+.pf-diag-body .pf-md-ul,
+.pf-diag-body .pf-md-ol {
+  margin: 4px 0 10px;
+  padding-left: 20px;
+}
+
+.pf-diag-body .pf-md-ul li,
+.pf-diag-body .pf-md-ol li {
+  margin-bottom: 4px;
+}
+
+.pf-diag-body strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.pf-diag-body em {
+  color: var(--text-soft);
+  font-style: italic;
 }
 .pf-diag-loading {
   color: var(--muted);

@@ -120,9 +120,7 @@
 
   function actionCellHtml(r) {
     if (!r.symbol) return '<span class="pf-null">--</span>';
-    var symbol = escapeAttr(r.symbol);
-    var name = escapeAttr(r.name || r.symbol);
-    return '<button type="button" class="pf-row-ai-btn" data-symbol="' + symbol + '" data-name="' + name + '">AI 分析</button>';
+    return '<button type="button" class="pf-row-ai-btn" data-symbol="' + escapeAttr(r.symbol) + '">AI 分析</button>';
   }
 
   function computeSummary(rows) {
@@ -248,6 +246,63 @@
 
   // ── AI Diagnosis ──
 
+  function mdToHtml(text) {
+    if (!text) return '';
+    // Escape HTML entities first
+    var s = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    // Split into blocks by blank lines
+    var blocks = s.split(/\n{2,}/);
+    var html = blocks.map(function (block) {
+      block = block.trim();
+      if (!block) return '';
+
+      // Heading: ## or ###
+      if (/^###\s+/.test(block)) {
+        return '<h4 class="pf-md-h">' + inlineToHtml(block.replace(/^###\s+/, '')) + '</h4>';
+      }
+      if (/^##\s+/.test(block)) {
+        return '<h3 class="pf-md-h">' + inlineToHtml(block.replace(/^##\s+/, '')) + '</h3>';
+      }
+      if (/^#\s+/.test(block)) {
+        return '<h3 class="pf-md-h">' + inlineToHtml(block.replace(/^#\s+/, '')) + '</h3>';
+      }
+
+      // List block
+      var lines = block.split('\n');
+      var isBullet  = lines.every(function (l) { return /^\s*[-*]\s+/.test(l) || l.trim() === ''; });
+      var isOrdered = lines.every(function (l) { return /^\s*\d+\.\s+/.test(l) || l.trim() === ''; });
+
+      if (isBullet) {
+        var items = lines.filter(function (l) { return l.trim(); }).map(function (l) {
+          return '<li>' + inlineToHtml(l.replace(/^\s*[-*]\s+/, '')) + '</li>';
+        });
+        return '<ul class="pf-md-ul">' + items.join('') + '</ul>';
+      }
+      if (isOrdered) {
+        var items = lines.filter(function (l) { return l.trim(); }).map(function (l) {
+          return '<li>' + inlineToHtml(l.replace(/^\s*\d+\.\s+/, '')) + '</li>';
+        });
+        return '<ol class="pf-md-ol">' + items.join('') + '</ol>';
+      }
+
+      // Paragraph (with inline line breaks)
+      return '<p class="pf-md-p">' + inlineToHtml(lines.join('<br>')) + '</p>';
+    }).join('');
+
+    return html;
+  }
+
+  function inlineToHtml(s) {
+    return s
+      .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+      .replace(/\*\*(.+?)\*\*/g,     '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,         '<em>$1</em>');
+  }
+
   function showDiagPanel(title, contentHtml, isHtml) {
     var panel = document.getElementById('pf-diag-panel');
     var body  = document.getElementById('pf-diag-body');
@@ -283,7 +338,7 @@
     if (!panel || !body || !btn) return;
 
     if (_diagCache) {
-      showDiagPanel('AI 投資組合診斷', _diagCache, false);
+      showDiagPanel('AI 投資組合診斷', mdToHtml(_diagCache), true);
       return;
     }
 
@@ -302,7 +357,7 @@
           showDiagPanel('AI 投資組合診斷', '<span class="pf-diag-error">診斷失敗：' + data.error + '</span>', true);
         } else {
           _diagCache = data.report;
-          showDiagPanel('AI 投資組合診斷', data.report, false);
+          showDiagPanel('AI 投資組合診斷', mdToHtml(data.report), true);
         }
       })
       .catch(function (err) {
@@ -314,44 +369,67 @@
       });
   }
 
-  function loadSingleStockDiagnosis(symbol, name, buttonEl) {
+  function loadSingleStockDiagnosis(symbol, buttonEl) {
     var panel = document.getElementById('pf-diag-panel');
     var body  = document.getElementById('pf-diag-body');
     if (!panel || !body || !symbol) return;
 
-    var cacheKey = String(symbol).toUpperCase();
-    var displayName = name || cacheKey;
+    var cacheKey    = String(symbol).toUpperCase();
+    var row         = DATA.find(function (d) { return d.symbol === symbol; });
+    var displayName = (row && row.name) || cacheKey;
 
     if (_stockDiagCache[cacheKey]) {
-      showDiagPanel(displayName + ' AI 分析', _stockDiagCache[cacheKey], false);
+      showDiagPanel(displayName + ' · 持倉診斷', mdToHtml(_stockDiagCache[cacheKey]), true);
       return;
     }
 
+    // 防止重複請求（同一 symbol 正在進行中）
+    if (_stockDiagCache[cacheKey + '__loading']) return;
+    _stockDiagCache[cacheKey + '__loading'] = true;
+
     if (buttonEl) {
-      buttonEl.disabled = true;
+      buttonEl.disabled    = true;
       buttonEl.textContent = '分析中…';
     }
 
-    showDiagPanel(displayName + ' AI 分析', '<span class="pf-diag-loading">' + displayName + ' AI 分析中，請稍候…</span>', true);
+    showDiagPanel(displayName + ' · 持倉診斷',
+      '<span class="pf-diag-loading">' + displayName + ' 分析中，請稍候（約 15–30 秒）…</span>', true);
 
-    fetch('/api/workbench/research/' + encodeURIComponent(cacheKey) + '/deep-analysis', {
-      method: 'GET',
+    var reqBody = {
+      symbol:    symbol,
+      name:      displayName,
+      price:     row ? row.price     : null,
+      avg:       row ? row.avg       : null,
+      shares:    row ? row.shares    : null,
+      available: row ? row.available : null,
+      pnl:       row ? row.pnl       : null,
+      pnlPct:    row ? row.pnlPct    : null,
+      signal:    row ? signal(row)   : null,
+    };
+
+    fetch('/api/portfolio/stock-diagnosis', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(reqBody),
     })
       .then(function (res) { return res.json(); })
       .then(function (data) {
         if (data.error && !data.report) {
-          showDiagPanel(displayName + ' AI 分析', '<span class="pf-diag-error">分析失敗：' + data.error + '</span>', true);
+          showDiagPanel(displayName + ' · 持倉診斷',
+            '<span class="pf-diag-error">分析失敗：' + data.error + '</span>', true);
           return;
         }
         _stockDiagCache[cacheKey] = data.report || '';
-        showDiagPanel(displayName + ' AI 分析', data.report || '此分析目前無資料。', false);
+        showDiagPanel(displayName + ' · 持倉診斷', mdToHtml(data.report || '此分析目前無資料。'), true);
       })
       .catch(function (err) {
-        showDiagPanel(displayName + ' AI 分析', '<span class="pf-diag-error">網路錯誤：' + err.message + '</span>', true);
+        showDiagPanel(displayName + ' · 持倉診斷',
+          '<span class="pf-diag-error">網路錯誤：' + err.message + '</span>', true);
       })
       .finally(function () {
+        delete _stockDiagCache[cacheKey + '__loading'];
         if (buttonEl) {
-          buttonEl.disabled = false;
+          buttonEl.disabled    = false;
           buttonEl.textContent = 'AI 分析';
         }
       });
@@ -407,7 +485,7 @@
       tbody.addEventListener('click', function (event) {
         var btn = event.target.closest('.pf-row-ai-btn');
         if (!btn) return;
-        loadSingleStockDiagnosis(btn.getAttribute('data-symbol'), btn.getAttribute('data-name'), btn);
+        loadSingleStockDiagnosis(btn.getAttribute('data-symbol'), btn);
       });
     }
 
