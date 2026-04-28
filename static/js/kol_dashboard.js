@@ -48,6 +48,21 @@
     }).join('');
   }
 
+  function renderStockTracking(stocks) {
+    if (!stocks || !stocks.length) return '';
+    var chips = stocks.map(function (s) {
+      var sym  = s.symbol || '';
+      var label = esc(s.name || '') +
+        (s.price  ? ' ' + esc(s.price)  : '') +
+        (s.change ? ' ' + esc(s.change) : '');
+      if (sym) {
+        return '<button class="kol-stock-chip" onclick="pfJumpToWorkbench(\'' + sym + '\')">' + label + '</button>';
+      }
+      return '<span class="kol-stock-chip kol-stock-chip-no-sym">' + label + '</span>';
+    }).join('');
+    return '<div class="kol-stock-tracking"><span class="kol-stock-label">關注個股</span>' + chips + '</div>';
+  }
+
   function renderSummaryCard(item) {
     var themes = (item.key_themes || []).map(function (t) {
       return '<span class="kol-theme-chip">' + esc(t) + '</span>';
@@ -70,6 +85,7 @@
         '</div>' +
         (themes ? '<div class="kol-themes">' + themes + '</div>' : '') +
         '<pre class="kol-summary-text">' + esc(item.summary) + '</pre>' +
+        renderStockTracking(item.stock_tracking) +
         transcriptSection +
       '</div>'
     );
@@ -242,6 +258,60 @@
     }
   }
 
+  // ── 股市小黑 rerun ───────────────────────────────────────────────────────
+
+  var _blackRerunPoller = null;
+
+  function setBlackRerunStatus(text, busy) {
+    var btn = document.getElementById('kol-rerun-black-btn');
+    var lbl = document.getElementById('kol-rerun-black-status');
+    if (btn) btn.disabled = !!busy;
+    if (lbl) lbl.textContent = text;
+  }
+
+  function pollBlackRerunStatus() {
+    fetch('/api/ops/kol/stock_black_fb/rerun/status')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.status === 'running') {
+          setBlackRerunStatus('⏳ ' + (d.message || '執行中…'), true);
+        } else if (d.status === 'done') {
+          setBlackRerunStatus('✅ 完成', false);
+          clearInterval(_blackRerunPoller);
+          _blackRerunPoller = null;
+          _loaded = false;
+          loadStatus();
+        } else if (d.status === 'error') {
+          setBlackRerunStatus('❌ 失敗: ' + d.message, false);
+          clearInterval(_blackRerunPoller);
+          _blackRerunPoller = null;
+        } else {
+          clearInterval(_blackRerunPoller);
+          _blackRerunPoller = null;
+        }
+      })
+      .catch(function () {
+        clearInterval(_blackRerunPoller);
+        _blackRerunPoller = null;
+      });
+  }
+
+  async function triggerRerunBlack() {
+    setBlackRerunStatus('⏳ 啟動中…', true);
+    try {
+      var res  = await fetch('/api/ops/kol/stock_black_fb/rerun', { method: 'POST' });
+      var data = await res.json();
+      if (!data.ok) {
+        setBlackRerunStatus('⚠️ ' + data.message, false);
+        return;
+      }
+      if (_blackRerunPoller) clearInterval(_blackRerunPoller);
+      _blackRerunPoller = setInterval(pollBlackRerunStatus, 4000);
+    } catch (e) {
+      setBlackRerunStatus('❌ 請求失敗', false);
+    }
+  }
+
   // ── Events ───────────────────────────────────────────────────────────────
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -261,6 +331,11 @@
     var keenspieRerunBtn = document.getElementById('kol-rerun-keenspie-btn');
     if (keenspieRerunBtn) {
       keenspieRerunBtn.addEventListener('click', triggerRerunKeenspie);
+    }
+
+    var blackRerunBtn = document.getElementById('kol-rerun-black-btn');
+    if (blackRerunBtn) {
+      blackRerunBtn.addEventListener('click', triggerRerunBlack);
     }
 
     var closeBtn = document.getElementById('kol-detail-close');

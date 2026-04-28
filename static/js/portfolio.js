@@ -56,8 +56,12 @@
   let filterMode  = 'all';
   let slThreshold = STOP_LOSS_DEFAULT;
   let tpThreshold = TAKE_PROFIT_DEFAULT;
-  let _diagCache  = null;
-  let _stockDiagCache = Object.create(null);
+  const CACHE_TTL_MS = 12 * 60 * 60 * 1000; // 12 小時
+
+  let _diagCache      = null; // { report, generatedAt }
+  let _stockDiagCache = Object.create(null); // symbol → { report, generatedAt }
+  let _overrides  = Object.create(null);
+  let _editingSymbol = null;
 
   function getThresholds() {
     var slEl = document.getElementById('pf-sl-threshold');
@@ -118,9 +122,90 @@
     return r.name + badgeHtml;
   }
 
+  function isCacheValid(entry) {
+    return entry && entry.report && entry.generatedAt &&
+      (Date.now() - entry.generatedAt) < CACHE_TTL_MS;
+  }
+
+  function fmtCacheTime(ts) {
+    if (!ts) return '';
+    var d   = new Date(ts);
+    var now = new Date();
+    var isToday = d.toDateString() === now.toDateString();
+    var hhmm = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+    return isToday ? ('生成於 ' + hhmm) : ('生成於 ' + (d.getMonth()+1) + '/' + d.getDate() + ' ' + hhmm);
+  }
+
+  function loadDiagCache() {
+    try {
+      var raw = localStorage.getItem('anya-pf-diag');
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (isCacheValid(parsed.portfolio)) _diagCache = parsed.portfolio;
+        if (parsed.stocks) {
+          Object.keys(parsed.stocks).forEach(function(sym) {
+            if (isCacheValid(parsed.stocks[sym])) _stockDiagCache[sym] = parsed.stocks[sym];
+          });
+        }
+      }
+    } catch(e) {}
+  }
+
+  function saveDiagCache() {
+    try {
+      var payload = { portfolio: _diagCache, stocks: _stockDiagCache };
+      localStorage.setItem('anya-pf-diag', JSON.stringify(payload));
+    } catch(e) {}
+  }
+
+  function loadOverrides() {
+    try {
+      var raw = localStorage.getItem('anya-pf-overrides');
+      if (raw) _overrides = JSON.parse(raw);
+    } catch(e) {}
+  }
+
+  function saveOverrides() {
+    try {
+      localStorage.setItem('anya-pf-overrides', JSON.stringify(_overrides));
+    } catch(e) {}
+  }
+
+  function effectiveRow(r) {
+    var key = r.symbol || r.name;
+    var ov  = _overrides[key] || {};
+    return Object.assign({}, r, ov);
+  }
+
+  function editRowHtml(r) {
+    var key = escapeAttr(r.symbol || r.name);
+    function inp(field, val, step) {
+      var v = (val !== null && val !== undefined) ? val : '';
+      return '<input class="pf-edit-input" type="number" data-field="' + field +
+        '" value="' + v + '" step="' + (step || 'any') + '">';
+    }
+    return '<tr class="pf-row-editing">' +
+      '<td>' + escapeAttr(r.name) + '</td>' +
+      '<td>' + inp('price',     r.price,     '0.01') + '</td>' +
+      '<td>' + inp('avg',       r.avg,       '0.01') + '</td>' +
+      '<td>' + inp('shares',    r.shares,    '1')    + '</td>' +
+      '<td>' + inp('available', r.available, '1')    + '</td>' +
+      '<td colspan="2"><span class="pf-null">儲存後計算</span></td>' +
+      '<td>' + inp('pnl',    r.pnl,    '1')    + '</td>' +
+      '<td>' + inp('pnlPct', r.pnlPct, '0.01') + '</td>' +
+      '<td class="pf-ai-cell">' +
+        '<button class="pf-save-btn"   data-symbol="' + key + '" title="儲存">✓</button>' +
+        '<button class="pf-cancel-btn" data-symbol="' + key + '" title="取消">✗</button>' +
+        '<button class="pf-reset-btn"  data-symbol="' + key + '" title="回復預設">↩</button>' +
+      '</td>' +
+      '</tr>';
+  }
+
   function actionCellHtml(r) {
-    if (!r.symbol) return '<span class="pf-null">--</span>';
-    return '<button type="button" class="pf-row-ai-btn" data-symbol="' + escapeAttr(r.symbol) + '">AI 分析</button>';
+    var sym = escapeAttr(r.symbol || r.name);
+    var editBtn = '<button type="button" class="pf-edit-btn" data-symbol="' + sym + '" title="編輯">✏</button>';
+    if (!r.symbol) return editBtn;
+    return '<button type="button" class="pf-row-ai-btn" data-symbol="' + escapeAttr(r.symbol) + '">AI 分析</button> ' + editBtn;
   }
 
   function computeSummary(rows) {
@@ -160,9 +245,25 @@
     return rows;
   }
 
+  function marketValue(r) {
+    return r.price != null && r.shares != null ? r.price * r.shares : null;
+  }
+
+  function recoveryPct(r) {
+    if (r.avg == null || r.price == null || r.price <= 0) return null;
+    if (r.avg <= r.price) return null; // 已獲利，不需回本
+    return (r.avg - r.price) / r.price * 100;
+  }
+
+  function getSortValue(r, key) {
+    if (key === 'marketValue')  return marketValue(r);
+    if (key === 'recoveryPct')  return recoveryPct(r);
+    return r[key];
+  }
+
   function applySort(rows) {
     return rows.slice().sort(function (a, b) {
-      var av = a[sortKey], bv = b[sortKey];
+      var av = getSortValue(a, sortKey), bv = getSortValue(b, sortKey);
       if (av === null && bv === null) return 0;
       if (av === null) return 1;
       if (bv === null) return -1;
@@ -220,7 +321,11 @@
     var tbody = document.getElementById('pf-tbody');
     if (!tbody) return;
 
-    tbody.innerHTML = sorted.map(function (r) {
+    tbody.innerHTML = sorted.map(function (rawR) {
+      var r = effectiveRow(rawR);
+      var editKey = r.symbol || r.name;
+      if (_editingSymbol && editKey === _editingSymbol) return editRowHtml(r);
+
       var sig = signal(r);
       var rowCls = '';
       if      (sig === 'stop-loss')    rowCls = 'pf-row-sl';
@@ -228,12 +333,23 @@
       else if (r.pnl !== null && r.pnl >= 0) rowCls = 'pf-row-profit';
       else if (r.pnl !== null && r.pnl < 0)  rowCls = 'pf-row-loss';
 
+      var mv   = marketValue(r);
+      var rPct = recoveryPct(r);
+      var mvHtml = mv !== null
+        ? mv.toLocaleString('zh-TW', { maximumFractionDigits: 0 })
+        : '<span class="pf-null">--</span>';
+      var rPctHtml = rPct !== null
+        ? '<span class="pf-recovery">+' + rPct.toFixed(1) + '%</span>'
+        : '<span class="pf-null">--</span>';
+
       return '<tr class="' + rowCls + '">' +
         '<td>' + nameCellHtml(r) + '</td>' +
         '<td>' + fmt(r.price, 2) + '</td>' +
         '<td>' + (r.avg !== null ? fmt(r.avg, 2) : '<span class="pf-null">--</span>') + '</td>' +
         '<td>' + r.shares.toLocaleString('zh-TW') + '</td>' +
         '<td>' + r.available.toLocaleString('zh-TW') + '</td>' +
+        '<td>' + mvHtml + '</td>' +
+        '<td>' + rPctHtml + '</td>' +
         '<td>' + fmtSigned(r.pnl) + '</td>' +
         '<td>' + fmtPct(r.pnlPct) + '</td>' +
         '<td class="pf-ai-cell">' + actionCellHtml(r) + '</td>' +
@@ -241,6 +357,7 @@
     }).join('');
 
     // ── Tfoot total (filtered) ──
+    setEl('pf-total-mv', s.totalMV.toLocaleString('zh-TW', { maximumFractionDigits: 0 }), true);
     setEl('pf-total-pnl', fmtSigned(s.totalPnl));
   }
 
@@ -303,13 +420,15 @@
       .replace(/\*(.+?)\*/g,         '<em>$1</em>');
   }
 
-  function showDiagPanel(title, contentHtml, isHtml) {
-    var panel = document.getElementById('pf-diag-panel');
-    var body  = document.getElementById('pf-diag-body');
-    var label = document.getElementById('pf-diag-title');
+  function showDiagPanel(title, contentHtml, isHtml, generatedAt) {
+    var panel   = document.getElementById('pf-diag-panel');
+    var body    = document.getElementById('pf-diag-body');
+    var label   = document.getElementById('pf-diag-title');
+    var timeEl  = document.getElementById('pf-diag-time');
     if (!panel || !body || !label) return;
 
     label.textContent = title || 'AI 診斷';
+    if (timeEl) timeEl.textContent = generatedAt ? fmtCacheTime(generatedAt) : '';
     if (isHtml) body.innerHTML = contentHtml;
     else body.textContent = contentHtml;
     panel.style.display = '';
@@ -337,8 +456,8 @@
     var btn   = document.getElementById('pf-ai-btn');
     if (!panel || !body || !btn) return;
 
-    if (_diagCache) {
-      showDiagPanel('AI 投資組合診斷', mdToHtml(_diagCache), true);
+    if (isCacheValid(_diagCache)) {
+      showDiagPanel('AI 投資組合診斷', mdToHtml(_diagCache.report), true, _diagCache.generatedAt);
       return;
     }
 
@@ -356,8 +475,9 @@
         if (data.error && !data.report) {
           showDiagPanel('AI 投資組合診斷', '<span class="pf-diag-error">診斷失敗：' + data.error + '</span>', true);
         } else {
-          _diagCache = data.report;
-          showDiagPanel('AI 投資組合診斷', mdToHtml(data.report), true);
+          _diagCache = { report: data.report, generatedAt: Date.now() };
+          saveDiagCache();
+          showDiagPanel('AI 投資組合診斷', mdToHtml(data.report), true, _diagCache.generatedAt);
         }
       })
       .catch(function (err) {
@@ -378,8 +498,9 @@
     var row         = DATA.find(function (d) { return d.symbol === symbol; });
     var displayName = (row && row.name) || cacheKey;
 
-    if (_stockDiagCache[cacheKey]) {
-      showDiagPanel(displayName + ' · 持倉診斷', mdToHtml(_stockDiagCache[cacheKey]), true);
+    if (isCacheValid(_stockDiagCache[cacheKey])) {
+      var cached = _stockDiagCache[cacheKey];
+      showDiagPanel(displayName + ' · 持倉診斷', mdToHtml(cached.report), true, cached.generatedAt);
       return;
     }
 
@@ -419,8 +540,10 @@
             '<span class="pf-diag-error">分析失敗：' + data.error + '</span>', true);
           return;
         }
-        _stockDiagCache[cacheKey] = data.report || '';
-        showDiagPanel(displayName + ' · 持倉診斷', mdToHtml(data.report || '此分析目前無資料。'), true);
+        _stockDiagCache[cacheKey] = { report: data.report || '', generatedAt: Date.now() };
+        saveDiagCache();
+        var entry = _stockDiagCache[cacheKey];
+        showDiagPanel(displayName + ' · 持倉診斷', mdToHtml(entry.report || '此分析目前無資料。'), true, entry.generatedAt);
       })
       .catch(function (err) {
         showDiagPanel(displayName + ' · 持倉診斷',
@@ -467,7 +590,9 @@
     ['pf-sl-threshold', 'pf-tp-threshold'].forEach(function (id) {
       var el = document.getElementById(id);
       if (el) el.addEventListener('change', function () {
-        _diagCache = null; // 門檻改變時清快取
+        _diagCache = null;
+        _stockDiagCache = Object.create(null);
+        saveDiagCache();
         render();
       });
     });
@@ -483,13 +608,99 @@
     var tbody = document.getElementById('pf-tbody');
     if (tbody) {
       tbody.addEventListener('click', function (event) {
-        var btn = event.target.closest('.pf-row-ai-btn');
-        if (!btn) return;
-        loadSingleStockDiagnosis(btn.getAttribute('data-symbol'), btn);
+        // AI 分析
+        var aiBtn = event.target.closest('.pf-row-ai-btn');
+        if (aiBtn) { loadSingleStockDiagnosis(aiBtn.getAttribute('data-symbol'), aiBtn); return; }
+
+        // ✏ 編輯
+        var editBtn = event.target.closest('.pf-edit-btn');
+        if (editBtn) { _editingSymbol = editBtn.getAttribute('data-symbol'); render(); return; }
+
+        // ✓ 儲存
+        var saveBtn = event.target.closest('.pf-save-btn');
+        if (saveBtn) {
+          var sym = saveBtn.getAttribute('data-symbol');
+          var row = saveBtn.closest('tr');
+          var ov  = {};
+          ['price','avg','shares','available','pnl','pnlPct'].forEach(function(f) {
+            var inp = row.querySelector('[data-field="' + f + '"]');
+            if (inp) { var v = inp.value.trim(); ov[f] = v === '' ? null : parseFloat(v); }
+          });
+          _overrides[sym] = ov;
+          saveOverrides();
+          _diagCache = null;
+          delete _stockDiagCache[sym.toUpperCase()];
+          _editingSymbol = null;
+          render();
+          return;
+        }
+
+        // ✗ 取消
+        var cancelBtn = event.target.closest('.pf-cancel-btn');
+        if (cancelBtn) { _editingSymbol = null; render(); return; }
+
+        // ↩ 重置
+        var resetBtn = event.target.closest('.pf-reset-btn');
+        if (resetBtn) {
+          delete _overrides[resetBtn.getAttribute('data-symbol')];
+          saveOverrides();
+          _editingSymbol = null;
+          render();
+          return;
+        }
       });
     }
 
+    var refreshBtn = document.getElementById('pf-refresh-price-btn');
+    if (refreshBtn) refreshBtn.addEventListener('click', updatePrices);
+
+    loadOverrides();
+    loadDiagCache();
     render();
+  }
+
+  function updatePrices() {
+    var btn     = document.getElementById('pf-refresh-price-btn');
+    var timeEl  = document.getElementById('pf-refresh-time');
+    if (btn) { btn.disabled = true; btn.textContent = '更新中…'; }
+    if (timeEl) timeEl.textContent = '';
+
+    var symbols = DATA.map(function(r) { return r.symbol; }).filter(Boolean);
+    var batches = [];
+    for (var i = 0; i < symbols.length; i += 30) batches.push(symbols.slice(i, i + 30));
+
+    var updated = 0, failed = 0;
+
+    Promise.all(batches.map(function(batch) {
+      return fetch('/api/workbench/quotes-batch?symbols=' + batch.join(','))
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          var quotes = data.quotes || {};
+          Object.keys(quotes).forEach(function(sym) {
+            var q = quotes[sym];
+            if (q && q.last_price != null) {
+              var ov = _overrides[sym] || {};
+              _overrides[sym] = Object.assign({}, ov, { price: q.last_price });
+              updated++;
+            } else {
+              failed++;
+            }
+          });
+        });
+    }))
+    .then(function() {
+      saveOverrides();
+      var now = new Date();
+      var hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+      if (timeEl) timeEl.textContent = '更新於 ' + hhmm + (failed ? '（' + failed + ' 檔失敗）' : '');
+      render();
+    })
+    .catch(function(err) {
+      if (timeEl) timeEl.textContent = '更新失敗：' + err.message;
+    })
+    .finally(function() {
+      if (btn) { btn.disabled = false; btn.textContent = '↻ 更新市價'; }
+    });
   }
 
   window.portfolioLoad = init;
