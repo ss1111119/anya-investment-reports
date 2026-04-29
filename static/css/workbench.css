@@ -227,10 +227,9 @@ a { color: inherit; text-decoration: none; }
 /* ── Grid layout ── */
 .main-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
 }
-@media (max-width: 720px) { .main-grid { grid-template-columns: 1fr; } }
 
 .hub-workbench-grid {
   display: grid;
@@ -536,14 +535,12 @@ a { color: inherit; text-decoration: none; }
 /* ── Research Tab Bar ── */
 .wb-tab-bar {
   display: flex;
-  overflow-x: auto;
-  gap: 2px;
+  flex-wrap: wrap;
+  gap: 4px;
   padding: 0 0 8px;
   margin-bottom: 12px;
   border-bottom: 1px solid var(--border);
-  scrollbar-width: none;
 }
-.wb-tab-bar::-webkit-scrollbar { display: none; }
 
 .wb-tab-btn {
   flex-shrink: 0;
@@ -576,6 +573,14 @@ a { color: inherit; text-decoration: none; }
   white-space: pre-wrap;
   color: var(--text);
   min-height: 80px;
+}
+
+.dip-report {
+  font-family: inherit;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  margin: 0;
+  line-height: 1.6;
 }
 
 .wb-sharpe-badge {

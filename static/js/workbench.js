@@ -144,6 +144,19 @@ async function loadInterpretation(symbol) {
   }
 }
 
+async function loadDip(symbol) {
+  const body = el("dip-body");
+  if (!body) return;
+  body.innerHTML = '<div class="skeleton" style="width:90%"></div><div class="skeleton" style="width:70%"></div>';
+  try {
+    const data = await apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/dip`);
+    const text = (data.report || "無資料").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    body.innerHTML = `<pre class="dip-report">${text}</pre>`;
+  } catch (e) {
+    body.innerHTML = '<div class="unavailable-state">逢低分析暫時無法取得。</div>';
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Research Tab System
 // ---------------------------------------------------------------------------
@@ -787,6 +800,7 @@ function loadSymbol(symbol) {
 
   loadQuote(currentSymbol);
   loadInterpretation(currentSymbol);
+  loadDip(currentSymbol);
   loadTdcc(currentSymbol);
 
   // Load whichever tab is currently active
@@ -948,6 +962,14 @@ document.addEventListener("DOMContentLoaded", () => {
   if (refreshBtn) {
     refreshBtn.addEventListener("click", () => {
       if (currentSymbol) loadQuote(currentSymbol);
+    });
+  }
+
+  // Dip refresh button
+  const dipRefreshBtn = el("dip-refresh-btn");
+  if (dipRefreshBtn) {
+    dipRefreshBtn.addEventListener("click", () => {
+      if (currentSymbol) loadDip(currentSymbol);
     });
   }
 
