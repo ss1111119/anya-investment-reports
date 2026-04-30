@@ -88,14 +88,32 @@ async function loadQuote(symbol) {
   card.innerHTML = '<div class="skeleton" style="width:120px;height:40px"></div><div class="skeleton" style="width:80px"></div>';
 
   try {
-    const data = await apiFetch(`/api/workbench/quote/${encodeURIComponent(symbol)}`);
-    renderQuote(data);
+    const [quoteData, histData] = await Promise.all([
+      apiFetch(`/api/workbench/quote/${encodeURIComponent(symbol)}`),
+      apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/price-history?days=30`).catch(() => null),
+    ]);
+    renderQuote(quoteData, histData);
   } catch (e) {
     card.innerHTML = `<div class="unavailable-state">無法取得 ${symbol} 行情。</div>`;
   }
 }
 
-function renderQuote(q) {
+function buildSparklineSvg(closes, isUp) {
+  const pts = closes.slice(-10);
+  if (pts.length < 2) return "";
+  const w = 80, h = 28;
+  const min = Math.min(...pts), max = Math.max(...pts);
+  const range = max - min || 1;
+  const xs = pts.map((_, i) => (i / (pts.length - 1)) * w);
+  const ys = pts.map(v => h - ((v - min) / range) * h);
+  const d = xs.map((x, i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(" ");
+  const color = isUp ? "#4caf82" : "#e05c5c";
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none" style="display:block">
+    <polyline points="${xs.map((x, i) => `${x.toFixed(1)},${ys[i].toFixed(1)}`).join(" ")}" stroke="${color}" stroke-width="1.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function renderQuote(q, hist) {
   const card = el("quote-body");
   if (q.freshness === "unavailable" || q.last_price == null) {
     card.innerHTML = `
@@ -110,14 +128,36 @@ function renderQuote(q) {
   const cls = pct > 0 ? "up" : pct < 0 ? "dn" : "flat";
   const sign = pct > 0 ? "+" : "";
   const freshLabel = freshnessLabel(q.freshness);
+  const sparkline = (hist && hist.closes && hist.closes.length >= 2)
+    ? buildSparklineSvg(hist.closes, pct >= 0)
+    : "";
+
+  let volBar = "";
+  if (hist && hist.volumes && hist.volumes.length >= 2 && hist.vol_avg20 && hist.vol_avg20 > 0) {
+    const lastVol = hist.volumes[hist.volumes.length - 1];
+    const ratio = Math.min(lastVol / hist.vol_avg20, 2.5);
+    const pct100 = Math.min(ratio / 2.5 * 100, 100).toFixed(1);
+    const volColor = ratio >= 1.5 ? "var(--ok)" : ratio >= 0.8 ? "var(--accent, #7eb8f7)" : "var(--muted)";
+    const volLabel = lastVol >= 1e6 ? (lastVol / 1e6).toFixed(1) + "M" : lastVol >= 1000 ? (lastVol / 1000).toFixed(0) + "K" : lastVol.toString();
+    const ratioLabel = ratio.toFixed(1) + "x";
+    volBar = `
+      <div class="quote-vol-wrap">
+        <div class="quote-vol-label"><span>成交量</span><span style="color:${volColor}">${volLabel} <small>(${ratioLabel} 均)</small></span></div>
+        <div class="quote-vol-track"><div class="quote-vol-bar" style="width:${pct100}%;background:${volColor}"></div></div>
+      </div>`;
+  }
 
   card.innerHTML = `
     <div class="quote-card">
       <div style="font-size:13px;color:var(--muted)">${q.name}（${q.symbol}）</div>
-      <div class="quote-price">${q.last_price.toLocaleString()}</div>
+      <div class="quote-price-row">
+        <div class="quote-price">${q.last_price.toLocaleString()}</div>
+        ${sparkline ? `<div class="quote-sparkline">${sparkline}</div>` : ""}
+      </div>
       <div class="quote-change ${cls}">
         ${sign}${(q.change ?? 0).toFixed(2)} &nbsp; ${sign}${pct.toFixed(2)}%
       </div>
+      ${volBar}
       <div class="quote-meta">
         <span class="meta-chip ${q.freshness}">${freshLabel}</span>
         <span class="meta-chip">來源: ${q.source}</span>
@@ -144,14 +184,77 @@ async function loadInterpretation(symbol) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Fundamentals mini-card
+// ---------------------------------------------------------------------------
+async function loadFundamentals(symbol) {
+  const body = el("fund-body");
+  if (!body) return;
+  body.innerHTML = '<div class="skeleton" style="width:80%;height:14px"></div>';
+  try {
+    const d = await apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/fundamentals`);
+
+    function fmt(v, decimals = 2, suffix = "") {
+      if (v === null || v === undefined) return '<span class="fund-na">—</span>';
+      const n = parseFloat(v);
+      if (isNaN(n)) return '<span class="fund-na">—</span>';
+      return `${n.toFixed(decimals)}${suffix}`;
+    }
+
+    function fmtYoy(v) {
+      if (v === null || v === undefined) return '<span class="fund-na">—</span>';
+      const n = parseFloat(v);
+      if (isNaN(n)) return '<span class="fund-na">—</span>';
+      const cls = n >= 0 ? "up" : "down";
+      const sign = n >= 0 ? "+" : "";
+      return `<span class="fund-value ${cls}">${sign}${n.toFixed(1)}%</span>`;
+    }
+
+    const latestRev = (d.revenue_months || [])[0] || {};
+    const revYoyHtml = fmtYoy(latestRev.revenue_yoy);
+    const revMonth = latestRev.year_month ? `<span class="fund-label">${latestRev.year_month} 營收YoY</span>` : `<span class="fund-label">營收YoY</span>`;
+
+    body.innerHTML = `
+      <div class="fund-cell">
+        <span class="fund-label">本益比 P/E</span>
+        <span class="fund-value">${fmt(d.pe_trailing, 1)}</span>
+      </div>
+      <div class="fund-cell">
+        <span class="fund-label">股價淨值比 P/B</span>
+        <span class="fund-value">${fmt(d.pb_ratio, 2)}</span>
+      </div>
+      <div class="fund-cell">
+        <span class="fund-label">殖利率</span>
+        <span class="fund-value">${fmt(d.dividend_yield, 2, "%")}</span>
+      </div>
+      <div class="fund-cell">
+        <span class="fund-label">EPS（近四季）</span>
+        <span class="fund-value">${fmt(d.eps_trailing, 2)}</span>
+      </div>
+      <div class="fund-cell">
+        <span class="fund-label">ROE</span>
+        <span class="fund-value">${fmt(d.roe, 1, "%")}</span>
+      </div>
+      <div class="fund-cell">
+        ${revMonth}
+        ${revYoyHtml}
+      </div>`;
+  } catch {
+    el("fund-body").innerHTML = '<span class="fund-na">資料載入失敗</span>';
+  }
+}
+
 async function loadDip(symbol) {
   const body = el("dip-body");
   if (!body) return;
   body.innerHTML = '<div class="skeleton" style="width:90%"></div><div class="skeleton" style="width:70%"></div>';
   try {
     const data = await apiFetch(`/api/workbench/research/${encodeURIComponent(symbol)}/dip`);
-    const text = (data.report || "無資料").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    body.innerHTML = `<pre class="dip-report">${text}</pre>`;
+    const text = data.report || "無資料";
+    const html = (typeof marked !== "undefined")
+      ? marked.parse(text)
+      : `<pre class="dip-report">${text.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>`;
+    body.innerHTML = `<div class="dip-report-md">${html}</div>`;
   } catch (e) {
     body.innerHTML = '<div class="unavailable-state">逢低分析暫時無法取得。</div>';
   }
@@ -539,6 +642,8 @@ function renderInstitutionalLoading() {
     '<div class="skeleton" style="width:60%"></div>';
 }
 
+let _instChart = null;
+
 function renderInstitutional(data) {
   const body = el("institutional-body");
   if (data.error) {
@@ -549,23 +654,62 @@ function renderInstitutional(data) {
   const cls = v => v > 0 ? "pos" : v < 0 ? "neg" : "zero";
 
   body.innerHTML = `
-    <div class="inst-row">
-      <span class="inst-label">外資</span>
-      <span class="inst-val ${cls(data.foreign_net)}">${fmtNet(data.foreign_net)}</span>
+    <div class="inst-summary">
+      <div class="inst-row">
+        <span class="inst-label">外資 (30日)</span>
+        <span class="inst-val ${cls(data.foreign_net)}">${fmtNet(data.foreign_net)}</span>
+      </div>
+      <div class="inst-row">
+        <span class="inst-label">投信 (30日)</span>
+        <span class="inst-val ${cls(data.trust_net)}">${fmtNet(data.trust_net)}</span>
+      </div>
+      <div class="inst-row">
+        <span class="inst-label">自營商 (30日)</span>
+        <span class="inst-val ${cls(data.dealer_net)}">${fmtNet(data.dealer_net)}</span>
+      </div>
+      <div style="margin-top:6px;font-size:11px;color:var(--muted)">
+        統計 ${data.days_covered || 0} 個交易日 ·
+        <span class="meta-chip ${data.freshness}" style="padding:2px 7px">${freshnessLabel(data.freshness)}</span>
+        ${data.latest_date ? "· 最新: " + data.latest_date : ""}
+      </div>
     </div>
-    <div class="inst-row">
-      <span class="inst-label">投信</span>
-      <span class="inst-val ${cls(data.trust_net)}">${fmtNet(data.trust_net)}</span>
-    </div>
-    <div class="inst-row">
-      <span class="inst-label">自營商</span>
-      <span class="inst-val ${cls(data.dealer_net)}">${fmtNet(data.dealer_net)}</span>
-    </div>
-    <div style="margin-top:8px;font-size:11px;color:var(--muted)">
-      統計 ${data.days_covered || 0} 個交易日 ·
-      <span class="meta-chip ${data.freshness}" style="padding:2px 7px">${freshnessLabel(data.freshness)}</span>
-      ${data.latest_date ? "· 最新: " + data.latest_date : ""}
+    <div class="inst-chart-wrap">
+      <canvas id="inst-chart"></canvas>
     </div>`;
+
+  const s = data.series;
+  if (!s || !s.dates || s.dates.length < 2) return;
+
+  if (_instChart) { _instChart.destroy(); _instChart = null; }
+
+  const labels = s.dates.map(d => d.slice(5));
+  const barColor = vals => vals.map(v => v >= 0 ? "rgba(76,175,130,0.75)" : "rgba(224,92,92,0.75)");
+
+  _instChart = new Chart(el("inst-chart"), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [
+        { label: "外資", data: s.foreign, backgroundColor: barColor(s.foreign), borderRadius: 2 },
+        { label: "投信", data: s.trust,   backgroundColor: barColor(s.trust),   borderRadius: 2 },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { labels: { color: "#aaa", font: { size: 11 } } },
+        tooltip: {
+          callbacks: { label: ctx => `${ctx.dataset.label}: ${fmtNet(ctx.raw)}` }
+        },
+      },
+      scales: {
+        x: { stacked: false, ticks: { color: "#666", font: { size: 10 }, maxRotation: 45 }, grid: { color: "rgba(255,255,255,0.05)" } },
+        y: { ticks: { color: "#666", font: { size: 10 }, callback: v => fmtNet(v) }, grid: { color: "rgba(255,255,255,0.05)" } },
+      },
+    },
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -799,6 +943,7 @@ function loadSymbol(symbol) {
   }
 
   loadQuote(currentSymbol);
+  loadFundamentals(currentSymbol);
   loadInterpretation(currentSymbol);
   loadDip(currentSymbol);
   loadTdcc(currentSymbol);
@@ -949,13 +1094,94 @@ async function deleteAlert(id) {
 // ---------------------------------------------------------------------------
 // Init
 // ---------------------------------------------------------------------------
+// Symbol autocomplete
+// ---------------------------------------------------------------------------
+function initAutocomplete() {
+  const inp = el("symbol-input");
+  const dropdown = el("symbol-dropdown");
+  let acResults = [];
+  let acIndex = -1;
+  let debounceTimer = null;
+
+  function closeDropdown() {
+    dropdown.hidden = true;
+    acIndex = -1;
+  }
+
+  function renderDropdown(items) {
+    acResults = items;
+    acIndex = -1;
+    if (!items.length) { closeDropdown(); return; }
+    dropdown.innerHTML = items.map((item, i) =>
+      `<li role="option" data-i="${i}">
+        <span class="ac-code">${item.code}</span>
+        <span class="ac-name">${item.name}</span>
+      </li>`
+    ).join("");
+    dropdown.hidden = false;
+  }
+
+  function selectItem(item) {
+    inp.value = item.code;
+    closeDropdown();
+    loadSymbol(item.code);
+  }
+
+  inp.addEventListener("input", () => {
+    clearTimeout(debounceTimer);
+    const q = inp.value.trim();
+    if (q.length < 1) { closeDropdown(); return; }
+    debounceTimer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/workbench/stock-search?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        renderDropdown(data.results || []);
+      } catch { closeDropdown(); }
+    }, 180);
+  });
+
+  inp.addEventListener("keydown", e => {
+    if (dropdown.hidden) {
+      if (e.key === "Enter") { el("lookup-btn").click(); }
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      acIndex = Math.min(acIndex + 1, acResults.length - 1);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      acIndex = Math.max(acIndex - 1, -1);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (acIndex >= 0) { selectItem(acResults[acIndex]); }
+      else { closeDropdown(); el("lookup-btn").click(); }
+      return;
+    } else if (e.key === "Escape") {
+      closeDropdown(); return;
+    }
+    dropdown.querySelectorAll("li").forEach((li, i) =>
+      li.classList.toggle("ac-active", i === acIndex)
+    );
+  });
+
+  dropdown.addEventListener("mousedown", e => {
+    const li = e.target.closest("li");
+    if (li) { e.preventDefault(); selectItem(acResults[+li.dataset.i]); }
+  });
+
+  document.addEventListener("click", e => {
+    if (!inp.contains(e.target) && !dropdown.contains(e.target)) closeDropdown();
+  });
+}
+
+// ---------------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
+  initAutocomplete();
   const inp = el("symbol-input");
   el("lookup-btn").addEventListener("click", () => {
     const sym = (inp.value || "").trim();
     if (sym) loadSymbol(sym);
   });
-  inp.addEventListener("keydown", e => { if (e.key === "Enter") el("lookup-btn").click(); });
 
   // Quote refresh button
   const refreshBtn = el("quote-refresh-btn");
