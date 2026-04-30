@@ -981,15 +981,38 @@ function renderWatchlist(items) {
   }
   list.innerHTML = items.map(item => `
     <div class="watchlist-item" data-symbol="${item.symbol}">
-      <div>
+      <div class="wl-left">
         <span class="watchlist-item-sym">${item.symbol}</span>
-        ${item.display_name ? `<span class="watchlist-item-name"> &nbsp;${item.display_name}</span>` : ""}
+        ${item.display_name ? `<span class="watchlist-item-name">${item.display_name}</span>` : ""}
       </div>
-      <div style="display:flex;gap:6px;align-items:center">
+      <div class="wl-quote" id="wlq-${item.symbol}">
+        <span class="wl-price-skeleton"></span>
+      </div>
+      <div class="wl-actions">
         <button class="btn btn-ghost btn-sm" onclick="loadSymbol('${item.symbol}')">查看</button>
         <button class="btn btn-danger btn-sm" onclick="removeFromWatchlist('${item.symbol}')">移除</button>
       </div>
     </div>`).join("");
+
+  // Batch fetch quotes and inject into each row
+  const syms = items.map(i => i.symbol).join(",");
+  apiFetch(`/api/workbench/quotes-batch?symbols=${encodeURIComponent(syms)}`).then(data => {
+    const quotes = data.quotes || {};
+    for (const [sym, q] of Object.entries(quotes)) {
+      const cell = el(`wlq-${sym}`);
+      if (!cell) continue;
+      if (q.freshness === "unavailable" || q.price == null) {
+        cell.innerHTML = `<span class="wl-na">—</span>`;
+        continue;
+      }
+      const chg = q.change_pct ?? 0;
+      const cls = chg > 0 ? "up" : chg < 0 ? "down" : "";
+      const sign = chg > 0 ? "+" : "";
+      cell.innerHTML = `
+        <span class="wl-price ${cls}">${Number(q.price).toFixed(2)}</span>
+        <span class="wl-chg ${cls}">${sign}${chg.toFixed(2)}%</span>`;
+    }
+  }).catch(() => {});
 }
 
 async function addToWatchlist() {

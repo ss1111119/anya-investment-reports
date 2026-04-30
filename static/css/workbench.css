@@ -441,8 +441,9 @@ a { color: inherit; text-decoration: none; }
 .watchlist-add input:focus { border-color: var(--accent); }
 .watchlist-list { display: flex; flex-direction: column; gap: 6px; }
 .watchlist-item {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
   align-items: center;
   padding: 8px 12px;
   background: rgba(255,255,255,0.04);
@@ -450,8 +451,19 @@ a { color: inherit; text-decoration: none; }
   border-radius: 10px;
   font-size: 13px;
 }
+.wl-left { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .watchlist-item-sym { font-weight: 700; color: var(--accent); }
-.watchlist-item-name { color: var(--muted); font-size: 12px; }
+.watchlist-item-name { color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wl-quote { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; min-width: 60px; }
+.wl-price { font-size: 14px; font-weight: 600; color: var(--text); }
+.wl-price.up   { color: var(--up); }
+.wl-price.down { color: var(--down); }
+.wl-chg  { font-size: 11px; }
+.wl-chg.up   { color: var(--up); }
+.wl-chg.down { color: var(--down); }
+.wl-na { color: var(--muted); font-size: 12px; }
+.wl-price-skeleton { display: inline-block; width: 48px; height: 14px; background: rgba(255,255,255,0.07); border-radius: 4px; animation: pulse 1.2s infinite; }
+.wl-actions { display: flex; gap: 6px; }
 .watchlist-empty { color: var(--muted); font-size: 13px; text-align: center; padding: 12px 0; }
 
 /* ── Alerts ── */
