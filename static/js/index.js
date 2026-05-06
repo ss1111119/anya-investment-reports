@@ -570,7 +570,7 @@ function renderSentiment(s) {
     <div class="sentiment-grid">
       <div class="fg-card">
         <div class="fg-label">台灣市場情緒</div>
-        <div class="fg-value ${fgClass(tw_g.label)}">${tw_g.value??'N/A'}</div>
+        <div class="fg-value ${fgClass(tw_g.label)}">${tw_g.value??'資料待補'}</div>
         <div class="fg-text ${fgClass(tw_g.label)}">${tw_g.label||'—'}</div>
         <div class="linear-gauge-wrap">
           <div class="linear-gauge-bg"></div>
@@ -580,7 +580,7 @@ function renderSentiment(s) {
       </div>
       <div class="fg-card">
         <div class="fg-label">CNN 恐懼貪婪</div>
-        <div class="fg-value ${fgClass(cnn.label)}">${cnn.value??'N/A'}</div>
+        <div class="fg-value ${fgClass(cnn.label)}">${cnn.value??'資料待補'}</div>
         <div class="fg-text ${fgClass(cnn.label)}">${cnn.label||'—'}</div>
         <div class="linear-gauge-wrap">
           <div class="linear-gauge-bg"></div>
@@ -589,7 +589,7 @@ function renderSentiment(s) {
       </div>
       <div class="fg-card">
         <div class="fg-label">加密貨幣情緒</div>
-        <div class="fg-value ${fgClass(crypto.label)}">${crypto.value??'N/A'}</div>
+        <div class="fg-value ${fgClass(crypto.label)}">${crypto.value??'資料待補'}</div>
         <div class="fg-text ${fgClass(crypto.label)}">${crypto.label||'—'}</div>
         <div class="linear-gauge-wrap">
           <div class="linear-gauge-bg"></div>
@@ -643,7 +643,7 @@ function renderSentiment(s) {
     const chips = series.map(s => `
       <div class="macro-chip">
         <div class="chip-name">${s.name}</div>
-        <div class="chip-value">${s.latest != null ? fmt(s.latest, s.symbol === 'DXY' ? 2 : 2) : 'N/A'}</div>
+        <div class="chip-value">${s.latest != null ? fmt(s.latest, s.symbol === 'DXY' ? 2 : 2) : '資料待補'}</div>
         <div class="chip-chg ${cls(s.change_pct)}">${arr(s.change_pct)} ${fmtPct(s.change_pct)}</div>
       </div>
     `).join('');
@@ -666,7 +666,7 @@ function renderSentiment(s) {
     const chips = series.map(s => `
       <div class="macro-chip">
         <div class="chip-name">${s.name}</div>
-        <div class="chip-value">${s.latest != null ? fmt(s.latest, 2) : 'N/A'}</div>
+        <div class="chip-value">${s.latest != null ? fmt(s.latest, 2) : '資料待補'}</div>
         <div class="chip-chg ${cls(s.change_pct)}">${arr(s.change_pct)} ${fmtPct(s.change_pct)}</div>
       </div>
     `).join('');
@@ -719,7 +719,7 @@ function renderSentiment(s) {
     const chips = series.map(s => `
       <div class="macro-chip">
         <div class="chip-name">${s.name}</div>
-        <div class="chip-value">${s.latest != null ? fmt(s.latest, 2) : 'N/A'}</div>
+        <div class="chip-value">${s.latest != null ? fmt(s.latest, 2) : '資料待補'}</div>
         <div class="chip-chg ${cls(s.change_pct)}">${arr(s.change_pct)} ${fmtPct(s.change_pct)}</div>
       </div>
     `).join('');
@@ -745,12 +745,12 @@ function renderTwPremarket(p) {
     <div class="premarket-grid">
       <div class="pm-chip">
         <div class="pm-label">富台 SGX 夜盤</div>
-        <div class="pm-value ${cls(p.sgx_fut?.change_pct)}">${p.sgx_fut?.value!=null?fmtK(p.sgx_fut.value):'N/A'}</div>
+        <div class="pm-value ${cls(p.sgx_fut?.change_pct)}">${p.sgx_fut?.value!=null?fmtK(p.sgx_fut.value):'資料待補'}</div>
         <div class="chip-chg ${cls(p.sgx_fut?.change_pct)}">${arr(p.sgx_fut?.change_pct)} ${fmtPct(p.sgx_fut?.change_pct)}</div>
       </div>
       <div class="pm-chip">
         <div class="pm-label">台指期夜盤</div>
-        <div class="pm-value ${cls(p.rich_fut?.change_pct)}">${p.rich_fut?.value!=null?fmtK(p.rich_fut.value):'N/A'}</div>
+        <div class="pm-value ${cls(p.rich_fut?.change_pct)}">${p.rich_fut?.value!=null?fmtK(p.rich_fut.value):'資料待補'}</div>
         <div class="chip-chg ${cls(p.rich_fut?.change_pct)}">${arr(p.rich_fut?.change_pct)} ${fmtPct(p.rich_fut?.change_pct)}</div>
       </div>
       <div class="pm-chip">
@@ -761,11 +761,11 @@ function renderTwPremarket(p) {
       </div>
       <div class="pm-chip">
         <div class="pm-label">PC Ratio</div>
-        <div class="pm-value">${p.pc_ratio!=null?fmt(p.pc_ratio):'N/A'}</div>
+        <div class="pm-value">${p.pc_ratio!=null?fmt(p.pc_ratio):'資料待補'}</div>
       </div>
       <div class="pm-chip">
         <div class="pm-label">融資維持率</div>
-        <div class="pm-value ${maintClass}">${maint!=null?fmt(maint)+'%':'N/A'}</div>
+        <div class="pm-value ${maintClass}">${maint!=null?fmt(maint)+'%':'資料待補'}</div>
       </div>
       ${p.vol_state ? `<div class="pm-chip"><div class="pm-label">波動狀態</div><div class="pm-value" style="font-size:13px;margin-top:4px">${p.vol_state}</div></div>` : ''}
     </div>`);
@@ -797,7 +797,7 @@ function renderInstitutional(inst) {
       ${items.map(i=>`
         <div class="inst-card">
           <div class="inst-name">${i.n}</div>
-          <div class="inst-value ${cls(i.v)}">${i.v==null?'N/A':(i.v>0?'+':'')+fmt(i.v)}</div>
+          <div class="inst-value ${cls(i.v)}">${i.v==null?'資料待補':(i.v>0?'+':'')+fmt(i.v)}</div>
           <div class="inst-unit">億元</div>
         </div>`).join('')}
     </div>
@@ -890,25 +890,33 @@ function renderMarketInterpretation(d) {
   if (themeNames.some(t => /地緣|通膨|風險|疲弱/.test(t))) score -= 0.5;
 
   const direction = score >= 2 ? '偏多' : score <= -2 ? '偏空' : '中性';
+  const confidence = Math.min(3, Math.max(1, Math.round(Math.abs(score))));
+  const confidenceText = confidence >= 3
+    ? '訊號偏強'
+    : confidence === 2
+      ? '訊號中等'
+      : '訊號偏弱';
+
   const summary = isWeekendMorning
-    ? `週末盤勢偏震盪，市場尚未形成單邊共識。`
+    ? `週末資料顯示盤勢仍以整理為主，方向先看下週開盤與國際盤是否同向。`
     : direction === '偏多'
-      ? `今日盤勢偏多，市場主軸仍在題材輪動與國際訊號同步。`
+      ? `今日盤勢偏多，但屬於輪動式上漲，不是全面失速型大噴出。`
       : direction === '偏空'
-        ? `今日盤勢偏弱，外圍壓力與情緒降溫正在一起影響盤面。`
-        : `今日盤勢偏震盪，市場尚未形成單邊共識。`;
+        ? `今日盤勢偏空，賣壓與風險偏好下降已開始主導盤面。`
+        : `今日盤勢偏震盪，雖然有方向，但還不到可以放心追價的程度。`;
 
   const actionText = isWeekendMorning
-    ? '週末以整理國際、商品與資金訊號為主，等週一開盤再確認方向。'
+    ? `操作含意：先不要用週末消息硬猜方向，等週一開盤後再看資金是否延續。`
     : direction === '偏多'
-      ? '策略上維持偏多，但不建議在情緒過熱時追價。'
+      ? `操作含意：偏多看待，回檔找點比追高更重要；若量能擴大且法人續買，趨勢才算站穩。`
       : direction === '偏空'
-        ? '策略上偏保守，等待風險降溫與趨勢確認。'
-        : '策略上以觀望為主，等國際與資金訊號同步後再決定。';
+        ? `操作含意：以防守為主，反彈先看壓力；若外部風險沒有降溫，不急著進場。`
+        : `操作含意：區間思維，先看突破或跌破再站隊，不用把今天解讀成一定要立刻出手。`;
 
   return card('sec-interpret', isWeekendMorning ? '🧭 週末盤勢解讀' : '🧭 今日盤勢解讀', `
     <div class="interpret-panel">
       <div class="interpret-summary">${escapeHtml(summary)}</div>
+      <div class="interpret-note">${escapeHtml(`判讀：${direction} / ${confidenceText}`)}</div>
       <div class="interpret-note">${escapeHtml(actionText)}</div>
     </div>`);
 }
