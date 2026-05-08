@@ -2,6 +2,7 @@
   'use strict';
 
   var balanceChart = null;
+  var _pnlInterval = null;
 
   function fmt(n) {
     if (n == null) return '-';
@@ -242,6 +243,10 @@
     loadBalanceChart();
     loadRecaps();
     loadPerformance();
+    loadPnlSummary();
+    loadAccuracyTrend();
+    if (_pnlInterval) clearInterval(_pnlInterval);
+    _pnlInterval = setInterval(loadPnlSummary, 60000);
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -384,6 +389,90 @@
                 '<span class="pt-muted">×' + e.count + '</span></div>';
             }).join('');
         }
+      })
+      .catch(function () {});
+  }
+
+  // ── P&L Summary + Accuracy Trend (paper-trading-observability) ──────────
+
+  var accuracyChart = null;
+
+  function fmtNTD(v) {
+    if (v == null) return '無法取得即時價格';
+    var n = Math.round(Number(v));
+    return (n >= 0 ? '+' : '') + n.toLocaleString('zh-TW') + ' NT$';
+  }
+
+  function fmtPctSigned(v) {
+    if (v == null) return '—';
+    return (Number(v) * 100).toFixed(2) + '%';
+  }
+
+  function loadPnlSummary() {
+    fetch('/api/paper-trading/pnl-summary')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        var uEl = document.getElementById('pnl-unrealized-value');
+        var rEl = document.getElementById('pnl-realized-value');
+        var wrEl = document.getElementById('pnl-win-rate');
+        var ddEl = document.getElementById('pnl-drawdown-value');
+
+        if (uEl) {
+          uEl.textContent = d.unrealized_pnl == null ? '無法取得即時價格' : fmtNTD(d.unrealized_pnl);
+          uEl.className = 'pnl-card-value ' + (d.unrealized_pnl != null && d.unrealized_pnl >= 0 ? 'pt-pos' : 'pt-neg');
+        }
+        if (rEl) {
+          rEl.textContent = fmtNTD(d.realized_pnl);
+          rEl.className = 'pnl-card-value ' + (d.realized_pnl >= 0 ? 'pt-pos' : 'pt-neg');
+        }
+        if (wrEl) wrEl.textContent = d.win_rate == null ? '—' : fmtPctSigned(d.win_rate);
+        if (ddEl) {
+          ddEl.textContent = fmtPctSigned(d.max_drawdown);
+          ddEl.className = 'pnl-card-value pt-neg';
+        }
+      })
+      .catch(function () {});
+  }
+
+  function loadAccuracyTrend() {
+    fetch('/api/paper-trading/accuracy-trend?days=30')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        var trend = d.trend || [];
+        var titleEl = document.getElementById('accuracy-trend-title');
+        var canvas = document.getElementById('accuracy-trend-chart');
+        if (!canvas) return;
+
+        var labels = trend.map(function (t) { return t.date.slice(5); }); // MM-DD
+        var values = trend.map(function (t) { return t.win_rate != null ? (t.win_rate * 100).toFixed(1) : null; });
+
+        if (trend.length < 5 && titleEl) {
+          titleEl.textContent = '30 天信號勝率趨勢（資料累積中）';
+        }
+
+        if (accuracyChart) { accuracyChart.destroy(); accuracyChart = null; }
+        accuracyChart = new Chart(canvas, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: '勝率 %',
+              data: values,
+              borderColor: '#38bdf8',
+              backgroundColor: 'rgba(56,189,248,0.1)',
+              tension: 0.3,
+              pointRadius: 3,
+              spanGaps: true,
+            }]
+          },
+          options: {
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { color: '#8da1bf', font: { size: 10 }, maxTicksLimit: 8 }, grid: { display: false } },
+              y: { min: 0, max: 100, ticks: { color: '#8da1bf', font: { size: 10 }, callback: function (v) { return v + '%'; } }, grid: { color: 'rgba(148,163,184,0.08)' } }
+            }
+          }
+        });
       })
       .catch(function () {});
   }

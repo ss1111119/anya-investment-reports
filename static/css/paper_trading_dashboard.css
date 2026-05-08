@@ -513,3 +513,53 @@
     padding: 16px;
   }
 }
+
+/* ── P&L Summary Cards (paper-trading-observability) ── */
+.pnl-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 0 0 20px;
+}
+
+.pnl-card {
+  background: #0e1e30;
+  border: 1px solid rgba(148,163,184,0.12);
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+.pnl-card-label {
+  font-size: 12px;
+  color: #8da1bf;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.pnl-card-value {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.pnl-card-sub {
+  font-size: 12px;
+  color: #8da1bf;
+  margin-top: 6px;
+}
+
+/* ── Accuracy Trend Chart ── */
+.accuracy-trend-container {
+  background: #0e1e30;
+  border: 1px solid rgba(148,163,184,0.12);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin: 0 0 24px;
+}
+
+@media (max-width: 700px) {
+  .pnl-summary-cards {
+    grid-template-columns: 1fr;
+  }
+}
