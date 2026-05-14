@@ -100,8 +100,8 @@ function collapseAllSections() {
 
 const WEEKLY_TEMPLATE_SECTION_ORDER = {
   'Pre-open': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'taiex', 'market_snapshot', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
-  'Close Summary': ['hero', 'taiex', 'institutional', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
-  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'institutional', 'market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'ai'],
+  'Close Summary': ['hero', 'taiex', 'institutional', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'ai'],
+  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'institutional', 'market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'ai'],
   'Weekend Macro': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
   'Next Week Preview': ['hero', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'market_snapshot', 'kol', 'ai'],
 };
@@ -199,6 +199,7 @@ function buildReportSectionMap(d, family) {
   const saConsensus = d.sa_consensus ? renderSeekingAlphaConsensus(d.sa_consensus) : '';
   const socialHeatmap = d.social_topic_heatmap ? renderSocialTopicHeatmap(d.social_topic_heatmap) : '';
   const techHeatmap = d.tech_topic_heatmap ? renderTechTopicHeatmap(d.tech_topic_heatmap) : '';
+  const predictionReview = d.prediction_review?.available !== false ? renderPredictionReview(d.prediction_review) : '';
 
   return {
     hero: `
@@ -231,6 +232,7 @@ function buildReportSectionMap(d, family) {
     chart_orchestration: chartOrchestration,
     news,
     kol,
+    prediction_review: predictionReview,
     ai,
     us_macro: usMacro,
     sa_consensus: saConsensus,
@@ -1084,6 +1086,31 @@ function renderKol(sp) {
 }
 
 // ── AI Analysis (persona tabs) ────────────────────────────────────────────────
+function renderPredictionReview(pr) {
+  if (!pr || pr.available === false) {
+    return card('sec-prediction-review', '🎯 今日預測驗證',
+      '<div style="color:var(--muted);padding:12px 0">今日資料尚未就緒</div>',
+      { collapsible: true });
+  }
+  const verdictColor = { accurate: '#16A34A', partially_accurate: '#D97706', inaccurate: '#DC2626' };
+  const verdictLabel = { accurate: '準確', partially_accurate: '部分準確', inaccurate: '不準確' };
+  const color = verdictColor[pr.verdict] || '#6B7280';
+  const label = verdictLabel[pr.verdict] || pr.verdict;
+  const scorePct = pr.score != null ? Math.round(pr.score * 100) + '%' : '';
+  const badge = `<span style="background:${color};color:#fff;padding:2px 10px;border-radius:12px;font-size:13px;font-weight:600">${label}</span>`;
+  const scoreSpan = scorePct ? `<span style="margin-left:10px;color:var(--muted);font-size:13px">評分 ${scorePct}</span>` : '';
+  const summary = pr.summary ? `<div style="margin:10px 0 14px;color:var(--text)">${pr.summary}</div>` : '';
+  const iconMap = { correct: '✅', incorrect: '❌', partial: '⚡' };
+  const rows = (pr.predictions || []).map(p =>
+    `<div style="padding:6px 0;border-bottom:1px solid var(--border)">
+      ${iconMap[p.result] || '•'} <b>${p.claim}</b>
+      <span style="color:var(--muted);margin-left:6px">→ ${p.actual}</span>
+    </div>`
+  ).join('');
+  const body = `<div>${badge}${scoreSpan}${summary}${rows}</div>`;
+  return card('sec-prediction-review', '🎯 今日預測驗證', body, { collapsible: true });
+}
+
 function renderAI(ai) {
   const ts = ai.generated_at||'';
   // Detect if we have persona-based content or single full_text
