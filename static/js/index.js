@@ -106,6 +106,24 @@ const WEEKLY_TEMPLATE_SECTION_ORDER = {
   'Next Week Preview': ['hero', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'market_snapshot', 'kol', 'ai'],
 };
 
+// Maps an APPROVED_CHART_LIBRARY chart id to the on-page section anchor that renders it.
+const CHART_ID_TO_SECTION = {
+  us_macro_panel: 'sec-macro',
+  futures_adr_panel: 'sec-tw',
+  sa_analyst_consensus_panel: 'sec-sa-consensus',
+  social_topic_heatmap_panel: 'sec-social-heatmap',
+  tech_topic_heatmap_panel: 'sec-tech-heatmap',
+  commodity_risk_panel: 'sec-commodity',
+  treasury_oil_panel: 'sec-yield-oil',
+  us_sector_rotation_panel: 'sec-us-sector',
+  sentiment_panel: 'sec-sentiment',
+  taiwan_price_panel: 'sec-history',
+  market_breadth_panel: 'sec-sentiment',
+  institutional_flow_panel: 'sec-inst',
+  sector_rotation_panel: 'sec-sector',
+  news_theme_strip: 'sec-news',
+};
+
 function parseReportDate(dateValue) {
   if(!dateValue) return null;
   const parsed = new Date(`${String(dateValue).trim()}T00:00:00`);
@@ -944,8 +962,15 @@ function renderChartOrchestration(o) {
     const desc = chart.description || '';
     const takeaway = chart.takeaway || desc || '';
     const action = chart.action || '';
+    const sectionId = CHART_ID_TO_SECTION[chart.id];
+    const clickAttrs = sectionId
+      ? ` role="link" tabindex="0" style="cursor:pointer;" onclick="jumpToSection('${sectionId}')" onkeydown="if(event.key==='Enter'){jumpToSection('${sectionId}')}"`
+      : '';
+    const jumpHint = sectionId
+      ? `<span style="font-size:12px;color:var(--accent);font-weight:600;">前往章節 →</span>`
+      : '';
     return `
-      <div class="news-theme-card">
+      <div class="news-theme-card"${clickAttrs}>
         <div class="news-theme-name">
           <strong style="color:var(--text);font-size:15px;">${escapeHtml(title)}</strong>
           <span class="news-theme-score">${escapeHtml(chart.priority || '—')}</span>
@@ -953,6 +978,7 @@ function renderChartOrchestration(o) {
         <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:6px;">${escapeHtml(chart.id || '')}</div>
         <div style="font-size:14px;color:var(--text);line-height:1.55;margin-bottom:8px;">${escapeHtml(takeaway)}</div>
         ${action ? `<div class="interpret-note" style="margin-top:0;">${escapeHtml(action)}</div>` : ''}
+        ${jumpHint}
       </div>
     `;
   }).join('');
@@ -1742,6 +1768,15 @@ function scrollToSection(id) {
   const el = document.getElementById(id);
   if(!el) return;
   el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function jumpToSection(id) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  if(el.classList.contains('is-collapsible') && isSectionCollapsed(id)) {
+    setSectionCollapsed(id, false);
+  }
+  scrollToSection(id);
 }
 
 function enhanceSectionShortcuts(order) {
