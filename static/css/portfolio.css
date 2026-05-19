@@ -572,6 +572,17 @@
   vertical-align: middle;
 }
 .pf-edit-btn:hover { opacity: 1; color: var(--accent); }
+.pf-del-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 4px;
+  opacity: 0.4;
+  transition: opacity 0.15s, color 0.15s;
+}
+.pf-del-btn:hover { opacity: 1; color: var(--crit); }
 .pf-save-btn, .pf-cancel-btn, .pf-reset-btn {
   border: none;
   border-radius: var(--r-xs);

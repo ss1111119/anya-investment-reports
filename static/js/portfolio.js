@@ -4,52 +4,8 @@
   const STOP_LOSS_DEFAULT   = -30;
   const TAKE_PROFIT_DEFAULT = 150;
 
-  const DATA = [
-    { name: '聯電',           symbol: '2303',   type: 'stock', price: 72.70,   avg: 48.79,  shares: 200,   available: 200,   pnl: 4719,    pnlPct: 48.36  },
-    { name: '鴻海',           symbol: '2317',   type: 'stock', price: 228.00,  avg: 83.65,  shares: 150,   available: 150,   pnl: 21502,   pnlPct: 171.36 },
-    { name: '仁寶',           symbol: '2324',   type: 'stock', price: 30.00,   avg: 23.59,  shares: 1000,  available: 1000,  pnl: 6274,    pnlPct: 26.59  },
-    { name: '台積電',         symbol: '2330',   type: 'stock', price: 2265.00, avg: 449.23, shares: 31,    available: 31,    pnl: 55979,   pnlPct: 401.97 },
-    { name: '微星',           symbol: '2377',   type: 'stock', price: 93.40,   avg: 137.40, shares: 50,    available: 50,    pnl: -2234,   pnlPct: -32.52 },
-    { name: '友達',           symbol: '2409',   type: 'stock', price: 17.35,   avg: 19.45,  shares: 80,    available: 80,    pnl: -192,    pnlPct: -12.34 },
-    { name: '聯發科',         symbol: '2454',   type: 'stock', price: 2435.00, avg: 821.47, shares: 15,    available: 15,    pnl: 24042,   pnlPct: 195.11 },
-    { name: '義隆',           symbol: '2458',   type: 'stock', price: 136.00,  avg: 129.69, shares: 100,   available: 100,   pnl: 571,     pnlPct: 4.40   },
-    { name: '長榮',           symbol: '2603',   type: 'stock', price: 199.50,  avg: 176.65, shares: 40,    available: 40,    pnl: 871,     pnlPct: 12.33  },
-    { name: '台灣高鐵',       symbol: '2633',   type: 'stock', price: 26.35,   avg: 33.34,  shares: 50,    available: 50,    pnl: -373,    pnlPct: -22.35 },
-    { name: '凱基金',         symbol: '2883',   type: 'stock', price: 20.50,   avg: 9.16,   shares: 1010,  available: 1010,  pnl: 11364,   pnlPct: 122.85 },
-    { name: '玉山金',         symbol: '2884',   type: 'stock', price: 32.55,   avg: 21.37,  shares: 60,    available: 26,    pnl: 646,     pnlPct: 51.66  },
-    { name: '元大金',         symbol: '2885',   type: 'stock', price: 50.80,   avg: 18.29,  shares: 569,   available: 569,   pnl: 18370,   pnlPct: 176.50 },
-    { name: '兆豐金',         symbol: '2886',   type: 'stock', price: 39.80,   avg: 29.62,  shares: 105,   available: 105,   pnl: 1037,    pnlPct: 33.34  },
-    { name: '大成',           symbol: '1210',   type: 'stock', price: 53.70,   avg: 50.49,  shares: 108,   available: 108,   pnl: 310,     pnlPct: 5.68   },
-    { name: '統一',           symbol: '1216',   type: 'stock', price: 70.50,   avg: 72.80,  shares: 100,   available: 100,   pnl: -271,    pnlPct: -3.72  },
-    { name: '聯華食',         symbol: '1227',   type: 'stock', price: 85.90,   avg: 35.86,  shares: 161,   available: 161,   pnl: 7996,    pnlPct: 138.51 },
-    { name: '遠東新',         symbol: '1402',   type: 'stock', price: 26.00,   avg: 32.87,  shares: 100,   available: 100,   pnl: -714,    pnlPct: -21.72 },
-    { name: '南僑',           symbol: '1702',   type: 'stock', price: 35.60,   avg: 48.64,  shares: 200,   available: 200,   pnl: -2649,   pnlPct: -27.23 },
-    { name: '中化生',         symbol: '1762',   type: 'stock', price: 27.55,   avg: 65.50,  shares: 50,    available: 50,    pnl: -1922,   pnlPct: -58.67 },
-    { name: '台船',           symbol: '2208',   type: 'stock', price: 20.35,   avg: 29.52,  shares: 200,   available: 200,   pnl: -1866,   pnlPct: -31.61 },
-    { name: '台新新光辛特',   symbol: null,     type: 'other', price: 9.39,    avg: null,   shares: 175,   available: 175,   pnl: 1619,    pnlPct: null   },
-    { name: '中信金',         symbol: '2891',   type: 'stock', price: 52.70,   avg: 21.40,  shares: 100,   available: 100,   pnl: 3095,    pnlPct: 144.63 },
-    { name: '第一金',         symbol: '2892',   type: 'stock', price: 28.35,   avg: 21.14,  shares: 114,   available: 114,   pnl: 793,     pnlPct: 32.90  },
-    { name: '統一超',         symbol: '2912',   type: 'stock', price: 226.00,  avg: 269.95, shares: 40,    available: 40,    pnl: -1805,   pnlPct: -16.72 },
-    { name: '緯創',           symbol: '3231',   type: 'stock', price: 142.50,  avg: 35.75,  shares: 110,   available: 110,   pnl: 11674,   pnlPct: 296.90 },
-    { name: '和碩',           symbol: '4938',   type: 'stock', price: 83.10,   avg: 74.06,  shares: 100,   available: 100,   pnl: 860,     pnlPct: 11.61  },
-    { name: '嘉聯益',         symbol: '6153',   type: 'stock', price: 17.90,   avg: 35.12,  shares: 105,   available: 105,   pnl: -1834,   pnlPct: -49.72 },
-    { name: '國泰永續高股息', symbol: '00878',  type: 'etf',   price: 25.00,   avg: 14.89,  shares: 1000,  available: 1000,  pnl: 10050,   pnlPct: 67.49  },
-    { name: '中信中國高股息', symbol: '00882',  type: 'etf',   price: 15.63,   avg: 15.83,  shares: 100,   available: 100,   pnl: -41,     pnlPct: -2.59  },
-    { name: '富邦越南',       symbol: '00885',  type: 'etf',   price: 18.62,   avg: 15.61,  shares: 1000,  available: 1000,  pnl: 2966,    pnlPct: 19.00  },
-    { name: '中信關鍵半導體', symbol: '00891',  type: 'etf',   price: 31.24,   avg: 15.41,  shares: 500,   available: 500,   pnl: 7877,    pnlPct: 102.22 },
-    { name: '富邦台灣半導體', symbol: '00892',  type: 'etf',   price: 38.10,   avg: 15.52,  shares: 1000,  available: 1000,  pnl: 22488,   pnlPct: 144.90 },
-    { name: '台泥',           symbol: '1101',   type: 'stock', price: 24.35,   avg: 41.14,  shares: 57,    available: 57,    pnl: -981,    pnlPct: -41.84 },
-    { name: '味全',           symbol: '1201',   type: 'stock', price: 12.70,   avg: 23.31,  shares: 100,   available: 100,   pnl: -1084,   pnlPct: -46.50 },
-    { name: '台郡',           symbol: '6269',   type: 'stock', price: 65.40,   avg: 149.67, shares: 30,    available: 30,    pnl: -2553,   pnlPct: -56.86 },
-    { name: '櫻花',           symbol: '9911',   type: 'stock', price: 81.80,   avg: 64.34,  shares: 100,   available: 100,   pnl: 1702,    pnlPct: 26.45  },
-    { name: '元大台灣50',     symbol: '0050',   type: 'etf',   price: 93.00,   avg: 40.19,  shares: 4954,  available: 4954,  pnl: 260489,  pnlPct: 130.82 },
-    { name: '元大高股息',     symbol: '0056',   type: 'etf',   price: 40.90,   avg: 31.46,  shares: 500,   available: 500,   pnl: 4669,    pnlPct: 29.68  },
-    { name: '富邦台50',       symbol: '006208', type: 'etf',   price: 215.45,  avg: 109.48, shares: 1016,  available: 1016,  pnl: 107140,  pnlPct: 96.32  },
-    { name: '國泰中國A50',    symbol: '00636',  type: 'etf',   price: 28.03,   avg: 30.27,  shares: 200,   available: 200,   pnl: -473,    pnlPct: -7.81  },
-    { name: '富邦公司治理',   symbol: '00692',  type: 'etf',   price: 81.10,   avg: 34.75,  shares: 100,   available: 100,   pnl: 4607,    pnlPct: 132.58 },
-    { name: '復華富時不動產', symbol: '00712',  type: 'etf',   price: 9.06,    avg: 14.51,  shares: 475,   available: 475,   pnl: -2613,   pnlPct: -37.91 },
-    { name: '元大臺灣ESG永續', symbol: '00850', type: 'etf',   price: 76.65,   avg: 33.74,  shares: 200,   available: 200,   pnl: null,    pnlPct: null   },
-  ];
+  var _positions = [];
+  var _addFormOpen = false;
 
   let sortKey     = 'pnlPct';
   let sortDir     = -1;
@@ -198,6 +154,7 @@
         '<button class="pf-cancel-btn" data-symbol="' + key + '" title="取消">✗</button>' +
         '<button class="pf-reset-btn"  data-symbol="' + key + '" title="回復預設">↩</button>' +
       '</td>' +
+      '<td></td>' +
       '</tr>';
   }
 
@@ -278,12 +235,48 @@
     if (isText) el.textContent = html; else el.innerHTML = html;
   }
 
+  function loadPositions() {
+    var tbody = document.getElementById('pf-tbody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:1.5rem;color:#888;">載入中…</td></tr>';
+    fetch('/api/portfolio/positions-store')
+      .then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function(data) {
+        _positions = data.positions || [];
+        if (_positions.length === 0 && !_addFormOpen) {
+          if (tbody) tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:2rem;color:#888;">目前無持倉，點擊「＋ 新增持倉」開始新增</td></tr>';
+          ['pf-count','pf-profit-count','pf-loss-count','pf-alert-count','pf-sl-count','pf-tp-count'].forEach(function(id){ setEl(id, 0, true); });
+          return;
+        }
+        render();
+      })
+      .catch(function(err) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:1.5rem;color:#c00;">載入失敗：' + err.message + '</td></tr>';
+      });
+  }
+
+  function addFormRowHtml() {
+    return '<tr class="pf-add-form-row">' +
+      '<td><input class="pf-input" data-field="symbol" placeholder="代碼*" style="width:60px">' +
+      '    <input class="pf-input" data-field="name"   placeholder="名稱"   style="width:70px"></td>' +
+      '<td>--</td>' +
+      '<td><input class="pf-input" data-field="avg"    placeholder="成本"   style="width:60px" type="number"></td>' +
+      '<td><input class="pf-input" data-field="shares" placeholder="股數*"  style="width:60px" type="number"></td>' +
+      '<td>--</td><td>--</td><td>--</td><td>--</td>' +
+      '<td><select class="pf-input" data-field="type" style="width:60px"><option value="stock">股票</option><option value="etf">ETF</option></select></td>' +
+      '<td><button class="pf-save-add-btn pf-btn">確認</button> <button class="pf-cancel-add-btn pf-btn">取消</button></td>' +
+      '<td></td>' +
+      '</tr>';
+  }
+
   function render() {
     getThresholds();
-    var filtered = applyFilter(DATA);
+    var filtered = applyFilter(_positions);
     var sorted   = applySort(filtered);
     var s        = computeSummary(filtered);
-    var sAll     = computeSummary(DATA);
+    var sAll     = computeSummary(_positions);
 
     // ── Header cards (always full portfolio) ──
     setEl('pf-total-pnl-hero', fmtSigned(sAll.totalPnl));
@@ -297,7 +290,7 @@
       retEl.textContent = sign + sAll.returnPct.toFixed(2) + '%';
     }
 
-    setEl('pf-count', DATA.length, true);
+    setEl('pf-count', _positions.length, true);
     setEl('pf-profit-count', sAll.profit, true);
     setEl('pf-loss-count', sAll.loss, true);
     setEl('pf-stock-pnl', fmtSigned(sAll.stockPnl));
@@ -321,7 +314,8 @@
     var tbody = document.getElementById('pf-tbody');
     if (!tbody) return;
 
-    tbody.innerHTML = sorted.map(function (rawR) {
+    var addFormHtml = _addFormOpen ? addFormRowHtml() : '';
+    tbody.innerHTML = addFormHtml + sorted.map(function (rawR) {
       var r = effectiveRow(rawR);
       var editKey = r.symbol || r.name;
       if (_editingSymbol && editKey === _editingSymbol) return editRowHtml(r);
@@ -353,6 +347,7 @@
         '<td>' + fmtSigned(r.pnl) + '</td>' +
         '<td>' + fmtPct(r.pnlPct) + '</td>' +
         '<td class="pf-ai-cell">' + actionCellHtml(r) + '</td>' +
+        '<td><button class="pf-del-btn pf-btn" data-symbol="' + (r.symbol || '') + '" title="刪除">🗑</button></td>' +
         '</tr>';
     }).join('');
 
@@ -436,7 +431,7 @@
 
   function buildDiagPayload() {
     getThresholds();
-    return DATA.map(function (r) {
+    return _positions.map(function (r) {
       return {
         name:   r.name,
         price:  r.price,
@@ -495,7 +490,7 @@
     if (!panel || !body || !symbol) return;
 
     var cacheKey    = String(symbol).toUpperCase();
-    var row         = DATA.find(function (d) { return d.symbol === symbol; });
+    var row         = _positions.find(function (d) { return d.symbol === symbol; });
     var displayName = (row && row.name) || cacheKey;
 
     if (isCacheValid(_stockDiagCache[cacheKey])) {
@@ -648,15 +643,76 @@
           render();
           return;
         }
+
+        // 🗑 刪除
+        var delBtn = event.target.closest('.pf-del-btn');
+        if (delBtn) {
+          var sym = delBtn.getAttribute('data-symbol');
+          fetch('/api/portfolio/positions-store/' + encodeURIComponent(sym), { method: 'DELETE' })
+            .then(function(res) {
+              if (!res.ok) throw new Error('HTTP ' + res.status);
+              var idx = _positions.findIndex(function(p) { return p.symbol === sym; });
+              if (idx !== -1) _positions.splice(idx, 1);
+              render();
+            })
+            .catch(function(err) { alert('刪除失敗：' + err.message); });
+          return;
+        }
+
+        // ✓ 確認新增
+        var saveAddBtn = event.target.closest('.pf-save-add-btn');
+        if (saveAddBtn) {
+          var formRow = tbody.querySelector('.pf-add-form-row');
+          if (!formRow) return;
+          var symVal    = (formRow.querySelector('[data-field="symbol"]').value || '').trim();
+          var sharesVal = (formRow.querySelector('[data-field="shares"]').value || '').trim();
+          if (!symVal || !sharesVal) { alert('代碼與股數為必填'); return; }
+          var payload = {
+            symbol: symVal,
+            name:   (formRow.querySelector('[data-field="name"]').value || '').trim() || symVal,
+            type:   formRow.querySelector('[data-field="type"]').value || 'stock',
+            avg:    parseFloat(formRow.querySelector('[data-field="avg"]').value) || null,
+            shares: parseInt(sharesVal, 10),
+          };
+          fetch('/api/portfolio/positions-store', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          })
+            .then(function(res) {
+              if (res.status === 409) { alert('代碼已存在'); throw new Error('duplicate'); }
+              if (!res.ok) throw new Error('HTTP ' + res.status);
+              return res.json();
+            })
+            .then(function(data) {
+              _positions.push(data.position);
+              _addFormOpen = false;
+              render();
+            })
+            .catch(function(err) { if (err.message !== 'duplicate') alert('新增失敗：' + err.message); });
+          return;
+        }
+
+        // ✗ 取消新增
+        var cancelAddBtn = event.target.closest('.pf-cancel-add-btn');
+        if (cancelAddBtn) { _addFormOpen = false; render(); return; }
       });
     }
+
+    var addBtn = document.getElementById('pf-add-btn');
+    if (addBtn) addBtn.addEventListener('click', function() {
+      _addFormOpen = true;
+      render();
+      var tbody2 = document.getElementById('pf-tbody');
+      if (tbody2) { var inp = tbody2.querySelector('[data-field="symbol"]'); if (inp) inp.focus(); }
+    });
 
     var refreshBtn = document.getElementById('pf-refresh-price-btn');
     if (refreshBtn) refreshBtn.addEventListener('click', updatePrices);
 
     loadOverrides();
     loadDiagCache();
-    render();
+    loadPositions();
   }
 
   function updatePrices() {
@@ -665,7 +721,7 @@
     if (btn) { btn.disabled = true; btn.textContent = '更新中…'; }
     if (timeEl) timeEl.textContent = '';
 
-    var symbols = DATA.map(function(r) { return r.symbol; }).filter(Boolean);
+    var symbols = _positions.map(function(r) { return r.symbol; }).filter(Boolean);
     var batches = [];
     for (var i = 0; i < symbols.length; i += 30) batches.push(symbols.slice(i, i + 30));
 
