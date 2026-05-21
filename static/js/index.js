@@ -99,11 +99,11 @@ function collapseAllSections() {
 }
 
 const WEEKLY_TEMPLATE_SECTION_ORDER = {
-  'Pre-open': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'taiex', 'market_snapshot', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
-  'Close Summary': ['hero', 'taiex', 'institutional', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'ai'],
-  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'institutional', 'market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'ai'],
-  'Weekend Macro': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'interpretation', 'chart_orchestration', 'news', 'kol', 'ai'],
-  'Next Week Preview': ['hero', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'market_snapshot', 'kol', 'ai'],
+  'Pre-open': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'taiex', 'market_snapshot', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
+  'Close Summary': ['hero', 'taiex', 'institutional', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
+  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'institutional', 'market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
+  'Weekend Macro': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
+  'Next Week Preview': ['hero', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'market_snapshot', 'kol', 'history_strip', 'ai'],
 };
 
 // Maps an APPROVED_CHART_LIBRARY chart id to the on-page section anchor that renders it.
@@ -218,6 +218,7 @@ function buildReportSectionMap(d, family) {
   const socialHeatmap = d.social_topic_heatmap ? renderSocialTopicHeatmap(d.social_topic_heatmap) : '';
   const techHeatmap = d.tech_topic_heatmap ? renderTechTopicHeatmap(d.tech_topic_heatmap) : '';
   const predictionReview = d.prediction_review?.available !== false ? renderPredictionReview(d.prediction_review) : '';
+  const historyStrip = d.history_7d ? renderHistoryStrip(d.history_7d) : '';
 
   return {
     hero: `
@@ -251,6 +252,7 @@ function buildReportSectionMap(d, family) {
     news,
     kol,
     prediction_review: predictionReview,
+    history_strip: historyStrip,
     ai,
     us_macro: usMacro,
     sa_consensus: saConsensus,
@@ -1109,6 +1111,71 @@ function renderKol(sp) {
         <span style="color:var(--muted);font-size:12px">${neutral}% 中性 / ${sp.total_kols||0} 位 KOL 統計</span>
       </div>
     </div>`, { collapsible: true });
+}
+
+// ── History strip (7-day signal / accuracy / recurring topics) ──────────────
+function renderHistoryStrip(h) {
+  if (!h || !Array.isArray(h.signals)) return '';
+  if (!h.signals.some(s => s && s.signal != null)) return '';
+
+  const escapeHtml = (value = '') => String(value)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+  const signalLabel = (sig) => sig === 'bullish' ? '多'
+    : sig === 'bearish' ? '空'
+    : sig === 'neutral' ? '平' : '—';
+  const signalClass = (sig) => sig === 'bullish' ? 'hs-pill-bullish'
+    : sig === 'bearish' ? 'hs-pill-bearish'
+    : sig === 'neutral' ? 'hs-pill-neutral'
+    : 'hs-pill-empty';
+
+  const signalCells = h.signals.map(s => {
+    const dateShort = s.date ? s.date.slice(5) : '—';
+    return `<div class="hs-pill ${signalClass(s.signal)}" title="${escapeHtml(s.date || '')}: ${signalLabel(s.signal)}">
+      <div class="hs-pill-label">${signalLabel(s.signal)}</div>
+      <div class="hs-pill-date">${escapeHtml(dateShort)}</div>
+    </div>`;
+  }).join('');
+
+  const verdictIcon = (v) => v === 'accurate' ? '✅'
+    : v === 'partially_accurate' ? '⚡'
+    : v === 'inaccurate' ? '❌' : '—';
+  const predictionCells = (h.predictions || []).map(p => {
+    const cls = p.verdict ? 'hs-pill-neutral' : 'hs-pill-empty';
+    const dateShort = p.date ? p.date.slice(5) : '—';
+    return `<div class="hs-pill ${cls}" title="${escapeHtml(p.date || '')}: ${escapeHtml(p.verdict || 'N/A')}">
+      <div class="hs-pill-label" style="font-size:18px">${verdictIcon(p.verdict)}</div>
+      <div class="hs-pill-date">${escapeHtml(dateShort)}</div>
+    </div>`;
+  }).join('');
+
+  const accuracyText = h.accuracy_rate != null
+    ? `<span class="hs-accuracy">過去 7 天命中率 ${Math.round(h.accuracy_rate * 100)}%</span>`
+    : `<span class="hs-accuracy" style="color:var(--muted)">尚無預測驗證紀錄</span>`;
+
+  const topicsList = (h.recurring_topics || []).map(t =>
+    `<div class="hs-topic-row">
+      <span class="hs-topic-name">${escapeHtml(t.topic)}</span>
+      <span class="hs-topic-source">${t.source === 'social' ? '社群' : '科技'}</span>
+      <span class="hs-topic-days">連續 ${t.days} 天</span>
+    </div>`
+  ).join('');
+
+  const topicsBlock = topicsList
+    ? `<div style="margin-top:14px"><div class="hs-subtitle">持續發酵主題</div>${topicsList}</div>`
+    : '';
+
+  const body = `
+    <div class="hs-subtitle">訊號連續性</div>
+    <div class="hs-row">${signalCells}</div>
+    <div class="hs-subtitle" style="margin-top:14px">預測準度</div>
+    <div class="hs-row">${predictionCells}</div>
+    <div style="margin-top:8px">${accuracyText}</div>
+    ${topicsBlock}
+  `;
+
+  return card('sec-history-strip', '📈 歷史對比', body, { collapsible: true });
 }
 
 // ── AI Analysis (persona tabs) ────────────────────────────────────────────────
