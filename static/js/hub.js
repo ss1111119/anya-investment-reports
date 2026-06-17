@@ -38,6 +38,7 @@
       loadGeminiSettings().catch(function (error) {
         setGeminiMessage(error.message || '無法載入 Gemini 設定', 'error');
       });
+      loadApiKeyStatus();
     }
 
     // Reload paper trading dashboard when trading tab becomes active
@@ -151,7 +152,6 @@
       'gemini-model': effective.gemini_model,
       'gemini-model-pro': effective.gemini_model_pro,
       'gemini-model-chat': effective.gemini_model_chat,
-      'paper-trading-gemini-model': effective.paper_trading_gemini_model,
       'gemini-queue-wait-timeout': effective.gemini_queue_wait_timeout_seconds,
       'gemini-queue-exec-timeout': effective.gemini_queue_exec_timeout_seconds,
       'gemini-queue-retry-max-attempts': effective.gemini_queue_retry_max_attempts,
@@ -160,7 +160,6 @@
       'gemini-model-source': effective.gemini_model,
       'gemini-model-pro-source': effective.gemini_model_pro,
       'gemini-model-chat-source': effective.gemini_model_chat,
-      'paper-trading-gemini-model-source': effective.paper_trading_gemini_model,
       'gemini-queue-wait-timeout-source': effective.gemini_queue_wait_timeout_seconds,
       'gemini-queue-exec-timeout-source': effective.gemini_queue_exec_timeout_seconds,
       'gemini-queue-retry-max-source': effective.gemini_queue_retry_max_attempts,
@@ -169,7 +168,6 @@
     fillGeminiSelect('gemini-model', options.gemini_model, valueMap['gemini-model'].value);
     fillGeminiSelect('gemini-model-pro', options.gemini_model_pro, valueMap['gemini-model-pro'].value);
     fillGeminiSelect('gemini-model-chat', options.gemini_model_chat, valueMap['gemini-model-chat'].value);
-    fillGeminiSelect('paper-trading-gemini-model', options.paper_trading_gemini_model, valueMap['paper-trading-gemini-model'] && valueMap['paper-trading-gemini-model'].value);
 
     const waitTimeout = document.getElementById('gemini-queue-wait-timeout');
     const execTimeout = document.getElementById('gemini-queue-exec-timeout');
@@ -187,6 +185,45 @@
 
     geminiSettingsSnapshot = sourcePayload;
     setGeminiMessage('設定已載入', 'ok');
+  }
+
+  async function loadApiKeyStatus() {
+    try {
+      const res = await fetch('/api/workbench/google-api-key');
+      if (!res.ok) return;
+      const data = await res.json();
+      const masked = document.getElementById('google-api-key-masked');
+      if (masked) masked.textContent = data.has_key ? data.masked : '未設定';
+    } catch (_) {}
+  }
+
+  async function saveApiKey() {
+    const input = document.getElementById('google-api-key-input');
+    const msg = document.getElementById('google-api-key-message');
+    if (!input || !input.value.trim()) {
+      if (msg) { msg.textContent = '請輸入 API key'; msg.dataset.kind = 'error'; }
+      return;
+    }
+    if (msg) { msg.textContent = '儲存中...'; msg.dataset.kind = ''; }
+    try {
+      const res = await fetch('/api/workbench/google-api-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ api_key: input.value.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (msg) { msg.textContent = data.detail || '儲存失敗'; msg.dataset.kind = 'error'; }
+        return;
+      }
+      input.value = '';
+      const masked = document.getElementById('google-api-key-masked');
+      if (masked) masked.textContent = data.masked;
+      const note = data.persisted ? '已儲存並寫入 .env' : '已套用（.env 寫入失敗，重啟後需重設）';
+      if (msg) { msg.textContent = note; msg.dataset.kind = 'ok'; }
+    } catch (err) {
+      if (msg) { msg.textContent = err.message || '儲存失敗'; msg.dataset.kind = 'error'; }
+    }
   }
 
   async function loadGeminiSettings() {
@@ -207,7 +244,6 @@
       gemini_model: document.getElementById('gemini-model')?.value || null,
       gemini_model_pro: document.getElementById('gemini-model-pro')?.value || null,
       gemini_model_chat: document.getElementById('gemini-model-chat')?.value || null,
-      paper_trading_gemini_model: document.getElementById('paper-trading-gemini-model')?.value || null,
       gemini_queue_wait_timeout_seconds: Number(document.getElementById('gemini-queue-wait-timeout')?.value || 0),
       gemini_queue_exec_timeout_seconds: Number(document.getElementById('gemini-queue-exec-timeout')?.value || 0),
       gemini_queue_retry_max_attempts: Number(document.getElementById('gemini-queue-retry-max-attempts')?.value || 0),
@@ -260,6 +296,31 @@
         saveGeminiSettings(event).catch(function (error) {
           setGeminiMessage(error.message || '儲存失敗', 'error');
         });
+      });
+    }
+
+    const apiKeySaveBtn = document.getElementById('google-api-key-save');
+    if (apiKeySaveBtn) {
+      apiKeySaveBtn.addEventListener('click', function () {
+        saveApiKey().catch(function (err) {
+          const msg = document.getElementById('google-api-key-message');
+          if (msg) { msg.textContent = err.message || '儲存失敗'; msg.dataset.kind = 'error'; }
+        });
+      });
+    }
+
+    const apiKeyToggle = document.getElementById('google-api-key-toggle');
+    if (apiKeyToggle) {
+      apiKeyToggle.addEventListener('click', function () {
+        const input = document.getElementById('google-api-key-input');
+        if (!input) return;
+        if (input.type === 'password') {
+          input.type = 'text';
+          apiKeyToggle.textContent = '隱藏';
+        } else {
+          input.type = 'password';
+          apiKeyToggle.textContent = '顯示';
+        }
       });
     }
 
