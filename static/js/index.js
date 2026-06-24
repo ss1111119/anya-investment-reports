@@ -903,16 +903,27 @@ function renderMarketInterpretation(d) {
   const greed = sentiment.tw_greed?.value != null ? Number(sentiment.tw_greed.value) : null;
   const regime = (tw.regime || tw.trend_state || '').toString();
 
-  let score = 0;
-  if (regime.includes('BULL')) score += 2;
-  if (regime.includes('BEAR')) score -= 2;
-  if (bullPct != null && bearPct != null) score += bullPct >= bearPct ? 0.5 : -0.5;
-  if (greed != null) score += greed >= 70 ? -1 : greed <= 35 ? 0.5 : 0;
-  if (themeNames.some(t => /AI|半導體|成長|軟體/.test(t))) score += 0.5;
-  if (themeNames.some(t => /地緣|通膨|風險|疲弱/.test(t))) score -= 0.5;
+  // 方向統一採用後端 headline.signal（已納入隔夜美股/VIX 等即時訊號），
+  // 與 Hero 大圖、深度分析同一事實來源，避免本卡片自算 regime 計分造成方向打架。
+  const sig = d.headline?.signal || 'neutral';
+  const direction = sig === 'bullish' ? '偏多' : sig === 'bearish' ? '偏空' : '中性';
 
-  const direction = score >= 2 ? '偏多' : score <= -2 ? '偏空' : '中性';
-  const confidence = Math.min(3, Math.max(1, Math.round(Math.abs(score))));
+  // 訊號強度：計算與 headline.signal「同向」的佐證因子數（不決定方向，只表強弱）。
+  let support = 0;
+  if (regime.includes('BULL') && sig === 'bullish') support += 1;
+  if (regime.includes('BEAR') && sig === 'bearish') support += 1;
+  if (bullPct != null && bearPct != null) {
+    if (sig === 'bullish' && bullPct >= bearPct) support += 1;
+    if (sig === 'bearish' && bearPct > bullPct) support += 1;
+  }
+  if (greed != null) {
+    if (sig === 'bearish' && greed >= 70) support += 1; // 過熱 → 偏空佐證
+    if (sig === 'bullish' && greed <= 35) support += 1; // 過冷 → 偏多佐證
+  }
+  if (sig === 'bullish' && themeNames.some(t => /AI|半導體|成長|軟體/.test(t))) support += 1;
+  if (sig === 'bearish' && themeNames.some(t => /地緣|通膨|風險|疲弱/.test(t))) support += 1;
+
+  const confidence = Math.min(3, Math.max(1, support));
   const confidenceText = confidence >= 3
     ? '訊號偏強'
     : confidence === 2
