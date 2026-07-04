@@ -102,8 +102,8 @@ const WEEKLY_TEMPLATE_SECTION_ORDER = {
   'Pre-open': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'taiex', 'market_snapshot', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
   'Close Summary': ['hero', 'taiex', 'institutional', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
   'Midweek Risk': ['hero', 'interpretation', 'taiex', 'institutional', 'market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
-  'Weekend Macro': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
-  'Next Week Preview': ['hero', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'market_snapshot', 'kol', 'history_strip', 'ai'],
+  'Weekend Macro': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'institutional', 'interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
+  'Next Week Preview': ['hero', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'institutional', 'market_snapshot', 'kol', 'history_strip', 'ai'],
 };
 
 // Maps an APPROVED_CHART_LIBRARY chart id to the on-page section anchor that renders it.
