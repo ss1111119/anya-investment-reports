@@ -99,11 +99,11 @@ function collapseAllSections() {
 }
 
 const WEEKLY_TEMPLATE_SECTION_ORDER = {
-  'Pre-open': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'taiex', 'market_snapshot', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
-  'Close Summary': ['hero', 'taiex', 'institutional', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
-  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'institutional', 'market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
-  'Weekend Macro': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'institutional', 'interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
-  'Next Week Preview': ['hero', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'institutional', 'market_snapshot', 'kol', 'history_strip', 'ai'],
+  'Pre-open': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'taiex', 'market_snapshot', 'tw_internals', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
+  'Close Summary': ['hero', 'taiex', 'institutional', 'tw_internals','sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
+  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'institutional', 'tw_internals','market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
+  'Weekend Macro': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'institutional', 'tw_internals','interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
+  'Next Week Preview': ['hero', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'institutional', 'tw_internals','market_snapshot', 'kol', 'history_strip', 'ai'],
 };
 
 // Maps an APPROVED_CHART_LIBRARY chart id to the on-page section anchor that renders it.
@@ -204,6 +204,7 @@ function buildReportSectionMap(d, family) {
   const usSectorHistory = d.us_sector_history?.series?.length ? renderUsSectorHistory(d.us_sector_history) : '';
   const institutional = d.institutional ? renderInstitutional(d.institutional) : '';
   const sectorFlow = d.sector_flow ? renderSectorFlow(d.sector_flow) : '';
+  const twInternals = d.tw_market_internals ? renderTwMarketInternals(d.tw_market_internals) : '';
   const interpretation = (d.market_news || d.sentiment || d.tw_premarket || d.social_pulse || d.us_macro || d.ai_analysis)
     ? renderMarketInterpretation(d)
     : '';
@@ -247,6 +248,7 @@ function buildReportSectionMap(d, family) {
       us_sector_history: usSectorHistory,
       institutional,
       sector_flow: sectorFlow,
+    tw_internals: twInternals,
     interpretation,
     chart_orchestration: chartOrchestration,
     news,
@@ -825,6 +827,45 @@ function renderInstitutional(inst) {
     </div>
     ${inst.note ? `<div style="margin-top:6px;font-size:12px;color:var(--muted);">${inst.note}</div>` : ''}
     <div style="margin-top:4px"><canvas id="inst-chart" height="70"></canvas></div>`);
+}
+
+// ── TW Market Internals (turnover / OTC index / foreign futures OI) ───────────
+function renderTwMarketInternals(m) {
+  const money = v => v==null ? '資料暫無'
+    : (Math.abs(v) >= 1e12 ? (v/1e12).toFixed(2)+' 兆'
+      : (v/1e8).toFixed(0)+' 億');
+  const t = m.turnover, o = m.otc_index, f = m.foreign_futures_oi;
+
+  const turnoverHtml = t ? `
+    <div class="inst-card">
+      <div class="inst-name">成交值</div>
+      <div class="inst-value">${money(t.trade_value)}</div>
+      <div class="inst-unit">量 ${t.trade_volume!=null?(t.trade_volume/1e8).toFixed(1)+' 億股':'—'}</div>
+    </div>
+    <div class="inst-card">
+      <div class="inst-name">漲跌停</div>
+      <div class="inst-value"><span class="up">▲${t.limit_up_count??'—'}</span> / <span class="down">▼${t.limit_down_count??'—'}</span></div>
+      <div class="inst-unit">漲 ${t.up_count??'—'} / 跌 ${t.down_count??'—'}</div>
+    </div>` : `<div class="inst-card"><div class="inst-name">成交/廣度</div><div class="inst-value">資料暫無</div></div>`;
+
+  const otcHtml = o ? `
+    <div class="inst-card">
+      <div class="inst-name">櫃買指數</div>
+      <div class="inst-value ${cls(o.change)}">${fmt(o.price)}</div>
+      <div class="inst-unit">${o.change!=null?(o.change>0?'+':'')+fmt(o.change):'—'} · 量 ${money(o.trade_value)}</div>
+    </div>` : `<div class="inst-card"><div class="inst-name">櫃買指數</div><div class="inst-value">資料暫無</div></div>`;
+
+  const futHtml = f ? `
+    <div class="inst-card">
+      <div class="inst-name">外資期貨淨未平倉</div>
+      <div class="inst-value ${cls(f.net_oi_vol)}">${f.net_oi_vol!=null?(f.net_oi_vol>0?'+':'')+fmtK(f.net_oi_vol):'—'}</div>
+      <div class="inst-unit">口 · ${f.contract||'TX'}</div>
+    </div>` : `<div class="inst-card"><div class="inst-name">外資期貨淨未平倉</div><div class="inst-value">資料暫無</div></div>`;
+
+  const dt = (t&&t.date) || (o&&o.date) || (f&&f.date) || '';
+  return card('sec-tw-internals',
+    `📊 台股內部結構 ${dt?`<span style="font-size:11px;color:var(--muted);font-weight:400">(${dt})</span>`:''}`,
+    `<div class="inst-row">${turnoverHtml}${otcHtml}${futHtml}</div>`);
 }
 
 // ── Sector Flow ───────────────────────────────────────────────────────────────
