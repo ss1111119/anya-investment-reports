@@ -862,10 +862,18 @@ function renderTwMarketInternals(m) {
       <div class="inst-unit">口 · ${f.contract||'TX'}</div>
     </div>` : `<div class="inst-card"><div class="inst-name">外資期貨淨未平倉</div><div class="inst-value">資料暫無</div></div>`;
 
-  const dt = (t&&t.date) || (o&&o.date) || (f&&f.date) || '';
+  const v = m.valuation;
+  const valHtml = v ? `
+    <div class="inst-card">
+      <div class="inst-name">大盤估值${v.stale?` <span style="font-size:10px;color:var(--yellow)">(${v.date} 偏舊)</span>`:''}</div>
+      <div class="inst-value">PER ${fmt(v.market_per)} · PBR ${fmt(v.market_pbr)}</div>
+      <div class="inst-unit">殖利率 ${fmt(v.market_yield)}%</div>
+    </div>` : `<div class="inst-card"><div class="inst-name">大盤估值</div><div class="inst-value">資料暫無</div></div>`;
+
+  const dt = (t&&t.date) || (o&&o.date) || (f&&f.date) || (v&&v.date) || '';
   return card('sec-tw-internals',
     `📊 台股內部結構 ${dt?`<span style="font-size:11px;color:var(--muted);font-weight:400">(${dt})</span>`:''}`,
-    `<div class="inst-row">${turnoverHtml}${otcHtml}${futHtml}</div>`);
+    `<div class="inst-row">${turnoverHtml}${otcHtml}${futHtml}${valHtml}</div>`);
 }
 
 // ── Sector Flow ───────────────────────────────────────────────────────────────
