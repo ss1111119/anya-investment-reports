@@ -1,7 +1,7 @@
 {
   "date": "2026-07-30",
   "report_type": "morning",
-  "generated_at": "2026-07-30T07:42:38",
+  "generated_at": "2026-07-30T08:46:26",
   "us_macro": [
     {
       "symbol": "SP500",
@@ -88,19 +88,19 @@
         "name": "日經225",
         "region": "Japan",
         "currency": "JPY",
-        "value": 62364.92,
-        "change_pct": -3.95
+        "value": 62401.24,
+        "change_pct": 0.06
       },
       {
         "symbol": "^KS11",
         "name": "KOSPI",
         "region": "Korea",
         "currency": "KRW",
-        "value": 6023.66,
-        "change_pct": -10.84
+        "value": 5697.93,
+        "change_pct": -5.41
       }
     ],
-    "summary": "日經225 62364.92 (-3.95%)；KOSPI 6023.66 (-10.84%)",
+    "summary": "日經225 62401.24 (+0.06%)；KOSPI 5697.93 (-5.41%)",
     "source": "yfinance"
   },
   "sentiment": {
@@ -1661,6 +1661,16 @@
         "bucket": "tw"
       },
       {
+        "id": "gn_cnbc_top_1785368571_6570",
+        "title": "Meta's stock drops on disappointing guidance, dwindling free cash flow",
+        "summary": "Meta's stock drops on disappointing guidance, dwindling free cash flow",
+        "url": "https://www.cnbc.com/2026/07/29/meta-q2-earnings-report-2026.html",
+        "published_at": 1785368537,
+        "source": "global_cnbc_top",
+        "category": "headline",
+        "bucket": "global"
+      },
+      {
         "id": "6550500",
         "title": "〈財報〉Meta財測失色、AI投資侵蝕現金流 盤後一度暴跌10%",
         "summary": "〈財報〉Meta財測失色、AI投資侵蝕現金流 盤後一度暴跌10%",
@@ -1689,61 +1699,49 @@
         "source": "cnyes",
         "category": "ai_news",
         "bucket": "api"
-      },
-      {
-        "id": "6551352",
-        "title": "Fed傳聲筒：3名官員力主升息 9月決策緊盯兩份通膨報告",
-        "summary": "《華爾街日報》(WSJ) 記者 Nick Timiraos 撰文稱，3 名地區聯準銀行總裁投下反對票，主張升息 1 碼，凸顯在通膨長期高於 2% 目標之際，聯準會內部要求收緊貨幣政策的「鷹派聲浪」逐漸增強。",
-        "url": "https://news.cnyes.com/news/id/6551352",
-        "published_at": 1785367825,
-        "source": "cnyes",
-        "category": "us_stock",
-        "bucket": "us"
       }
     ],
     "themes": [
       {
-        "name": "聯準會鷹派升息預期與美元強勢",
-        "insight": "聯準會內部出現主張升息的鷹派聲浪，市場對利率政策的焦慮感升溫，進而鞏固美元強勢地位，對全球風險資產構成壓力。",
+        "name": "Meta 財報失色與 AI 資本支出疑慮",
+        "insight": "Meta 因財測疲軟及 AI 投資侵蝕現金流導致股價盤後重挫，反映市場對於科技巨頭在 AI 領域的高額資本支出能否轉化為即時獲利產生質疑。",
         "score": 95,
         "sources": [
-          "MoneyDJ",
-          "cnyes"
+          "cnyes",
+          "global_cnbc_top"
         ],
         "evidence": [
-          "不排除FED升息，鞏固美元強勢",
-          "Fed傳聲筒：3名官員力主升息 9月決策緊盯兩份通膨報告"
+          "Meta財測失色、AI投資侵蝕現金流 盤後一度暴跌10%",
+          "Meta's stock drops on disappointing guidance, dwindling free cash flow"
         ]
       },
       {
-        "name": "科技巨頭財報波動與AI投資效益檢視",
-        "insight": "市場對科技股的評價標準轉趨嚴格，Meta因AI投資侵蝕現金流導致盤後重挫，顯示投資人開始質疑AI資本支出的短期獲利回報。",
-        "score": 90,
+        "name": "聯準會升息預期與美元強勢格局",
+        "insight": "市場對於聯準會維持或重啟升息的預期升溫，進一步鞏固美元強勢地位，對全球風險資產與新興市場資金流向構成壓力。",
+        "score": 88,
+        "sources": [
+          "MoneyDJ"
+        ],
+        "evidence": [
+          "不排除FED升息，鞏固美元強勢"
+        ]
+      },
+      {
+        "name": "AI 產業鏈分歧與多模型應用趨勢",
+        "insight": "儘管 AI 股出現回暖跡象，但高通展望低迷與微軟推動多模型策略顯示，AI 供應鏈正進入汰弱留強與應用多元化的調整期。",
+        "score": 82,
         "sources": [
           "cnyes"
         ],
         "evidence": [
-          "〈財報〉Meta財測失色、AI投資侵蝕現金流 盤後一度暴跌10%",
-          "不只押注OpenAI！微軟CEO納德拉：AI模型不該被綁死"
-        ]
-      },
-      {
-        "name": "半導體產業展望分歧與市場震盪",
-        "insight": "高通展望低迷與科技股波動加劇，顯示半導體供應鏈在AI需求與終端消費疲軟之間面臨拉鋸，法人對高估值科技股採取獲利了結策略。",
-        "score": 80,
-        "sources": [
-          "MoneyDJ",
-          "cnyes"
-        ],
-        "evidence": [
-          "企業獲利撐起美股下半場 科技股表現受關注",
+          "不只押注OpenAI！微軟CEO納德拉：AI模型不該被綁死",
           "美股波動加劇：高通展望低迷 AI股回暖"
         ]
       },
       {
-        "name": "全球宏觀經濟與零售數據動態",
-        "insight": "英國零售數據意外增長帶動英鎊回升，顯示全球主要經濟體在通膨壓力下，消費韌性仍是影響貨幣政策與市場情緒的關鍵變數。",
-        "score": 70,
+        "name": "全球宏觀經濟與貨幣政策影響",
+        "insight": "英國零售數據意外增長帶動英鎊回升，顯示全球主要經濟體在通膨與利率政策下的復甦路徑各異，影響匯率波動。",
+        "score": 75,
         "sources": [
           "MoneyDJ"
         ],
@@ -1865,13 +1863,23 @@
             "bucket": "us"
           }
         ],
-        "count": 20
+        "count": 16
       },
       {
         "name": "全球頭條",
         "subtitle": "Bloomberg / Reuters / CNBC",
         "icon": "🌍",
         "items": [
+          {
+            "id": "gn_cnbc_top_1785368571_6570",
+            "title": "Meta's stock drops on disappointing guidance, dwindling free cash flow",
+            "summary": "Meta's stock drops on disappointing guidance, dwindling free cash flow",
+            "url": "https://www.cnbc.com/2026/07/29/meta-q2-earnings-report-2026.html",
+            "published_at": 1785368537,
+            "source": "global_cnbc_top",
+            "category": "headline",
+            "bucket": "global"
+          },
           {
             "id": "gn_cnbc_tech_1785368300_7153",
             "title": "The U.S. wants Asia to use its AI — but China dominates cheaper models",
@@ -1893,27 +1901,65 @@
             "bucket": "global"
           },
           {
-            "id": "gn_cnbc_tech_1785364690_6791",
-            "title": "Jim Cramer says software's comeback could be the blueprint for AI stocks' next rally",
-            "summary": "Jim Cramer says software's comeback could be the blueprint for AI stocks' next rally",
-            "url": "https://www.cnbc.com/2026/07/29/jim-cramer-softwares-comeback-blueprint-ai-stocks-rally.html",
-            "published_at": 1785363733,
-            "source": "global_cnbc_tech",
-            "category": "headline",
-            "bucket": "global"
-          },
-          {
-            "id": "gn_bloomberg_1785368298_5539",
-            "title": "Asian Stocks to Fall as Fed Keeps Rates on Hold: Markets Wrap",
-            "summary": "Asian Stocks to Fall as Fed Keeps Rates on Hold: Markets Wrap",
-            "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxORWJmVzRKLU00TG5WVm1kTks3TXNQak1mcG96YlNpMTJwTm1Lb3B3QnhzNTdaWC1sM3RYYUh1UjUxVWRhZUJiU093T09pcXZid1dhWm4xSndDZl9Yb3dKLV9qWlBLTHRIVmN2MkhDVmF4WTJfVWhWczVRV05DbjhSc0FqeW9lXzhTeTlLU2k3Tkt6TERn?oc=5",
-            "published_at": 1785363073,
+            "id": "gn_bloomberg_1785370207_1002",
+            "title": "Bond Rout Sends Warning to Warsh That Tough Talk Is Not Enough",
+            "summary": "Bond Rout Sends Warning to Warsh That Tough Talk Is Not Enough",
+            "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQVUJPdk14LW1uYnY5REJvMGp6am1IN3RwZTlIZkhMUU1TVXpHRWZPWm5teGlwT0hxM2gzam9qaXd1QWRsMk12RUw2ZEF6c3pBWEhiLW85MkVBS3NkX2lIQjlhcEJqaVlMeW1Jejg0NUZnZ1E5Vmd4cTFCd0JnbWtMMVk4REtjVThZczBLcW1STmRtbGk0OTV6M2t3cm5qTzFmZzBTWmhRZlVZc1FGa3VENEU3UQ?oc=5",
+            "published_at": 1785364267,
             "source": "global_bloomberg",
             "category": "headline",
             "bucket": "global"
           }
         ],
-        "count": 12
+        "count": 11
+      },
+      {
+        "name": "東南亞 / 印度",
+        "subtitle": "NewsAPI.ai / GNews 區域新聞",
+        "icon": "🧭",
+        "items": [
+          {
+            "id": "rss_th_542718",
+            "title": "Wall Street closes down sharply after Fed holds rates unchanged",
+            "summary": "Wall Street closes down sharply after Fed holds rates unchanged",
+            "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPYTBjTkgxdmttOW1mOFd3NHRiOHNOdEhqMG12bzU1WWVOcm1pTGNuazF6OGU2VkJya1dZd3lKSXRmZ0V3NFJ6eXJGbGk1SzgtQ2E1NzI0YmJQZk9uZ1lmWTZqNHpEY3lrYVZtYlNIYXllOWNYUDdxT1owV3FnX1ZUNHdyMGN4VlM0QVZpbV9PYzkzT1ktVXZLRWx6dmMtNnRIMnVIUzBfakZmMl9kS25ldGQxbw?oc=5",
+            "published_at": 1785365796,
+            "source": "rss_th",
+            "category": "regional_th",
+            "bucket": "regional"
+          },
+          {
+            "id": "google_rss_jp_334001",
+            "title": "Map: 6.8-Magnitude Earthquake Shakes Japan",
+            "summary": "<a href=\"https://news.google.com/rss/articles/CBMigwFBVV95cUxNSDlKWlJBUHN3MWZfNHhqekhuZVlrZmdLN3l3ZVhNTXk4dXBCN3ZQdjhfR1BxcFRiSmdGcFpXbVVPVUlSVktuZVdUcWlmc2NNVEtBNFZONU1iTklRZ1R6eW1YZkpkb0M3RGk2OHMydHk2RWd1ZERmdjVBem9fTzgyZVVyYw?oc=5\" target=\"_blank\">Map: 6.8-Magnitude Earthquake Shakes Japan</a>  <font color=\"#6f6f6f\">The New York Times</font>",
+            "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNSDlKWlJBUHN3MWZfNHhqekhuZVlrZmdLN3l3ZVhNTXk4dXBCN3ZQdjhfR1BxcFRiSmdGcFpXbVVPVUlSVktuZVdUcWlmc2NNVEtBNFZONU1iTklRZ1R6eW1YZkpkb0M3RGk2OHMydHk2RWd1ZERmdjVBem9fTzgyZVVyYw?oc=5",
+            "published_at": 1785365765,
+            "source": "google_news_rss_jp",
+            "category": "regional_jp",
+            "bucket": "regional"
+          },
+          {
+            "id": "rss_th_155172",
+            "title": "Microsoft Profit Jumps 31% as Azure Cloud Sales Surpass $100 Billion",
+            "summary": "Microsoft Profit Jumps 31% as Azure Cloud Sales Surpass $100 Billion",
+            "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxNaDkyU1ptM2xGN2M5QUJtclpSMFJtQVd4VlZJeTJKbXJPb2Q4cW1VUlZubjVoQ291MnB3T3AwT1RQcENGTmtEVHB3bUNsTzBRRjlHTjQ0dGpabWpZM3pZTGlIcjNGcGRTdDlDc2tCc01QYUxtaXpHREFvSWV6VC1Nbw?oc=5",
+            "published_at": 1785365580,
+            "source": "rss_th",
+            "category": "regional_th",
+            "bucket": "regional"
+          },
+          {
+            "id": "rss_sg_842818",
+            "title": "Warsh vows not to 'waver' on inflation as divided Fed leaves rates unchanged",
+            "summary": "Warsh vows not to 'waver' on inflation as divided Fed leaves rates unchanged",
+            "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQRW9SeVFjTXAxOEdFbVJDYTNGR1VZd0cwZkY2cmpKQVA2UHBxbzBnRXlxR1NWQWhUdUdXRUhLUXc0WTd2bllEalRUQk93UnNWVm5uLWJ3aDJEOFlDa0dRTXNYSlNWVzJHdW5IbnF6a3lyNWlzblRpeHFOeW9MX0dwTi16TDVYOUxCTHRDWl9uVXZmMFlTVXh6VWxsMnFscHRwQ2ZUUnhFR2tRVWRsVlRocXRsc3M?oc=5",
+            "published_at": 1785364676,
+            "source": "rss_sg",
+            "category": "regional_sg",
+            "bucket": "regional"
+          }
+        ],
+        "count": 9
       },
       {
         "name": "API 新聞",
@@ -1961,7 +2007,7 @@
             "bucket": "api"
           }
         ],
-        "count": 30
+        "count": 24
       }
     ],
     "source_summary": [
@@ -1977,25 +2023,30 @@
       },
       {
         "label": "美股 / 宏觀",
-        "count": 20,
+        "count": 16,
         "icon": "🇺🇸"
       },
       {
         "label": "全球頭條",
-        "count": 12,
+        "count": 11,
         "icon": "🌍"
       },
       {
+        "label": "東南亞 / 印度",
+        "count": 9,
+        "icon": "🧭"
+      },
+      {
         "label": "API 新聞",
-        "count": 30,
+        "count": 24,
         "icon": "🔌"
       }
     ],
     "highlights": [
       "🇹🇼 MoneyDJ 熱門排行 6 則",
       "🗞️ 鉅亨網台灣 1 則",
-      "🇺🇸 美股 / 宏觀 20 則",
-      "🌍 全球頭條 12 則"
+      "🇺🇸 美股 / 宏觀 16 則",
+      "🌍 全球頭條 11 則"
     ]
   },
   "social_topic_heatmap": {
@@ -2003,56 +2054,56 @@
     "benchmark": "PTT Stock / Google Trends（商業與財經）",
     "report_date": "2026-07-30",
     "coverage": 6,
-    "as_of": "2026-07-30T07:41:44.987963",
-    "summary": "社群熱度聚焦在 航空 公司、股災好的防禦標的、「好得不能再好」 SK海力士獲利暴增後股，共有 6 個上升主題。",
+    "as_of": "2026-07-30T08:46:40.583903",
+    "summary": "社群熱度聚焦在 bigbang、航空 公司、中華民國勞動部，共有 6 個上升主題。",
     "topics": [
       {
-        "topic": "航空 公司",
+        "topic": "bigbang",
         "source": "google_trends_finance",
-        "score": 2000.0,
+        "score": 5000.0,
         "velocity": 1000.0,
-        "timestamp": "2026-07-30T07:41:44.987963",
+        "timestamp": "2026-07-30T08:46:40.583903",
         "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
         "direction": "rising",
         "is_rising": true
       },
       {
-        "topic": "股災好的防禦標的",
-        "source": "ptt_stock",
-        "score": 100.0,
-        "velocity": 100.0,
-        "timestamp": "2026-07-30T07:41:45.138711",
-        "url": "https://www.ptt.cc/bbs/Stock/M.1785345282.A.2E9.html",
+        "topic": "航空 公司",
+        "source": "google_trends_finance",
+        "score": 2000.0,
+        "velocity": 1000.0,
+        "timestamp": "2026-07-30T08:46:40.583903",
+        "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
         "direction": "rising",
         "is_rising": true
       },
       {
-        "topic": "「好得不能再好」 SK海力士獲利暴增後股",
-        "source": "ptt_stock",
-        "score": 61.0,
-        "velocity": 61.0,
-        "timestamp": "2026-07-30T07:41:45.138711",
-        "url": "https://www.ptt.cc/bbs/Stock/M.1785341465.A.EC7.html",
+        "topic": "中華民國勞動部",
+        "source": "google_trends_finance",
+        "score": 2000.0,
+        "velocity": 1000.0,
+        "timestamp": "2026-07-30T08:46:40.583903",
+        "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
         "direction": "rising",
         "is_rising": true
       },
       {
-        "topic": "華許不給線索！城堡證券：Fed 本周將「",
-        "source": "ptt_stock",
-        "score": 48.0,
-        "velocity": 48.0,
-        "timestamp": "2026-07-30T07:41:45.138711",
-        "url": "https://www.ptt.cc/bbs/Stock/M.1785350682.A.005.html",
+        "topic": "微軟財報",
+        "source": "google_trends_finance",
+        "score": 2000.0,
+        "velocity": 1000.0,
+        "timestamp": "2026-07-30T08:46:40.583903",
+        "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
         "direction": "rising",
         "is_rising": true
       },
       {
-        "topic": "聯準會維持利率不變 3名官員主張升息一碼",
-        "source": "ptt_stock",
-        "score": 37.0,
-        "velocity": 37.0,
-        "timestamp": "2026-07-30T07:41:45.138711",
-        "url": "https://www.ptt.cc/bbs/Stock/M.1785352492.A.EEC.html",
+        "topic": "openai",
+        "source": "google_trends_finance",
+        "score": 2000.0,
+        "velocity": 600.0,
+        "timestamp": "2026-07-30T08:46:40.583903",
+        "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
         "direction": "rising",
         "is_rising": true
       },
@@ -2061,7 +2112,7 @@
         "source": "google_trends_finance",
         "score": 0.0,
         "velocity": 1000.0,
-        "timestamp": "2026-07-30T07:41:44.987963",
+        "timestamp": "2026-07-30T08:46:40.583903",
         "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
         "direction": "rising",
         "is_rising": true
@@ -2069,12 +2120,8 @@
     ],
     "source_summary": [
       {
-        "source": "ptt_stock",
-        "count": 4
-      },
-      {
         "source": "google_trends_finance",
-        "count": 2
+        "count": 6
       }
     ]
   },
@@ -2084,50 +2131,48 @@
     "report_date": "2026-07-30",
     "coverage": 4,
     "as_of": "2026-07-30",
-    "summary": "科技主題熱度集中在 聯準會鷹派升息預期與美元強勢、科技巨頭財報波動與AI投資效益檢視、半導體產業展望分歧與市場震盪，主線仍由新聞主題驅動。",
+    "summary": "科技主題熱度集中在 Meta 財報失色與 AI 資本支出疑慮、聯準會升息預期與美元強勢格局、AI 產業鏈分歧與多模型應用趨勢，主線仍由新聞主題驅動。",
     "topics": [
       {
-        "topic": "聯準會鷹派升息預期與美元強勢",
-        "summary": "聯準會內部出現主張升息的鷹派聲浪，市場對利率政策的焦慮感升溫，進而鞏固美元強勢地位，對全球風險資產構成壓力。",
+        "topic": "Meta 財報失色與 AI 資本支出疑慮",
+        "summary": "Meta 因財測疲軟及 AI 投資侵蝕現金流導致股價盤後重挫，反映市場對於科技巨頭在 AI 領域的高額資本支出能否轉化為即時獲利產生質疑。",
         "score": 95,
         "sources": [
-          "MoneyDJ",
-          "cnyes"
+          "cnyes",
+          "global_cnbc_top"
         ],
         "evidence": [
-          "不排除FED升息，鞏固美元強勢",
-          "Fed傳聲筒：3名官員力主升息 9月決策緊盯兩份通膨報告"
+          "Meta財測失色、AI投資侵蝕現金流 盤後一度暴跌10%",
+          "Meta's stock drops on disappointing guidance, dwindling free cash flow"
         ]
       },
       {
-        "topic": "科技巨頭財報波動與AI投資效益檢視",
-        "summary": "市場對科技股的評價標準轉趨嚴格，Meta因AI投資侵蝕現金流導致盤後重挫，顯示投資人開始質疑AI資本支出的短期獲利回報。",
-        "score": 90,
+        "topic": "聯準會升息預期與美元強勢格局",
+        "summary": "市場對於聯準會維持或重啟升息的預期升溫，進一步鞏固美元強勢地位，對全球風險資產與新興市場資金流向構成壓力。",
+        "score": 88,
+        "sources": [
+          "MoneyDJ"
+        ],
+        "evidence": [
+          "不排除FED升息，鞏固美元強勢"
+        ]
+      },
+      {
+        "topic": "AI 產業鏈分歧與多模型應用趨勢",
+        "summary": "儘管 AI 股出現回暖跡象，但高通展望低迷與微軟推動多模型策略顯示，AI 供應鏈正進入汰弱留強與應用多元化的調整期。",
+        "score": 82,
         "sources": [
           "cnyes"
         ],
         "evidence": [
-          "〈財報〉Meta財測失色、AI投資侵蝕現金流 盤後一度暴跌10%",
-          "不只押注OpenAI！微軟CEO納德拉：AI模型不該被綁死"
-        ]
-      },
-      {
-        "topic": "半導體產業展望分歧與市場震盪",
-        "summary": "高通展望低迷與科技股波動加劇，顯示半導體供應鏈在AI需求與終端消費疲軟之間面臨拉鋸，法人對高估值科技股採取獲利了結策略。",
-        "score": 80,
-        "sources": [
-          "MoneyDJ",
-          "cnyes"
-        ],
-        "evidence": [
-          "企業獲利撐起美股下半場 科技股表現受關注",
+          "不只押注OpenAI！微軟CEO納德拉：AI模型不該被綁死",
           "美股波動加劇：高通展望低迷 AI股回暖"
         ]
       },
       {
-        "topic": "全球宏觀經濟與零售數據動態",
-        "summary": "英國零售數據意外增長帶動英鎊回升，顯示全球主要經濟體在通膨壓力下，消費韌性仍是影響貨幣政策與市場情緒的關鍵變數。",
-        "score": 70,
+        "topic": "全球宏觀經濟與貨幣政策影響",
+        "summary": "英國零售數據意外增長帶動英鎊回升，顯示全球主要經濟體在通膨與利率政策下的復甦路徑各異，影響匯率波動。",
+        "score": 75,
         "sources": [
           "MoneyDJ"
         ],
@@ -2138,8 +2183,8 @@
     ]
   },
   "ai_analysis": {
-    "full_text": "【今日結論】\n今日台股開盤直接定調為「空方主導」，受美股費半重挫與韓股熔斷的連鎖效應影響，台指期夜盤已先行反映 1.69% 的跌幅，今日開盤將直接測試 39,600 點的關鍵防守位，建議投資人採取「現金為王」策略，嚴禁任何形式的抄底行為。\n【新聞驅動】\n市場主線已從 AI 成長敘事切換至「流動性危機」，聯準會官員鷹派抬頭導致升息預期升溫，與地緣政治引發的能源通膨風險形成雙重夾擊。科技巨頭因資本支出過大侵蝕現金流，導致華爾街對 AI 投報率失去耐心，資金正瘋狂從高估值板塊撤出，轉向防禦性資產。\n【國際與台股】\n費半指數單日大跌 5.33% 顯示半導體產業進入去槓桿負循環，台積電 ADR 雖有溢價但難掩整體市場流動性枯竭的窘境。東北亞市場慘烈，KOSPI 重挫逾 10% 顯示區域性資金正在恐慌性撤離，台股在缺乏買盤支撐下，今日將面臨沉重的賣壓測試。\n【KOL與情緒】\n社群熱搜關鍵字已從 AI 轉向「股災防禦」與「繼承」，顯示散戶情緒已進入恐慌清理槓桿的階段。VIX 指數飆升 13.45% 配合 CNN 恐慌指數降至 32，市場已不再看基本面財報，而是進入純粹的估值修正與流動性保衛戰。\n【操作含意】\n今日操作核心為「汰弱留強」，若持股跌破 3/2 基準線應果斷減碼，切勿對補漲抱有幻想。請將資金水位拉高，避開無現金流支撐的 AI 設備股，在波動率維持高檔的環境下，保留現金部位是目前唯一能確保決策帶寬不受噪音干擾的生存之道。\n\n【關鍵數據】\n台指期夜盤=39645.0 (-1.69%)\n富台指期=3237.3798828125 (-4.05%)\n道瓊=51594.140625 (-2.19%)\nNasdaq=24442.94140625 (-1.74%)\nS&P 500=7316.14990234375 (-1.52%)\n費半=10447.4892578125 (-5.33%)\n布蘭特原油=90.4000015258789 (+7.50%)",
-    "generated_at": "2026-07-30T07:43:05"
+    "full_text": "【今日結論】\n今日台股開盤直接定調為「偏空」格局，市場正處於去槓桿的惡性循環中。台指期夜盤重挫 1.69% 預示開盤將直接跌破 4 萬點整數關卡，建議投資人放棄抄底幻想，將現金部位視為當前最高價值的資產。\n【新聞驅動】\n市場主線聚焦於「AI 資本支出疑慮」與「聯準會升息預期」的雙重夾擊，Meta 財報失色引發華爾街對 AI 投報率的質疑，導致科技股估值面臨劇烈修正。同時，聯準會官員轉鷹與通膨預期反彈，使得市場在衰退與升息之間擺盪，導致波動率（VIX）飆升，資金正加速從高風險科技板塊撤離。\n【國際與台股】\n美股費半大跌 5.33% 與台積電 ADR 下挫 4.50% 成為今日台股重挫的直接導火線，區域性流動性緊縮更體現在 KOSPI 大跌 5.41% 的慘況上。儘管台積電 ADR 仍有溢價，但在流動性枯竭的環境下，這僅是滯後的技術性數據，無法支撐現貨市場的買盤信心。\n【KOL與情緒】\n社群情緒已從追逐 AI 轉向「防禦與繼承」等避險關鍵字，顯示散戶籌碼正在進行恐慌性清理。CNN 恐懼貪婪指數降至 32，市場已進入去槓桿的深水區，權值股的控盤效果在賣壓湧現下已完全失效，市場目前由恐慌情緒主導。\n【操作含意】\n今日操作核心為「汰弱留強」，請嚴格執行跌破 3/2 基準線個股的減碼動作，避開無現金流支撐的 AI 設備股。防守點位設定在 39,600 點，若開盤無法守穩，應立即降低持股水位，保留現金等待波動率收斂，切勿在流動性喪失的階段進行逆勢接刀。\n\n【關鍵數據】\n台指期夜盤=39645.0 (-1.69%)\n富台指期=3237.3798828125 (-4.05%)\n道瓊=51594.140625 (-2.19%)\nNasdaq=24442.94140625 (-1.74%)\nS&P 500=7316.14990234375 (-1.52%)\n費半=10447.4892578125 (-5.33%)\n布蘭特原油=90.4000015258789 (+7.50%)",
+    "generated_at": "2026-07-30T08:47:07"
   },
   "chart_orchestration": {
     "family": "Midweek Risk",
@@ -2147,7 +2192,7 @@
     "report_date": "2026-07-30",
     "chart_budget": 4,
     "source": "gemini",
-    "generated_at": "2026-07-30T07:43:14",
+    "generated_at": "2026-07-30T08:47:17",
     "selected_charts": [
       {
         "id": "tech_topic_heatmap_panel",
@@ -2160,8 +2205,8 @@
           "Weekend Macro",
           "Next Week Preview"
         ],
-        "takeaway": "AI 投資效益被重新檢視，科技產業展望分歧。",
-        "action": "調整配置至較低估值板塊。",
+        "takeaway": "Meta 財測疲軟導致市場質疑 AI 投報率，促使科技板塊估值向下修正。",
+        "action": "密切關注 AI 供應鏈汰弱留強進度。",
         "priority": "medium"
       },
       {
@@ -2175,8 +2220,8 @@
           "Weekend Macro",
           "Next Week Preview"
         ],
-        "takeaway": "社群避險意願升高，關注防禦型資產。",
-        "action": "持續監控市場情緒變化。",
+        "takeaway": "社群關注焦點除科技巨頭財報外，亦提及微軟多模型策略與勞動部議題。",
+        "action": "追蹤與勞動部相關之特定產業政策與輿情變化。",
         "priority": "medium"
       },
       {
@@ -2190,8 +2235,8 @@
           "Weekend Macro",
           "Next Week Preview"
         ],
-        "takeaway": "市場情緒指標顯示買盤薄弱。",
-        "action": "維持高現金部位。",
+        "takeaway": "台股當前下跌家數遠大於上漲家數，市場偏向恐慌。",
+        "action": "觀察廣度指標是否出現賣壓收斂跡象。",
         "priority": "medium"
       }
     ],
@@ -2203,72 +2248,108 @@
     "chart_commentary": [
       {
         "chart_id": "tech_topic_heatmap_panel",
-        "takeaway": "AI 投資效益被重新檢視，科技產業展望分歧。",
-        "action": "調整配置至較低估值板塊。"
+        "takeaway": "Meta 財測疲軟導致市場質疑 AI 投報率，促使科技板塊估值向下修正。",
+        "action": "密切關注 AI 供應鏈汰弱留強進度。"
       },
       {
         "chart_id": "social_topic_heatmap_panel",
-        "takeaway": "社群避險意願升高，關注防禦型資產。",
-        "action": "持續監控市場情緒變化。"
+        "takeaway": "社群關注焦點除科技巨頭財報外，亦提及微軟多模型策略與勞動部議題。",
+        "action": "追蹤與勞動部相關之特定產業政策與輿情變化。"
       },
       {
         "chart_id": "sentiment_panel",
-        "takeaway": "市場情緒指標顯示買盤薄弱。",
-        "action": "維持高現金部位。"
+        "takeaway": "台股當前下跌家數遠大於上漲家數，市場偏向恐慌。",
+        "action": "觀察廣度指標是否出現賣壓收斂跡象。"
       }
     ],
-    "overall_summary": "今日台股開盤呈現空方主導格局。受美股費半大跌及韓股重挫連鎖效應影響，台指期夜盤已先行反映 1.69% 跌幅。市場核心敘事從 AI 成長紅利轉向聯準會鷹派升息預期導致的流動性收緊。科技巨頭獲利回報驗證期表現不佳，引發法人對高估值板塊進行獲利了結。建議投資人嚴守現金為王原則，不進行抄底操作。",
+    "overall_summary": "今日台股面臨「偏空」格局，主要受美股科技巨頭財報失色及 AI 資本支出疑慮影響。費半指數大跌超過 5%，帶動台積電 ADR 與整體台股信心走弱。市場正處於去槓桿階段，投資人應避免抄底，現金部位成為當前風險防禦的核心配置。",
     "news_themes": [
       {
-        "label": "聯準會鷹派升息預期",
-        "summary": "市場對利率政策焦慮加劇，鷹派官員立場鞏固強勢美元，壓抑風險資產表現。",
+        "label": "Meta 財報失色與 AI 資本支出疑慮",
+        "summary": "Meta 財測疲軟且高額 AI 投資侵蝕現金流，引發華爾街對 AI 投報率的嚴重質疑，導致科技估值面臨重估。",
         "sources": [
-          "MoneyDJ",
-          "cnyes"
+          "cnyes",
+          "global_cnbc_top"
         ],
         "evidence": [
-          "不排除FED升息",
-          "Fed傳聲筒：3名官員力主升息"
+          "Meta 盤後一度暴跌10%",
+          "Meta's stock drops on disappointing guidance"
         ]
       },
       {
-        "label": "AI 投資效益遭質疑",
-        "summary": "Meta 等科技巨頭資本支出過大，導致現金流承壓，市場對高評價 AI 股信心動搖。",
+        "label": "聯準會升息預期與美元強勢格局",
+        "summary": "市場對聯準會升息預期重燃，支撐美元匯率，進一步對全球高風險科技板塊構成流動性擠壓。",
         "sources": [
-          "cnyes"
+          "MoneyDJ"
         ],
         "evidence": [
-          "Meta 財測失色、AI 投資侵蝕現金流"
+          "不排除 FED 升息，鞏固美元強勢"
         ]
       },
       {
-        "label": "半導體產業展望分歧",
-        "summary": "高通展望疲軟顯示終端消費與供應鏈拉鋸，市場對半導體股採取避險獲利了結。",
+        "label": "AI 產業鏈分歧與多模型應用趨勢",
+        "summary": "市場對 AI 供應鏈進入汰弱留強階段達成共識，微軟推動多模型策略正改變科技巨頭的競爭維度。",
         "sources": [
-          "MoneyDJ",
           "cnyes"
         ],
         "evidence": [
-          "高通展望低迷",
-          "費半單日大跌 5.33%"
+          "微軟推動多模型策略",
+          "高通展望低迷"
         ]
       }
     ],
     "chart_gap_suggestions": [
       {
-        "chart_name": "AI 資本支出與現金流對比圖",
-        "why_needed": "需量化科技巨頭在 AI 的資本投入與實際自由現金流的變化，以驗證市場對投資效益檢視的主題。",
+        "chart_name": "地緣政治風險圖 (ACLED)",
+        "why_needed": "把衝突事件數、致死數與未來風險預測可視化，讓地緣政治對市場的影響更直觀。",
         "data_needed": [
-          "CapEx",
-          "Free Cash Flow",
-          "AI Revenue Contribution"
+          "recent conflict count",
+          "fatalities",
+          "forecast hotspots",
+          "date range"
         ],
         "which_report_types": [
-          "Weekend Macro",
-          "Next Week Preview"
+          "morning",
+          "evening",
+          "weekend_morning",
+          "weekend_evening",
+          "weekly_review"
+        ],
+        "priority": "high",
+        "evidence": "專案已有 ACLED service，但目前未做成可視化圖表。"
+      },
+      {
+        "chart_name": "社群熱度圖 (PTT / Dcard)",
+        "why_needed": "把 PTT 與 Dcard 的熱門討論、看多看空比與主題熱度做成圖，補足市場情緒面。",
+        "data_needed": [
+          "top posts",
+          "bullish/bearish ratio",
+          "topic themes",
+          "engagement score"
+        ],
+        "which_report_types": [
+          "morning",
+          "evening",
+          "weekend_morning",
+          "weekend_evening"
         ],
         "priority": "medium",
-        "evidence": "科技巨頭財報波動與 AI 投資效益檢視"
+        "evidence": "現有 trend_pulse 與社群抓取已能提供底層資料。"
+      },
+      {
+        "chart_name": "科技主題熱度圖",
+        "why_needed": "晨報常聚焦 AI / 半導體 / 科技權值，將科技主題與新聞來源拆開呈現會更清楚。",
+        "data_needed": [
+          "topic score",
+          "news source mix",
+          "trend velocity"
+        ],
+        "which_report_types": [
+          "morning",
+          "weekend_morning"
+        ],
+        "priority": "low",
+        "evidence": "目前科技內容散落在新聞主題與 AI 分析中，尚未獨立成圖。"
       }
     ]
   },
@@ -2303,7 +2384,7 @@
     "market_news": {
       "state": "OK",
       "source": "None",
-      "updated_at": "2026-07-30 07:40:03",
+      "updated_at": "2026-07-30 07:42:17",
       "age_days": 0,
       "max_age_days": 1,
       "reason": null,
