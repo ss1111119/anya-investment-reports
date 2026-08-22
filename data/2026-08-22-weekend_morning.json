@@ -1,7 +1,7 @@
 {
   "date": "2026-08-22",
   "report_type": "weekend_morning",
-  "generated_at": "2026-08-22T07:42:42",
+  "generated_at": "2026-08-22T08:47:03",
   "us_macro": [
     {
       "symbol": "SP500",
@@ -88,23 +88,23 @@
         "name": "日經225",
         "region": "Japan",
         "currency": "JPY",
-        "value": 66216.79,
-        "change_pct": 1.36,
-        "value_date": "2026-08-20",
-        "baseline_date": "2026-08-19"
+        "value": 66016.36,
+        "change_pct": -0.3,
+        "value_date": "2026-08-21",
+        "baseline_date": "2026-08-20"
       },
       {
         "symbol": "^KS11",
         "name": "KOSPI",
         "region": "Korea",
         "currency": "KRW",
-        "value": 6852.58,
-        "change_pct": 5.89,
-        "value_date": "2026-08-20",
-        "baseline_date": "2026-08-19"
+        "value": 6912.95,
+        "change_pct": 0.88,
+        "value_date": "2026-08-21",
+        "baseline_date": "2026-08-20"
       }
     ],
-    "summary": "日經225 66216.79 (+1.36%)；KOSPI 6852.58 (+5.89%)",
+    "summary": "日經225 66016.36 (-0.30%)；KOSPI 6912.95 (+0.88%)",
     "source": "yfinance"
   },
   "sentiment": {
@@ -3629,6 +3629,16 @@
         "bucket": "tw"
       },
       {
+        "id": "6584087",
+        "title": "特斯拉股價為何跳漲？Robotaxi大戰拉斯維加斯開打 首年獲准部署多達5000輛",
+        "summary": "特斯拉股價為何跳漲？Robotaxi大戰拉斯維加斯開打 首年獲准部署多達5000輛",
+        "url": "https://news.cnyes.com/news/id/6584087",
+        "published_at": 1787355986,
+        "source": "cnyes",
+        "category": "us_stock",
+        "bucket": "us"
+      },
+      {
         "id": "6584101",
         "title": "美財政部救債市失靈？長債殖利率連兩日反彈 30年期再逼近5.3%",
         "summary": "美國財政部擴大長天期公債回購帶來的漲勢迅速消退，美債殖利率週五 (21 日) 連續第二個交易日攀升。市場認為，通膨疑慮、聯準會政策、美國債務膨脹與企業發債熱潮，並非財政部增加回購就能化解。",
@@ -3657,22 +3667,12 @@
         "source": "global_reuters",
         "category": "headline",
         "bucket": "global"
-      },
-      {
-        "id": "6584092",
-        "title": "SpaceX再獲賣出評級 分析師：股價可能下跌25%",
-        "summary": "SpaceX(SPCX-US)股票周五(21日)再獲一項看空評級，焦點在於現金。DZ Bank分析師Markus Leistner開始追蹤馬斯克旗下這家火箭與AI公司，給予「賣出」評級，目標價為100美元。",
-        "url": "https://news.cnyes.com/news/id/6584092",
-        "published_at": 1787352002,
-        "source": "cnyes",
-        "category": "us_stock",
-        "bucket": "us"
       }
     ],
     "themes": [
       {
-        "name": "美債殖利率反彈與財政政策挑戰",
-        "insight": "美國長債殖利率連續兩日攀升，市場對通膨、債務膨脹及企業發債壓力感到擔憂，財政部的回購干預措施效果有限，顯示宏觀環境對固定收益資產構成挑戰。",
+        "name": "美債殖利率反彈與宏觀避險需求",
+        "insight": "美國長債殖利率連續兩日攀升，市場對通膨與債務問題的擔憂抵銷了財政部回購政策的利多，促使資金轉向防禦型美元債券配置。",
         "score": 90,
         "sources": [
           "cnyes",
@@ -3684,29 +3684,28 @@
         ]
       },
       {
-        "name": "AI 產業擴張面臨社會與資本市場阻力",
-        "insight": "AI 產業在基礎設施建設（資料中心）遭遇社區反彈，且資本市場對相關企業（如 SpaceX）的現金流與估值開始出現看空評級，顯示市場對 AI 泡沫化的風險意識提升。",
+        "name": "特斯拉 Robotaxi 擴張與 AI 基礎設施風險",
+        "insight": "科技板塊呈現兩極化發展，特斯拉因 Robotaxi 部署計畫獲准而股價跳漲，但 AI 資料中心興建引發的社會反彈已成為企業 IPO 的潛在風險因素。",
         "score": 85,
         "sources": [
           "cnyes"
         ],
         "evidence": [
-          "美國人反對AI資料中心聲浪升高？Anthropic IPO招股書擬列風險因素",
-          "SpaceX再獲賣出評級 分析師：股價可能下跌25%"
+          "特斯拉股價為何跳漲？Robotaxi大戰拉斯維加斯開打 首年獲准部署多達5000輛",
+          "美國人反對AI資料中心聲浪升高？Anthropic IPO招股書擬列風險因素"
         ]
       },
       {
-        "name": "台灣資金轉向防禦型與多元資產配置",
-        "insight": "受市場震盪影響，台灣投資人與法人資金正從單一科技股轉向多元資產配置，包括越南機會基金、新興市場美元債及多重資產收息標的，以分散風險。",
+        "name": "台灣資金轉向多元資產與區域佈局",
+        "insight": "受台股震盪影響，投資人與法人資金正從單一科技股轉向越南機會基金、亞太實質收息及 ESG 永續半導體等多元化標的，尋求收益穩定性。",
         "score": 80,
         "sources": [
           "MoneyDJ"
         ],
         "evidence": [
           "中國信託越南機會基金七月操作",
-          "中國信託新興市場0-5年期美元",
-          "中國信託策略優利多重資產基金",
-          "中國信託亞太實質收息多重資產"
+          "中國信託亞太實質收息多重資產",
+          "中國信託臺灣ESG永續關鍵半導體E"
         ]
       }
     ],
@@ -3765,6 +3764,16 @@
         "icon": "🇺🇸",
         "items": [
           {
+            "id": "6584087",
+            "title": "特斯拉股價為何跳漲？Robotaxi大戰拉斯維加斯開打 首年獲准部署多達5000輛",
+            "summary": "特斯拉股價為何跳漲？Robotaxi大戰拉斯維加斯開打 首年獲准部署多達5000輛",
+            "url": "https://news.cnyes.com/news/id/6584087",
+            "published_at": 1787355986,
+            "source": "cnyes",
+            "category": "us_stock",
+            "bucket": "us"
+          },
+          {
             "id": "6584101",
             "title": "美財政部救債市失靈？長債殖利率連兩日反彈 30年期再逼近5.3%",
             "summary": "美國財政部擴大長天期公債回購帶來的漲勢迅速消退，美債殖利率週五 (21 日) 連續第二個交易日攀升。市場認為，通膨疑慮、聯準會政策、美國債務膨脹與企業發債熱潮，並非財政部增加回購就能化解。",
@@ -3793,19 +3802,9 @@
             "source": "cnyes",
             "category": "us_stock",
             "bucket": "us"
-          },
-          {
-            "id": "6584094",
-            "title": "貝森特突襲回購長債 川普撇清：「不是我下令的！」",
-            "summary": "美國總統川普週五 (21 日) 表示，財長貝森特本週擴大長天期美債回購，並非出自他的授意，而是貝森特自行決定採取行動。",
-            "url": "https://news.cnyes.com/news/id/6584094",
-            "published_at": 1787351402,
-            "source": "cnyes",
-            "category": "us_stock",
-            "bucket": "us"
           }
         ],
-        "count": 12
+        "count": 11
       },
       {
         "name": "全球頭條",
@@ -3853,7 +3852,55 @@
             "bucket": "global"
           }
         ],
-        "count": 8
+        "count": 6
+      },
+      {
+        "name": "東南亞 / 印度",
+        "subtitle": "NewsAPI.ai / GNews 區域新聞",
+        "icon": "🧭",
+        "items": [
+          {
+            "id": "rss_th_782125",
+            "title": "Stock Market Today: Dow Opens Higher; Yields Steady; Bitcoin in Focus — Live Updates",
+            "summary": "Stock Market Today: Dow Opens Higher; Yields Steady; Bitcoin in Focus — Live Updates",
+            "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxQSWg3azFqLWQ4Wk4weVZuYVFjYVBwZnBuak94TWxuUlZNQ1BZWXNzaWhfR05teG1VWEtrNVdwZFRxTmZCVTdRVkFuZm9hLS1XSV8wUlQwckE4UWk4MXJxdVNFZWllNktGaUxMRFNEN25TVXJveDBEYWFhMUVXazR1VTBQR200UFE?oc=5",
+            "published_at": 1787351340,
+            "source": "rss_th",
+            "category": "regional_th",
+            "bucket": "regional"
+          },
+          {
+            "id": "rss_th_552575",
+            "title": "TikTok to pay $400m to US in one of largest child privacy settlements",
+            "summary": "TikTok to pay $400m to US in one of largest child privacy settlements",
+            "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE9uUGxYTVJLSG4xVU9tQWdDSHVXaFYxOE5oUEZ1MTVNWHV4b0NsZkNBajBRdGtwc1FvQVlaQ1RhYWxxNmd0VTRUWi1rNjUyb1d5dTFXTldmZl84dw?oc=5",
+            "published_at": 1787348447,
+            "source": "rss_th",
+            "category": "regional_th",
+            "bucket": "regional"
+          },
+          {
+            "id": "rss_th_366128",
+            "title": "Alfalfa sprouts recalled for E. coli and salmonella after dozens of illnesses",
+            "summary": "Alfalfa sprouts recalled for E. coli and salmonella after dozens of illnesses",
+            "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQbGdWdWdnZ0VhZ2lmc3g2aUh5X3h0VzN6VXFEazZFRDY0ZG9CTnE3dkc0dXJ1RTZOQ0d1amdMV1FhTTcxZklybjYyMUtBRFMtSEVQd3IwcFpaNEgxN3p4NXVReTRpVktnaTdfQ0xUTi1heDg5LWllRi1iLU5DZUpGWnU0UXZRVU1sMHVqVzZ3XzdwakJWVmpSb0xscWhmUmdLdjZFd1o4TElobHVka1E?oc=5",
+            "published_at": 1787342715,
+            "source": "rss_th",
+            "category": "regional_th",
+            "bucket": "regional"
+          },
+          {
+            "id": "rss_sg_818046",
+            "title": "Live updates: Bitcoin slips back to $77,000 after challenging $80,000 overnight",
+            "summary": "Live updates: Bitcoin slips back to $77,000 after challenging $80,000 overnight",
+            "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxPZzJvcDc2b1JvS3pELVpQX2VvWHhmWWp6bzlINEtZbkhXNUUzWnpUTHZQXy1XdW5CWU9KZUloa05haHdsTUlNd2dEZzQzcTFaSUYzdXNZaWhrd2J3Y3lZWXp4TVkzUU1aLVU4TmZuMVNaY0wydGlEMnp4cy1Td1Q2bWNhYjJuaHdZZkRWQ1FCeExrSTJwZHh3ckEybW9ZM2RDWTljUlRub0NHU0o5RF83LTBTeDRZdHBRZElfWEFGeWM2TkR0Nk95Yg?oc=5",
+            "published_at": 1787340826,
+            "source": "rss_sg",
+            "category": "regional_sg",
+            "bucket": "regional"
+          }
+        ],
+        "count": 5
       }
     ],
     "source_summary": [
@@ -3864,19 +3911,25 @@
       },
       {
         "label": "美股 / 宏觀",
-        "count": 12,
+        "count": 11,
         "icon": "🇺🇸"
       },
       {
         "label": "全球頭條",
-        "count": 8,
+        "count": 6,
         "icon": "🌍"
+      },
+      {
+        "label": "東南亞 / 印度",
+        "count": 5,
+        "icon": "🧭"
       }
     ],
     "highlights": [
       "🇹🇼 MoneyDJ 熱門排行 6 則",
-      "🇺🇸 美股 / 宏觀 12 則",
-      "🌍 全球頭條 8 則"
+      "🇺🇸 美股 / 宏觀 11 則",
+      "🌍 全球頭條 6 則",
+      "🧭 東南亞 / 印度 5 則"
     ]
   },
   "social_topic_heatmap": {
@@ -3884,66 +3937,66 @@
     "benchmark": "PTT Stock / Google Trends（商業與財經）",
     "report_date": "2026-08-22",
     "coverage": 6,
-    "as_of": "2026-08-22T07:41:39.303308",
-    "summary": "社群熱度聚焦在 史 努 比 福袋 買 一 送 一、美國債突破40兆美元！財長貝森特要大家、美軍秘密打通荷姆茲運油航道，日均運量近，共有 6 個上升主題。",
+    "as_of": "2026-08-22T08:47:13.834849",
+    "summary": "社群熱度聚焦在 新光 銀行、史 努 比 福袋 買 一 送 一、0821 上市外資買賣超排行，共有 6 個上升主題。",
     "topics": [
+      {
+        "topic": "新光 銀行",
+        "source": "google_trends_finance",
+        "score": 5000.0,
+        "velocity": 1000.0,
+        "timestamp": "2026-08-22T08:47:13.834849",
+        "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
+        "direction": "rising",
+        "is_rising": true
+      },
       {
         "topic": "史 努 比 福袋 買 一 送 一",
         "source": "google_trends_finance",
         "score": 5000.0,
         "velocity": 1000.0,
-        "timestamp": "2026-08-22T07:41:39.303308",
+        "timestamp": "2026-08-22T08:47:13.834849",
         "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
+        "direction": "rising",
+        "is_rising": true
+      },
+      {
+        "topic": "0821 上市外資買賣超排行",
+        "source": "ptt_stock",
+        "score": 80.0,
+        "velocity": 80.0,
+        "timestamp": "2026-08-22T08:47:14.050310",
+        "url": "https://www.ptt.cc/bbs/Stock/M.1787300049.A.65C.html",
         "direction": "rising",
         "is_rising": true
       },
       {
         "topic": "美國債突破40兆美元！財長貝森特要大家",
         "source": "ptt_stock",
-        "score": 58.0,
-        "velocity": 58.0,
-        "timestamp": "2026-08-22T07:41:39.430805",
+        "score": 70.0,
+        "velocity": 70.0,
+        "timestamp": "2026-08-22T08:47:14.050310",
         "url": "https://www.ptt.cc/bbs/Stock/M.1787325393.A.4BC.html",
+        "direction": "rising",
+        "is_rising": true
+      },
+      {
+        "topic": "台股狂漲56% GDP衝11%！ 外媒示警：AI榮",
+        "source": "ptt_stock",
+        "score": 65.0,
+        "velocity": 65.0,
+        "timestamp": "2026-08-22T08:47:14.050310",
+        "url": "https://www.ptt.cc/bbs/Stock/M.1787299510.A.5C0.html",
         "direction": "rising",
         "is_rising": true
       },
       {
         "topic": "美軍秘密打通荷姆茲運油航道，日均運量近",
         "source": "ptt_stock",
-        "score": 38.0,
-        "velocity": 38.0,
-        "timestamp": "2026-08-22T07:41:39.430805",
+        "score": 51.0,
+        "velocity": 51.0,
+        "timestamp": "2026-08-22T08:47:14.050310",
         "url": "https://www.ptt.cc/bbs/Stock/M.1787331261.A.551.html",
-        "direction": "rising",
-        "is_rising": true
-      },
-      {
-        "topic": "SCFI連四漲！巴拿馬運河限航撿到槍、美東",
-        "source": "ptt_stock",
-        "score": 14.0,
-        "velocity": 14.0,
-        "timestamp": "2026-08-22T07:41:39.430805",
-        "url": "https://www.ptt.cc/bbs/Stock/M.1787325135.A.75E.html",
-        "direction": "rising",
-        "is_rising": true
-      },
-      {
-        "topic": "7610 聯友金屬千載難逢的歐印機會",
-        "source": "ptt_stock",
-        "score": 14.0,
-        "velocity": 14.0,
-        "timestamp": "2026-08-22T07:41:39.430805",
-        "url": "https://www.ptt.cc/bbs/Stock/M.1787326905.A.1FB.html",
-        "direction": "rising",
-        "is_rising": true
-      },
-      {
-        "topic": "手機報稅中獎名單",
-        "source": "google_trends_finance",
-        "score": 0.0,
-        "velocity": 1000.0,
-        "timestamp": "2026-08-22T07:41:39.303308",
-        "url": "https://trends.google.com.tw/trending?geo=TW&category=3",
         "direction": "rising",
         "is_rising": true
       }
@@ -3965,11 +4018,11 @@
     "report_date": "2026-08-22",
     "coverage": 3,
     "as_of": "2026-08-22",
-    "summary": "科技主題熱度集中在 美債殖利率反彈與財政政策挑戰、AI 產業擴張面臨社會與資本市場阻力、台灣資金轉向防禦型與多元資產配置，主線仍由新聞主題驅動。",
+    "summary": "科技主題熱度集中在 美債殖利率反彈與宏觀避險需求、特斯拉 Robotaxi 擴張與 AI 基礎設施風險、台灣資金轉向多元資產與區域佈局，主線仍由新聞主題驅動。",
     "topics": [
       {
-        "topic": "美債殖利率反彈與財政政策挑戰",
-        "summary": "美國長債殖利率連續兩日攀升，市場對通膨、債務膨脹及企業發債壓力感到擔憂，財政部的回購干預措施效果有限，顯示宏觀環境對固定收益資產構成挑戰。",
+        "topic": "美債殖利率反彈與宏觀避險需求",
+        "summary": "美國長債殖利率連續兩日攀升，市場對通膨與債務問題的擔憂抵銷了財政部回購政策的利多，促使資金轉向防禦型美元債券配置。",
         "score": 90,
         "sources": [
           "cnyes",
@@ -3981,36 +4034,35 @@
         ]
       },
       {
-        "topic": "AI 產業擴張面臨社會與資本市場阻力",
-        "summary": "AI 產業在基礎設施建設（資料中心）遭遇社區反彈，且資本市場對相關企業（如 SpaceX）的現金流與估值開始出現看空評級，顯示市場對 AI 泡沫化的風險意識提升。",
+        "topic": "特斯拉 Robotaxi 擴張與 AI 基礎設施風險",
+        "summary": "科技板塊呈現兩極化發展，特斯拉因 Robotaxi 部署計畫獲准而股價跳漲，但 AI 資料中心興建引發的社會反彈已成為企業 IPO 的潛在風險因素。",
         "score": 85,
         "sources": [
           "cnyes"
         ],
         "evidence": [
-          "美國人反對AI資料中心聲浪升高？Anthropic IPO招股書擬列風險因素",
-          "SpaceX再獲賣出評級 分析師：股價可能下跌25%"
+          "特斯拉股價為何跳漲？Robotaxi大戰拉斯維加斯開打 首年獲准部署多達5000輛",
+          "美國人反對AI資料中心聲浪升高？Anthropic IPO招股書擬列風險因素"
         ]
       },
       {
-        "topic": "台灣資金轉向防禦型與多元資產配置",
-        "summary": "受市場震盪影響，台灣投資人與法人資金正從單一科技股轉向多元資產配置，包括越南機會基金、新興市場美元債及多重資產收息標的，以分散風險。",
+        "topic": "台灣資金轉向多元資產與區域佈局",
+        "summary": "受台股震盪影響，投資人與法人資金正從單一科技股轉向越南機會基金、亞太實質收息及 ESG 永續半導體等多元化標的，尋求收益穩定性。",
         "score": 80,
         "sources": [
           "MoneyDJ"
         ],
         "evidence": [
           "中國信託越南機會基金七月操作",
-          "中國信託新興市場0-5年期美元",
-          "中國信託策略優利多重資產基金",
-          "中國信託亞太實質收息多重資產"
+          "中國信託亞太實質收息多重資產",
+          "中國信託臺灣ESG永續關鍵半導體E"
         ]
       }
     ]
   },
   "ai_analysis": {
-    "full_text": "今日結論：\n台股目前是 區間整理 格局，短線以輪動整理為主；現在先看成交、情緒和國際盤能不能一起往同一方向走。\n\n新聞驅動：\n今天的題材重點集中在 美債殖利率反彈與財政政策挑戰, AI 產業擴張面臨社會與資本市場阻力, 台灣資金轉向防禦型與多元資產配置，🇹🇼 MoneyDJ 熱門排行 6 則, 🇺🇸 美股 / 宏觀 12 則, 🌍 全球頭條 8 則。這代表資金正在找主線，市場有反應，但還沒完全定調。\n\n國際與台股：\n美股與宏觀訊號以 S&P 500 7641.16015625 (-0.87%)、Nasdaq 26067.169921875 (-1.00%)、費半 (SOX) 11800.01953125 (+0.53%)、道瓊 52759.2109375 (-1.32%) 為主；台股部分，TAIEX 45224.29，漲跌 290.55，盤面寬度為 589 漲 / 381 跌。夜盤與期貨方面，SGX 3771.780029296875 +0.61%，富台 44804.0 -0.22%（資料日 2026-08-21）。外部訊號仍在對齊中，暫時不算完全同向，但也沒有失控。\n\nKOL與情緒：\n台灣市場情緒位於 62（貪婪 (Greed)），CNN F&G 為 55，Crypto F&G 為 72。如果 KOL 方向和盤勢同向，趨勢比較容易延續；如果不同向，代表盤中拉扯還在。\n\n操作含意：\n綜合來看，等突破再站隊 是比較合理的節奏；如果後續量能和國際盤一起轉強，就順勢跟進；如果情緒先衝太快、指標沒跟上，就先放慢節奏，分批觀察比追價更實際。\n\n【關鍵數據】\n台指期夜盤=44804.0 (-0.22%)（資料日 2026-08-21）\n富台指期=3771.780029296875 (+0.61%)\n道瓊=52759.2109375 (-1.32%)\nNasdaq=26067.169921875 (-1.00%)\nS&P 500=7641.16015625 (-0.87%)\n費半=11800.01953125 (+0.53%)\n布蘭特原油=93.77999877929688 (+2.36%)",
-    "generated_at": "2026-08-22T07:43:31"
+    "full_text": "今日結論：\n台股目前是 區間整理 格局，短線以輪動整理為主；現在先看成交、情緒和國際盤能不能一起往同一方向走。\n\n新聞驅動：\n今天的題材重點集中在 美債殖利率反彈與宏觀避險需求, 特斯拉 Robotaxi 擴張與 AI 基礎設施風險, 台灣資金轉向多元資產與區域佈局，🇹🇼 MoneyDJ 熱門排行 6 則, 🇺🇸 美股 / 宏觀 11 則, 🌍 全球頭條 6 則。這代表資金正在找主線，市場有反應，但還沒完全定調。\n\n國際與台股：\n美股與宏觀訊號以 S&P 500 7641.16015625 (-0.87%)、Nasdaq 26067.169921875 (-1.00%)、費半 (SOX) 11800.01953125 (+0.53%)、道瓊 52759.2109375 (-1.32%) 為主；台股部分，TAIEX 45224.29，漲跌 290.55，盤面寬度為 589 漲 / 381 跌。夜盤與期貨方面，SGX 3771.780029296875 +0.61%，富台 44804.0 -0.22%（資料日 2026-08-21）。外部訊號仍在對齊中，暫時不算完全同向，但也沒有失控。\n\nKOL與情緒：\n台灣市場情緒位於 62（貪婪 (Greed)），CNN F&G 為 55，Crypto F&G 為 72。如果 KOL 方向和盤勢同向，趨勢比較容易延續；如果不同向，代表盤中拉扯還在。\n\n操作含意：\n綜合來看，等突破再站隊 是比較合理的節奏；如果後續量能和國際盤一起轉強，就順勢跟進；如果情緒先衝太快、指標沒跟上，就先放慢節奏，分批觀察比追價更實際。\n\n【關鍵數據】\n台指期夜盤=44804.0 (-0.22%)（資料日 2026-08-21）\n富台指期=3771.780029296875 (+0.61%)\n道瓊=52759.2109375 (-1.32%)\nNasdaq=26067.169921875 (-1.00%)\nS&P 500=7641.16015625 (-0.87%)\n費半=11800.01953125 (+0.53%)\n布蘭特原油=93.77999877929688 (+2.36%)",
+    "generated_at": "2026-08-22T08:47:53"
   },
   "chart_orchestration": {
     "family": "Weekend Macro",
@@ -4018,21 +4070,32 @@
     "report_date": "2026-08-22",
     "chart_budget": 4,
     "source": "gemini",
-    "generated_at": "2026-08-22T07:43:41",
+    "generated_at": "2026-08-22T08:48:02",
     "selected_charts": [
       {
-        "id": "social_topic_heatmap_panel",
-        "title": "社群熱度圖",
-        "description": "PTT / Dcard / Google Trends 的熱門主題、速度與升溫強度。",
+        "id": "us_macro_panel",
+        "title": "美股與風險資產",
+        "description": "S&P 500、Nasdaq、SOX、VIX 與美元、黃金、原油的跨資產訊號。",
         "families": [
           "Pre-open",
-          "Close Summary",
-          "Midweek Risk",
           "Weekend Macro",
           "Next Week Preview"
         ],
-        "takeaway": "社群熱度聚焦於美國債務風險與航運中斷，顯示投資人對宏觀利空的敏感度提升。",
-        "action": "利用假日檢視配置中的地緣政治曝險。",
+        "takeaway": "風險資產短期承壓，避險訊號顯著。",
+        "action": "監控後續成交量能否支撐整理區間。",
+        "priority": "medium"
+      },
+      {
+        "id": "treasury_oil_panel",
+        "title": "美債殖利率與油價",
+        "description": "美國 10 年期公債殖利率與原油價格的通膨與定價訊號。",
+        "families": [
+          "Weekend Macro",
+          "Midweek Risk",
+          "Next Week Preview"
+        ],
+        "takeaway": "殖利率走升造成資產定價壓力。",
+        "action": "觀察長債走勢是否出現止穩訊號。",
         "priority": "medium"
       },
       {
@@ -4046,100 +4109,89 @@
           "Weekend Macro",
           "Next Week Preview"
         ],
-        "takeaway": "AI 主題熱度雖高，但內容轉向社會與資本阻力，指標意義從利多轉為風險預警。",
-        "action": "對 AI 供應鏈進行汰弱留強。",
+        "takeaway": "宏觀避險與基礎建設風險為兩大主線。",
+        "action": "檢視科技板塊中受殖利率影響較敏感的權值股。",
         "priority": "medium"
       },
       {
-        "id": "us_macro_panel",
-        "title": "美股與風險資產",
-        "description": "S&P 500、Nasdaq、SOX、VIX 與美元、黃金、原油的跨資產訊號。",
+        "id": "social_topic_heatmap_panel",
+        "title": "社群熱度圖",
+        "description": "PTT / Dcard / Google Trends 的熱門主題、速度與升溫強度。",
         "families": [
           "Pre-open",
-          "Weekend Macro",
-          "Next Week Preview"
-        ],
-        "takeaway": "美股回調與 VIX 上升，確認市場進入波動擴大期。",
-        "action": "維持防禦性現金水位。",
-        "priority": "medium"
-      },
-      {
-        "id": "treasury_oil_panel",
-        "title": "美債殖利率與油價",
-        "description": "美國 10 年期公債殖利率與原油價格的通膨與定價訊號。",
-        "families": [
-          "Weekend Macro",
+          "Close Summary",
           "Midweek Risk",
+          "Weekend Macro",
           "Next Week Preview"
         ],
-        "takeaway": "債息與油價同步走高，對評價面帶來雙重壓抑。",
-        "action": "監控金融與防禦性產業在市場修正下的表現。",
+        "takeaway": "社群對宏觀債務與外資動態高度關注。",
+        "action": "利用輿情熱度判斷市場情緒轉折點。",
         "priority": "medium"
       }
     ],
     "chart_order": [
-      "social_topic_heatmap_panel",
-      "tech_topic_heatmap_panel",
       "us_macro_panel",
-      "treasury_oil_panel"
+      "treasury_oil_panel",
+      "tech_topic_heatmap_panel",
+      "social_topic_heatmap_panel"
     ],
     "chart_commentary": [
       {
-        "chart_id": "social_topic_heatmap_panel",
-        "takeaway": "社群熱度聚焦於美國債務風險與航運中斷，顯示投資人對宏觀利空的敏感度提升。",
-        "action": "利用假日檢視配置中的地緣政治曝險。"
-      },
-      {
-        "chart_id": "tech_topic_heatmap_panel",
-        "takeaway": "AI 主題熱度雖高，但內容轉向社會與資本阻力，指標意義從利多轉為風險預警。",
-        "action": "對 AI 供應鏈進行汰弱留強。"
-      },
-      {
         "chart_id": "us_macro_panel",
-        "takeaway": "美股回調與 VIX 上升，確認市場進入波動擴大期。",
-        "action": "維持防禦性現金水位。"
+        "takeaway": "風險資產短期承壓，避險訊號顯著。",
+        "action": "監控後續成交量能否支撐整理區間。"
       },
       {
         "chart_id": "treasury_oil_panel",
-        "takeaway": "債息與油價同步走高，對評價面帶來雙重壓抑。",
-        "action": "監控金融與防禦性產業在市場修正下的表現。"
+        "takeaway": "殖利率走升造成資產定價壓力。",
+        "action": "觀察長債走勢是否出現止穩訊號。"
+      },
+      {
+        "chart_id": "tech_topic_heatmap_panel",
+        "takeaway": "宏觀避險與基礎建設風險為兩大主線。",
+        "action": "檢視科技板塊中受殖利率影響較敏感的權值股。"
+      },
+      {
+        "chart_id": "social_topic_heatmap_panel",
+        "takeaway": "社群對宏觀債務與外資動態高度關注。",
+        "action": "利用輿情熱度判斷市場情緒轉折點。"
       }
     ],
-    "overall_summary": "本週末市場主線清晰呈現「防禦性轉向」的特徵。隨著美國 10 年期公債殖利率攀升至 4.69% 並伴隨長債發債壓力，市場對通膨與財政穩定性產生焦慮。AI 產業因資料中心建置阻力與估值過高疑慮，獲利回吐壓力增大。台灣市場方面，資金結構正由單一科技股調整，轉向多元資產配置，反映投資人對於國際宏觀變數的謹慎。社群情緒轉向關注地緣政治（荷姆茲航道）與債務議題，整體情緒處於中性至貪婪交界，顯示市場在整理中尋找新平衡，後續需觀察量能能否跟上，以確認整理格局是否轉弱。",
+    "overall_summary": "本週台股市場處於區間整理格局，資金面呈現從單一科技股轉向多元區域配置的趨勢。國際市場受美債殖利率反彈與避險情緒影響，美股主要指數承壓，科技板塊出現兩極化表現，一方面受惠 Robotaxi 進展，另一方面則面臨 AI 基礎設施社會風險的挑戰。市場目前處於重新尋找主線的過渡期，建議關注宏觀環境穩定性與資金輪動結構。",
     "news_themes": [
       {
-        "label": "美債殖利率反彈與財政政策挑戰",
-        "summary": "長債殖利率攀升引發對通膨與發債壓力的擔憂，宏觀環境對固定收益資產構成挑戰。",
+        "label": "美債殖利率反彈與宏觀避險需求",
+        "summary": "美國長債殖利率攀升，市場憂慮通膨與債務問題，資金傾向防禦型配置。",
         "sources": [
           "cnyes",
           "global_reuters"
         ],
         "evidence": [
           "美財政部救債市失靈？長債殖利率連兩日反彈 30年期再逼近5.3%",
-          "Wall St rises on the day but falls for the week; bond yields and Iran in focus"
+          "Wall St rises on the day but falls for the week"
         ]
       },
       {
-        "label": "AI 產業擴張面臨社會與資本市場阻力",
-        "summary": "AI 基礎設施遭遇在地反彈，且資本市場對企業估值與現金流出現看空訊號。",
+        "label": "特斯拉 Robotaxi 擴張與 AI 基礎設施風險",
+        "summary": "科技板塊分歧，特斯拉獲部署許可，但 AI 資料中心面臨社會反彈與 IPO 風險。",
         "sources": [
           "cnyes"
         ],
         "evidence": [
-          "美國人反對AI資料中心聲浪升高？Anthropic IPO招股書擬列風險因素",
-          "SpaceX再獲賣出評級 分析師：股價可能下跌25%"
+          "特斯拉 Robotaxi 大戰拉斯維加斯開打",
+          "Anthropic IPO 招股書擬列 AI 資料中心風險"
         ]
       },
       {
-        "label": "台灣資金轉向防禦型與多元資產配置",
-        "summary": "受國際震盪影響，資金由科技股向多元化標的（如越南基金、債券型資產）分散。",
+        "label": "台灣資金轉向多元資產與區域佈局",
+        "summary": "投資人轉向越南基金、亞太收息及 ESG 半導體等多元標的以尋求收益穩定。",
         "sources": [
           "MoneyDJ"
         ],
         "evidence": [
           "中國信託越南機會基金七月操作",
-          "中國信託新興市場0-5年期美元",
-          "中國信託策略優利多重資產基金"
+          "中國信託亞太實質收息多重資產",
+          "中國信託臺灣ESG永續關鍵半導體E"
         ]
       }
     ],
@@ -4227,13 +4279,13 @@
       "freshness_label": "stale"
     },
     "asia_market": {
-      "state": "STALE",
+      "state": "OK",
       "source": "yfinance",
-      "updated_at": "2026-08-20",
-      "age_days": 2,
+      "updated_at": "2026-08-21",
+      "age_days": 1,
       "max_age_days": 1,
-      "reason": "last updated 2 days ago",
-      "freshness_label": "stale"
+      "reason": null,
+      "freshness_label": "current"
     },
     "sentiment": {
       "state": "OK",
@@ -4247,7 +4299,7 @@
     "market_news": {
       "state": "OK",
       "source": "None",
-      "updated_at": "2026-08-22 07:30:07",
+      "updated_at": "2026-08-22 07:46:26",
       "age_days": 0,
       "max_age_days": 1,
       "reason": null,
