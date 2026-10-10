@@ -328,28 +328,91 @@ async function loadIndex() {
     });
     sel.addEventListener('change', () => loadReport(sel.value));
     updateReportNavButtons();
-    if(index.length) loadReport(index[0].file);
+    // The LINE push links to ?date=…&type=…; open that report, not
+    // whichever is newest by the time the link is clicked.
+    const { entry, missing } = findRequestedReport(index, new URLSearchParams(location.search));
+    if(missing) _deepLinkNotice = missing;
+    if(entry) loadReport(entry.file, { history: 'replace' });
   } catch(e) {
     document.getElementById('app').innerHTML =
       `<div class="loader" style="color:var(--red)">⚠️ 無法載入報告清單：${e.message}</div>`;
   }
 }
 
+// ── Deep links ───────────────────────────────────────────────────────────────
+let _deepLinkNotice = null;
+
+// Returns the entry named by ?date=&type= (type optional), else the newest.
+// `missing` describes a requested report that is not in the index, so the
+// reader is told rather than silently shown a different day.
+function findRequestedReport(index, params) {
+  const date = params.get('date');
+  const type = params.get('type');
+  if(!date) return { entry: index[0], missing: null };
+  const match = index.find(e => e.date === date && (!type || e.type === type));
+  if(match) return { entry: match, missing: null };
+  const label = `${date} ${type ? (TYPE_LABELS[type] || type) : ''}`.trim();
+  return { entry: index[0], missing: label };
+}
+
+function syncReportUrl(file, mode) {
+  if(mode === 'none') return;
+  const entry = _reportIndex.find(e => e.file === file);
+  if(!entry) return;
+  const params = new URLSearchParams(location.search);
+  params.set('date', entry.date);
+  params.set('type', entry.type);
+  const url = `${location.pathname}?${params.toString()}${location.hash}`;
+  if(mode === 'replace') history.replaceState({ file }, '', url);
+  else history.pushState({ file }, '', url);
+}
+
+window.addEventListener('popstate', (event) => {
+  if(!_reportIndex.length) return;
+  // The file recorded with the history entry is exact; date/type is the
+  // fallback for entries that came from a pasted link.
+  const recorded = _reportIndex.find(e => e.file === event.state?.file);
+  const { entry, missing } = recorded
+    ? { entry: recorded, missing: null }
+    : findRequestedReport(_reportIndex, new URLSearchParams(location.search));
+  _deepLinkNotice = missing;
+  if(entry && entry.file !== _currentReportFile) loadReport(entry.file, { history: 'none' });
+});
+
+// Only the most recent request may render: a slow response for a report the
+// reader already moved past must not overwrite the one they asked for.
+let _loadSeq = 0;
+
 // ── Load report JSON ─────────────────────────────────────────────────────────
-async function loadReport(file) {
+async function loadReport(file, { history: historyMode = 'push' } = {}) {
   document.getElementById('app').innerHTML = '<div class="loader">載入資料中<span class="spinner"></span></div>';
   destroyCharts();
+  const seq = ++_loadSeq;
   try {
     const res = await fetch(`${file}?_=${Date.now()}`);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    _currentData = await res.json();
+    const data = await res.json();
+    if(seq !== _loadSeq) return;
+    _currentData = data;
     _currentReportFile = file;
     _currentReportIndex = _reportIndex.findIndex(item => item.file === file);
     const sel = document.getElementById('date-select');
     if(sel && sel.value !== file) sel.value = file;
+    syncReportUrl(file, historyMode);
     render(_currentData);
+    if(_deepLinkNotice) {
+      const notice = document.createElement('div');
+      notice.className = 'loader';
+      notice.style.color = 'var(--red)';
+      notice.textContent = `⚠️ 找不到 ${_deepLinkNotice} 的報告，以下顯示最新一份。`;
+      document.getElementById('app').prepend(notice);
+      _deepLinkNotice = null;
+    }
     updateReportNavButtons();
   } catch(e) {
+    if(seq !== _loadSeq) return;
+    // The notice belonged to this load; it must not surface on a later one.
+    _deepLinkNotice = null;
     document.getElementById('app').innerHTML =
       `<div class="loader" style="color:var(--red)">⚠️ 載入失敗：${e.message}</div>`;
   }
@@ -727,19 +790,37 @@ function renderSentiment(s) {
       }))
       .filter(s => s.latestNorm != null)
       .sort((a, b) => Number(b.latestNorm) - Number(a.latestNorm));
+    // Two different rankings live in this card and must not share a label.
+    // `normalized` is 100 on the first date of the range, so it ranks the
+    // cumulative move since then; the chips show the latest day's change.
+    // Labelling the cumulative leader "領漲" next to chips made 2026-10-10 read
+    // "領漲：科技" while the 科技 chip showed ▼1.79%, the weakest of the day.
     const leader = latestRank[0];
     const laggard = latestRank[latestRank.length - 1];
+    const cumPct = s => Number(s.latestNorm) - 100;
     const defensiveSet = new Set(['必需消費', '公用事業', '醫療保健', '不動產']);
     const offensiveSet = new Set(['科技', '非必需消費', '金融', '工業', '能源', '原物料', '通訊服務']);
-    const defensiveAvg = latestRank.filter(s => defensiveSet.has(s.name)).reduce((acc, s) => acc + Number(s.latestNorm || 0), 0) / Math.max(1, latestRank.filter(s => defensiveSet.has(s.name)).length);
-    const offensiveAvg = latestRank.filter(s => offensiveSet.has(s.name)).reduce((acc, s) => acc + Number(s.latestNorm || 0), 0) / Math.max(1, latestRank.filter(s => offensiveSet.has(s.name)).length);
-    const biasText = latestRank.length
-      ? (defensiveAvg >= offensiveAvg
-        ? '資金相對偏向防禦族群。'
-        : '資金相對偏向進攻族群。')
+    const avgCum = set => {
+      const members = latestRank.filter(s => set.has(s.name));
+      return members.length ? members.reduce((acc, s) => acc + cumPct(s), 0) / members.length : null;
+    };
+    const defensiveAvg = avgCum(defensiveSet);
+    const offensiveAvg = avgCum(offensiveSet);
+    const sinceText = dates.length ? `${dates[0].slice(5)} 以來` : '區間內';
+    const biasText = (defensiveAvg != null && offensiveAvg != null)
+      ? `${sinceText}資金相對偏向${defensiveAvg >= offensiveAvg ? '防禦' : '進攻'}族群`
+        + `（進攻平均 ${fmtPct(offensiveAvg)}、防禦平均 ${fmtPct(defensiveAvg)}）。`
       : '目前仍在觀察輪動方向。';
-    const leaderText = leader ? `領漲：${leader.name}` : '領漲：—';
-    const laggardText = laggard ? `弱勢：${laggard.name}` : '弱勢：—';
+    const leaderText = leader
+      ? `${sinceText}累積｜領先：${leader.name} ${fmtPct(cumPct(leader))}｜落後：${laggard.name} ${fmtPct(cumPct(laggard))}`
+      : `${sinceText}累積｜—`;
+    const daily = series
+      .filter(s => s.change_pct != null && !Number.isNaN(Number(s.change_pct)))
+      .sort((a, b) => Number(b.change_pct) - Number(a.change_pct));
+    const lastDay = dates.length ? dates[dates.length - 1].slice(5) : '';
+    const laggardText = daily.length
+      ? `最新交易日${lastDay ? `（${lastDay}）` : ''}｜最強：${daily[0].name} ${fmtPct(daily[0].change_pct)}｜最弱：${daily[daily.length - 1].name} ${fmtPct(daily[daily.length - 1].change_pct)}`
+      : '最新交易日｜—';
     const chips = series.map(s => `
       <div class="macro-chip">
         <div class="chip-name">${s.name}</div>
@@ -752,7 +833,8 @@ function renderSentiment(s) {
       ${dateRange ? `<div style="margin-top:8px;font-size:11px;color:var(--muted);">${dateRange}</div>` : ''}
       <div class="interpret-panel" style="margin-top:12px;padding:12px 14px;">
         <div class="interpret-summary">${escapeHtml(biasText)}</div>
-        <div class="interpret-note" style="margin-top:6px">${escapeHtml(`${leaderText}｜${laggardText}`)}</div>
+        <div class="interpret-note" style="margin-top:6px">${escapeHtml(leaderText)}</div>
+        <div class="interpret-note" style="margin-top:4px">${escapeHtml(laggardText)}</div>
       </div>
       <div style="margin-top:14px;height:260px;"><canvas id="us-sector-chart"></canvas></div>
     `);
