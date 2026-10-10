@@ -10,7 +10,7 @@ let _currentReportIndex = -1;
 let _anchorsObserver = null;
 let _backTopBound = false;
 const SECTION_COLLAPSE_STORAGE_KEY = 'anya.report.section-collapse.v1';
-const DEFAULT_COLLAPSED_SECTIONS = new Set(['sec-chart-orchestration', 'sec-news', 'sec-kol']);
+const DEFAULT_COLLAPSED_SECTIONS = new Set(['sec-chart-orchestration', 'sec-news', 'sec-kol', 'sec-social-heatmap']);
 let _sectionCollapseState = loadSectionCollapseState();
 
 // Type labels
@@ -99,11 +99,11 @@ function collapseAllSections() {
 }
 
 const WEEKLY_TEMPLATE_SECTION_ORDER = {
-  'Pre-open': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'taiex', 'market_snapshot', 'tw_internals', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
-  'Close Summary': ['hero', 'taiex', 'institutional', 'tw_internals','sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
-  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'institutional', 'tw_internals','market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
-  'Weekend Macro': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'institutional', 'tw_internals','interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
-  'Next Week Preview': ['hero', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'tech_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'institutional', 'tw_internals','market_snapshot', 'kol', 'history_strip', 'ai'],
+  'Pre-open': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'taiex', 'market_snapshot', 'tw_internals', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
+  'Close Summary': ['hero', 'taiex', 'institutional', 'tw_internals','sector_flow', 'sa_consensus', 'social_heatmap', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
+  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'institutional', 'tw_internals','market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
+  'Weekend Macro': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'institutional', 'tw_internals','interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
+  'Next Week Preview': ['hero', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'institutional', 'tw_internals','market_snapshot', 'kol', 'history_strip', 'ai'],
 };
 
 // Maps an APPROVED_CHART_LIBRARY chart id to the on-page section anchor that renders it.
@@ -112,7 +112,6 @@ const CHART_ID_TO_SECTION = {
   futures_adr_panel: 'sec-tw',
   sa_analyst_consensus_panel: 'sec-sa-consensus',
   social_topic_heatmap_panel: 'sec-social-heatmap',
-  tech_topic_heatmap_panel: 'sec-tech-heatmap',
   commodity_risk_panel: 'sec-commodity',
   treasury_oil_panel: 'sec-yield-oil',
   us_sector_rotation_panel: 'sec-us-sector',
@@ -217,9 +216,9 @@ function buildReportSectionMap(d, family) {
   const usMacro = d.us_macro?.length ? renderUsMacro(d.us_macro) : '';
   const saConsensus = d.sa_consensus ? renderSeekingAlphaConsensus(d.sa_consensus) : '';
   const socialHeatmap = d.social_topic_heatmap ? renderSocialTopicHeatmap(d.social_topic_heatmap) : '';
-  const techHeatmap = d.tech_topic_heatmap ? renderTechTopicHeatmap(d.tech_topic_heatmap) : '';
   const predictionReview = d.prediction_review?.available !== false ? renderPredictionReview(d.prediction_review) : '';
   const historyStrip = d.history_7d ? renderHistoryStrip(d.history_7d) : '';
+  const freshnessNotice = renderDataFreshnessNotice(d.data_health);
 
   return {
     hero: `
@@ -236,6 +235,7 @@ function buildReportSectionMap(d, family) {
               ${actionBadge}
             </div>
             <div id="hero-teaser">${d.headline?.teaser||'—'}</div>
+            ${freshnessNotice}
           </div>
         </div>
       </div>`,
@@ -259,7 +259,6 @@ function buildReportSectionMap(d, family) {
     us_macro: usMacro,
     sa_consensus: saConsensus,
     social_heatmap: socialHeatmap,
-    tech_heatmap: techHeatmap,
   };
 }
 
@@ -330,8 +329,8 @@ async function loadIndex() {
     updateReportNavButtons();
     // The LINE push links to ?date=…&type=…; open that report, not
     // whichever is newest by the time the link is clicked.
-    const { entry, missing } = findRequestedReport(index, new URLSearchParams(location.search));
-    if(missing) _deepLinkNotice = missing;
+    const { entry, notice } = findRequestedReport(index, new URLSearchParams(location.search));
+    if(notice) _deepLinkNotice = notice;
     if(entry) loadReport(entry.file, { history: 'replace' });
   } catch(e) {
     document.getElementById('app').innerHTML =
@@ -342,17 +341,49 @@ async function loadIndex() {
 // ── Deep links ───────────────────────────────────────────────────────────────
 let _deepLinkNotice = null;
 
-// Returns the entry named by ?date=&type= (type optional), else the newest.
-// `missing` describes a requested report that is not in the index, so the
-// reader is told rather than silently shown a different day.
+// Weekday and weekend editions of the same slot. weekly_review has no
+// counterpart and never stands in for another type.
+const REPORT_FAMILY = {
+  morning: 'morning', weekend_morning: 'morning',
+  evening: 'evening', weekend_evening: 'evening',
+};
+
+// Resolves ?date=&type= (type optional) to an index entry. `notice` says what
+// was shown instead whenever it is not exactly what was asked for, naming the
+// report actually loaded -- never a blanket "showing the latest".
 function findRequestedReport(index, params) {
   const date = params.get('date');
   const type = params.get('type');
-  if(!date) return { entry: index[0], missing: null };
-  const match = index.find(e => e.date === date && (!type || e.type === type));
-  if(match) return { entry: match, missing: null };
-  const label = `${date} ${type ? (TYPE_LABELS[type] || type) : ''}`.trim();
-  return { entry: index[0], missing: label };
+  const nameOf = e => `${e.date} ${TYPE_LABELS[e.type] || e.type}`;
+  const asked = `${date} ${type ? (TYPE_LABELS[type] || type) : ''}`.trim();
+  if(!date || !index.length) return { entry: index[0], notice: null };
+
+  // index is sorted newest date first, and within a date by edition rank.
+  const sameDay = index.filter(e => e.date === date);
+  if(sameDay.length) {
+    if(!type) return { entry: sameDay[0], notice: null };
+    const exact = sameDay.find(e => e.type === type);
+    if(exact) return { entry: exact, notice: null };
+    const family = REPORT_FAMILY[type];
+    const sibling = family && sameDay.find(e => REPORT_FAMILY[e.type] === family);
+    const other = type !== 'weekly_review' && sameDay.find(e => e.type !== 'weekly_review');
+    const pick = sibling || other;
+    if(pick) {
+      return { entry: pick,
+               notice: `找不到 ${asked} 的報告，改顯示同日的${TYPE_LABELS[pick.type] || pick.type}。` };
+    }
+  }
+
+  const latest = index[0];
+  if(date > latest.date) {
+    return { entry: latest, notice: `${date} 尚無報告，以下顯示最新一份（${nameOf(latest)}）。` };
+  }
+  const earlier = index.filter(e => e.date < date);
+  const before = (type === 'weekly_review' && earlier.find(e => e.type === 'weekly_review')) || earlier[0];
+  if(before) {
+    return { entry: before, notice: `找不到 ${asked} 的報告，改顯示在它之前最近的一份（${nameOf(before)}）。` };
+  }
+  return { entry: latest, notice: `找不到 ${asked} 的報告，以下顯示最新一份（${nameOf(latest)}）。` };
 }
 
 function syncReportUrl(file, mode) {
@@ -372,10 +403,10 @@ window.addEventListener('popstate', (event) => {
   // The file recorded with the history entry is exact; date/type is the
   // fallback for entries that came from a pasted link.
   const recorded = _reportIndex.find(e => e.file === event.state?.file);
-  const { entry, missing } = recorded
-    ? { entry: recorded, missing: null }
+  const { entry, notice } = recorded
+    ? { entry: recorded, notice: null }
     : findRequestedReport(_reportIndex, new URLSearchParams(location.search));
-  _deepLinkNotice = missing;
+  _deepLinkNotice = notice;
   if(entry && entry.file !== _currentReportFile) loadReport(entry.file, { history: 'none' });
 });
 
@@ -404,7 +435,7 @@ async function loadReport(file, { history: historyMode = 'push' } = {}) {
       const notice = document.createElement('div');
       notice.className = 'loader';
       notice.style.color = 'var(--red)';
-      notice.textContent = `⚠️ 找不到 ${_deepLinkNotice} 的報告，以下顯示最新一份。`;
+      notice.textContent = `⚠️ ${_deepLinkNotice}`;
       document.getElementById('app').prepend(notice);
       _deepLinkNotice = null;
     }
@@ -465,8 +496,6 @@ function render(d) {
       if(d.us_sector_history?.series?.length) buildUSSectorHistoryChart(d.us_sector_history);
       if(d.sector_flow) buildSectorChart(d.sector_flow);
       if(d.sa_consensus) buildSaConsensusChart(d.sa_consensus);
-      if(d.social_topic_heatmap) buildSocialTopicHeatmapChart(d.social_topic_heatmap);
-      if(d.tech_topic_heatmap) buildTechTopicHeatmapChart(d.tech_topic_heatmap);
       if(d.ai_analysis) renderMarkdown(d.ai_analysis);
       updateAnchors();
       updateReportNavButtons();
@@ -554,6 +583,9 @@ function renderSeekingAlphaConsensus(sa) {
 }
 
 function renderSocialTopicHeatmap(heatmap) {
+  // Attention, not signal. Google search interest (thousands) and PTT push
+  // counts (up to ~100) are different units, so each source gets its own list
+  // with its own unit; ranking them together once put "周子瑜" first.
   const escapeHtml = (value = '') => String(value)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -561,88 +593,50 @@ function renderSocialTopicHeatmap(heatmap) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
   const topics = Array.isArray(heatmap.topics) ? heatmap.topics : [];
-  const summary = String(heatmap.summary || '社群熱度資料').trim();
-  const benchmark = String(heatmap.benchmark || 'PTT Stock / Google Trends（商業與財經）').trim();
-  const coverage = heatmap.coverage != null ? Number(heatmap.coverage) : topics.length;
+  const bySource = heatmap.by_source && typeof heatmap.by_source === 'object'
+    ? heatmap.by_source
+    : topics.reduce((acc, t) => { (acc[t.source || 'unknown'] = acc[t.source || 'unknown'] || []).push(t); return acc; }, {});
+  const SOURCE_META = {
+    ptt_stock: { title: 'PTT 股版討論', unit: '推文' },
+    google_trends_finance: { title: '大眾搜尋（Google）', unit: '搜尋熱度' },
+  };
+  const CATEGORY_LABEL = { market: '市場事件', retail: '散戶情緒', attention: '大眾話題' };
   const asOf = String(heatmap.as_of || '').trim();
-  const chips = [
-    { label: '來源', value: String(heatmap.source || 'stock_social') },
-    { label: '覆蓋', value: `${coverage} 檔` },
-    { label: '樣本', value: benchmark },
-  ];
-  const rows = topics.slice(0, 5).map(item => `
-    <div class="news-theme-card">
-      <div class="news-theme-name">
-        <strong style="color:var(--text);font-size:15px;">${escapeHtml(item.topic || '')}</strong>
-        <span class="news-theme-score">${escapeHtml(item.is_rising ? 'Rising' : 'Stable')}</span>
-      </div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:8px;">
-        <span style="display:inline-block;margin-right:8px;">Source：${escapeHtml(item.source || '—')}</span>
-        <span style="display:inline-block;margin-right:8px;">Score：${escapeHtml(item.score != null ? Number(item.score).toFixed(1) : '—')}</span>
-        <span style="display:inline-block;margin-right:8px;">Velocity：${escapeHtml(item.velocity != null ? Number(item.velocity).toFixed(1) : '—')}</span>
-      </div>
+  const columns = Object.entries(bySource)
+    .filter(([, items]) => Array.isArray(items) && items.length)
+    .map(([source, items]) => {
+      const meta = SOURCE_META[source] || { title: source, unit: '分數' };
+      const rows = items.map(item => {
+        const score = item.score != null && !Number.isNaN(Number(item.score))
+          ? `${meta.unit} ${Number(item.score).toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+          : '';
+        const label = CATEGORY_LABEL[item.category] || '';
+        return `
+          <div class="news-theme-card">
+            <div class="news-theme-name">
+              <strong style="color:var(--text);font-size:14px;">${escapeHtml(item.topic || '')}</strong>
+              ${label ? `<span class="news-theme-score">${escapeHtml(label)}</span>` : ''}
+            </div>
+            ${score ? `<div style="font-size:12px;color:var(--muted);">${escapeHtml(score)}</div>` : ''}
+          </div>`;
+      }).join('');
+      return `
+        <div>
+          <div class="interpret-title" style="margin-bottom:8px;">${escapeHtml(meta.title)}</div>
+          ${rows}
+        </div>`;
+    }).join('');
+  const body = columns ? `
+    <div class="interpret-note" style="margin-top:0;">大家在討論什麼——注意力不是交易訊號，兩個來源的分數單位不同、不互相比較。</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:12px;">
+      ${columns}
     </div>
-  `).join('');
-  const body = topics.length ? `
-    <div class="interpret-summary">${escapeHtml(summary)}</div>
-    <div class="interpret-meta">
-      ${chips.map(chip => `<span class="interpret-chip">${escapeHtml(chip.label)}：${escapeHtml(chip.value)}</span>`).join('')}
-    </div>
-    <div class="news-theme-grid" style="margin-top:14px;">
-      ${rows}
-    </div>
-    <div style="margin-top:14px;height:260px;"><canvas id="social-heatmap-chart"></canvas></div>
   ` : `
     <div class="news-empty-state">
       暫無可顯示的熱門社群討論。
     </div>
   `;
-  return card('sec-social-heatmap', `📌 社群熱度圖${asOf ? ` <span style="font-size:11px;color:var(--muted);font-weight:400">(${escapeHtml(asOf)})</span>` : ''}`, body);
-}
-
-function renderTechTopicHeatmap(heatmap) {
-  const escapeHtml = (value = '') => String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-  const topics = Array.isArray(heatmap.topics) ? heatmap.topics : [];
-  if(!topics.length) return '';
-
-  const summary = String(heatmap.summary || '科技主題資料').trim();
-  const benchmark = String(heatmap.benchmark || '科技主題 / 新聞主線').trim();
-  const coverage = heatmap.coverage != null ? Number(heatmap.coverage) : topics.length;
-  const asOf = String(heatmap.as_of || '').trim();
-  const chips = [
-    { label: '來源', value: String(heatmap.source || 'market_news') },
-    { label: '覆蓋', value: `${coverage} 檔` },
-    { label: '樣本', value: benchmark },
-  ];
-  const rows = topics.slice(0, 5).map(item => `
-    <div class="news-theme-card">
-      <div class="news-theme-name">
-        <strong style="color:var(--text);font-size:15px;">${escapeHtml(item.topic || '')}</strong>
-        <span class="news-theme-score">${escapeHtml(item.score != null ? Number(item.score).toFixed(0) : '—')}</span>
-      </div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:8px;">
-        ${escapeHtml(item.summary || '科技主題彙整')}
-      </div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.55;">
-        <span style="display:inline-block;margin-right:8px;">Sources：${escapeHtml((item.sources || []).slice(0, 3).join('、') || '—')}</span>
-      </div>
-    </div>
-  `).join('');
-  return card('sec-tech-heatmap', `📌 科技主題熱度圖${asOf ? ` <span style="font-size:11px;color:var(--muted);font-weight:400">(${escapeHtml(asOf)})</span>` : ''}`, `
-    <div class="interpret-summary">${escapeHtml(summary)}</div>
-    <div class="interpret-meta">
-      ${chips.map(chip => `<span class="interpret-chip">${escapeHtml(chip.label)}：${escapeHtml(chip.value)}</span>`).join('')}
-    </div>
-    <div class="news-theme-grid" style="margin-top:14px;">
-      ${rows}
-    </div>
-    <div style="margin-top:14px;height:260px;"><canvas id="tech-heatmap-chart"></canvas></div>
-  `);
+  return card('sec-social-heatmap', `📡 市場注意力雷達${asOf ? ` <span style="font-size:11px;color:var(--muted);font-weight:400">(${escapeHtml(asOf)})</span>` : ''}`, body, { collapsible: true });
 }
 
 // ── Sentiment ─────────────────────────────────────────────────────────────────
@@ -1094,13 +1088,10 @@ function renderChartOrchestration(o) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
   const selected = Array.isArray(o.selected_charts) ? o.selected_charts : [];
-  const themes = Array.isArray(o.news_themes) ? o.news_themes : [];
-  const gapSuggestions = Array.isArray(o.chart_gap_suggestions) ? o.chart_gap_suggestions : [];
-  const budget = Number(o.chart_budget ?? selected.length ?? 0);
-  const family = String(o.family || _currentTemplateFamily || 'Pre-open');
-  const source = String(o.source || 'fallback');
-  const summary = String(o.overall_summary || '圖表編排目前不可用，系統已回退到靜態報告區塊。');
-  const selectedCount = selected.length;
+  // A fallback orchestration carries only a maintainer message ("圖表編排目前
+  // 不可用…") -- nothing for a reader -- so the card is left out entirely.
+  if (o.source === 'fallback' && !selected.length) return '';
+  const summary = String(o.overall_summary || '');
   const chartCards = selected.map(chart => {
     const title = chart.title || chart.id || '未命名圖表';
     const desc = chart.description || '';
@@ -1117,58 +1108,16 @@ function renderChartOrchestration(o) {
       <div class="news-theme-card"${clickAttrs}>
         <div class="news-theme-name">
           <strong style="color:var(--text);font-size:15px;">${escapeHtml(title)}</strong>
-          <span class="news-theme-score">${escapeHtml(chart.priority || '—')}</span>
         </div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:6px;">${escapeHtml(chart.id || '')}</div>
         <div style="font-size:14px;color:var(--text);line-height:1.55;margin-bottom:8px;">${escapeHtml(takeaway)}</div>
         ${action ? `<div class="interpret-note" style="margin-top:0;">${escapeHtml(action)}</div>` : ''}
         ${jumpHint}
       </div>
     `;
   }).join('');
-  const themeCards = themes.map(theme => {
-    const label = theme.label || theme.name || '未命名主題';
-    const summaryText = theme.summary || theme.insight || '';
-    const evidence = Array.isArray(theme.evidence) ? theme.evidence : [];
-    const sources = Array.isArray(theme.sources) ? theme.sources : [];
-    return `
-      <div class="interpret-box">
-        <div class="interpret-title">${escapeHtml(label)}<span style="color:var(--muted);font-weight:400">${sources.length ? escapeHtml(sources.join('、')) : ''}</span></div>
-        <div class="interpret-list">
-          <div>${escapeHtml(summaryText || 'Gemini 整理後主題')}</div>
-          ${evidence.length ? `<div><span>證據：</span>${escapeHtml(evidence.slice(0, 2).join('； '))}</div>` : ''}
-        </div>
-      </div>
-    `;
-  }).join('');
-  const gapCards = gapSuggestions.map(item => {
-    const title = item.chart_name || item.name || '未命名建議';
-    const whyNeeded = item.why_needed || item.reason || '';
-    const dataNeeded = Array.isArray(item.data_needed) ? item.data_needed : [];
-    const reportTypes = Array.isArray(item.which_report_types) ? item.which_report_types : [];
-    const evidence = item.evidence || '';
-    const priority = String(item.priority || 'medium');
-    return `
-      <div class="news-theme-card">
-        <div class="news-theme-name">
-          <strong style="color:var(--text);font-size:15px;">${escapeHtml(title)}</strong>
-          <span class="news-theme-score">${escapeHtml(priority)}</span>
-        </div>
-        ${whyNeeded ? `<div style="font-size:14px;color:var(--text);line-height:1.55;margin-bottom:8px;">${escapeHtml(whyNeeded)}</div>` : ''}
-        ${dataNeeded.length ? `<div style="font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:6px;"><strong style="color:var(--text);">需要資料：</strong>${escapeHtml(dataNeeded.join('、'))}</div>` : ''}
-        ${reportTypes.length ? `<div style="font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:6px;"><strong style="color:var(--text);">適用報表：</strong>${escapeHtml(reportTypes.join('、'))}</div>` : ''}
-        ${evidence ? `<div style="font-size:12px;color:var(--muted);line-height:1.55;">${escapeHtml(evidence)}</div>` : ''}
-      </div>
-    `;
-  }).join('');
   let html = '<div class="interpret-panel">';
   html += `
-    <div class="interpret-summary">${escapeHtml(summary)}</div>
-    <div class="interpret-meta">
-      <span class="interpret-chip">Family: ${escapeHtml(family)}</span>
-      <span class="interpret-chip">Selected: ${selectedCount} / Max: ${budget}</span>
-      <span class="interpret-chip">Source: ${escapeHtml(source)}</span>
-    </div>
+    ${summary ? `<div class="interpret-summary">${escapeHtml(summary)}</div>` : ''}
   `;
 
   if(chartCards) {
@@ -1179,38 +1128,46 @@ function renderChartOrchestration(o) {
     `;
   }
 
-  if(themes.length) {
-    html += `
-      <div class="interpret-box">
-        <div class="interpret-title">Gemini 主題整合</div>
-        <div class="theme-row" style="margin-bottom:0">
-          ${themes.slice(0, 5).map(theme => `
-            <div class="theme-pill">${escapeHtml(theme.label || theme.name || '')}</div>
-          `).join('')}
-        </div>
-      </div>
-      <div class="interpret-grid">
-        ${themeCards}
-      </div>
-    `;
-  }
+  // News themes are shown once, in the multi-source news section; listing
+  // them again here was the third copy on the page.
 
-  if(gapSuggestions.length) {
-    html += `
-      <div class="interpret-box">
-        <div class="interpret-title">📌 圖表缺口建議</div>
-        <div class="interpret-list">
-          <div>Gemini 判斷目前報告仍可補強的圖表方向。你可以依照這裡的資料需求去補做新圖，之後加入圖庫就能重複使用。</div>
-        </div>
-      </div>
-      <div class="interpret-grid">
-        ${gapCards}
-      </div>
-    `;
-  }
+  // Chart-gap suggestions ("you can build these charts next") and the
+  // family / budget / source chips are for whoever maintains the generator,
+  // not for readers of a public report; they stay in the payload only.
 
   html += '</div>';
-  return card('sec-chart-orchestration', '🧠 Gemini 編排摘要', html, { collapsible: true });
+  return card('sec-chart-orchestration', '🧭 今日圖表重點', html, { collapsible: true });
+}
+
+// ── Data freshness ───────────────────────────────────────────────────────────
+// The generator records every section's freshness in data_health, but nothing
+// showed it: a weekend report presented Thursday's market internals the same
+// way as today's. Only sections that are not current are listed.
+const DATA_HEALTH_LABELS = {
+  us_macro: '美股宏觀', asia_market: '亞洲市場', sentiment: '市場情緒',
+  market_news: '新聞', ai_analysis: 'AI 分析', tw_premarket: '台股盤前',
+  tw_market_internals: '台股內部結構', institutional: '三大法人',
+  sector_flow: '類股排行', social_pulse: 'KOL 情緒', prediction_review: '預測驗證',
+};
+
+function renderDataFreshnessNotice(health) {
+  if (!health || typeof health !== 'object') return '';
+  const escapeHtml = (value = '') => String(value)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  const stale = [];
+  const missing = [];
+  Object.entries(health).forEach(([key, h]) => {
+    if (!h || typeof h !== 'object' || h.state === 'OK') return;
+    const label = DATA_HEALTH_LABELS[key] || key;
+    if (h.state === 'MISSING' || !h.updated_at) missing.push(label);
+    else stale.push(`${label}截至 ${String(h.updated_at).slice(5, 10)}`);
+  });
+  if (!stale.length && !missing.length) return '';
+  const parts = [];
+  if (stale.length) parts.push(stale.join('、'));
+  if (missing.length) parts.push(`${missing.join('、')}暫無資料`);
+  return `<div class="interpret-note" style="margin-top:10px;font-size:12px;">⏱ 資料時間：${escapeHtml(parts.join('；'))}</div>`;
 }
 
 // ── KOL ──────────────────────────────────────────────────────────────────────
@@ -1250,7 +1207,7 @@ function renderKol(sp) {
           <div class="kol-bar-bear" style="width:${bear}%"></div>
         </div>
         <span class="dn" style="font-weight:600">${bear}% 空</span>
-        <span style="color:var(--muted);font-size:12px">${neutral}% 中性 / ${sp.total_kols||0} 位 KOL 統計</span>
+        <span style="color:var(--muted);font-size:12px">${neutral}% 中性 / ${sp.total_kols||0} 位 KOL 統計${(sp.total_kols||0) < 10 ? '（樣本少，僅供參考）' : ''}</span>
       </div>
     </div>`, { collapsible: true });
 }
@@ -1292,8 +1249,14 @@ function renderHistoryStrip(h) {
     </div>`;
   }).join('');
 
-  const accuracyText = h.accuracy_rate != null
-    ? `<span class="hs-accuracy">過去 7 天命中率 ${Math.round(h.accuracy_rate * 100)}%</span>`
+  // A rate without its count overstated four verdicts as "75% over 7 days".
+  const verdicts = (h.predictions || []).filter(p => p && p.verdict);
+  const hits = verdicts.filter(p => p.verdict === 'accurate').length;
+  const partial = verdicts.filter(p => p.verdict === 'partially_accurate').length;
+  const misses = verdicts.filter(p => p.verdict === 'inaccurate').length;
+  const fewText = verdicts.length < 10 ? '，樣本少，僅供參考' : '';
+  const accuracyText = verdicts.length
+    ? `<span class="hs-accuracy">已驗證 ${verdicts.length} 筆：命中 ${hits}${partial ? `、部分 ${partial}` : ''}、未中 ${misses}${h.accuracy_rate != null ? `（命中率 ${Math.round(h.accuracy_rate * 100)}%${fewText}）` : ''}</span>`
     : `<span class="hs-accuracy" style="color:var(--muted)">尚無預測驗證紀錄</span>`;
 
   const topicsList = (h.recurring_topics || []).map(t =>
@@ -1808,128 +1771,6 @@ function buildSaConsensusChart(sa) {
           },
           grid:{ color: dark },
           title: { display:true, text:'評級值（越低越強）', color:'#7a8ba8', font:{ size:10 } }
-        },
-        y: { ticks: { color:'#e2e8f5', font:{ size:11 } }, grid:{ color:'transparent' } }
-      },
-      maintainAspectRatio: false,
-    }
-  });
-}
-
-function buildSocialTopicHeatmapChart(heatmap) {
-  const el = document.getElementById('social-heatmap-chart');
-  if(!el || !heatmap || !Array.isArray(heatmap.topics) || heatmap.topics.length < 1) return;
-  if(_charts.socialHeatmap) {
-    _charts.socialHeatmap.destroy();
-    delete _charts.socialHeatmap;
-  }
-  const items = heatmap.topics
-    .map(item => ({
-      ...item,
-      topic: String(item.topic || '').trim(),
-    }))
-    .filter(item => item.topic)
-    .slice(0, 5);
-  if(!items.length) return;
-
-  const labels = items.map(item => item.topic);
-  const velocity = items.map(item => item.velocity != null ? Number(item.velocity) : 0);
-
-  _charts.socialHeatmap = new Chart(el, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'Velocity',
-          data: velocity,
-          backgroundColor: 'rgba(56,217,192,0.7)',
-          borderColor: '#38d9c0',
-          borderWidth: 1,
-          borderRadius: 4,
-        },
-      ]
-    },
-    options: {
-      ...chartDefaults,
-      indexAxis: 'y',
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => {
-              const raw = ctx.raw != null ? Number(ctx.raw).toFixed(1) : 'N/A';
-              return `${ctx.dataset.label}: ${raw}`;
-            }
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks:{color:'#7a8ba8',font:{size:10}},
-          grid:{color:dark},
-          title:{display:true,text:'熱度速度',color:'#7a8ba8',font:{size:10}},
-        },
-        y: { ticks: { color:'#e2e8f5', font:{ size:11 } }, grid:{ color:'transparent' } }
-      },
-      maintainAspectRatio: false,
-    }
-  });
-}
-
-function buildTechTopicHeatmapChart(heatmap) {
-  const el = document.getElementById('tech-heatmap-chart');
-  if(!el || !heatmap || !Array.isArray(heatmap.topics) || heatmap.topics.length < 1) return;
-  if(_charts.techHeatmap) {
-    _charts.techHeatmap.destroy();
-    delete _charts.techHeatmap;
-  }
-  const items = heatmap.topics
-    .map(item => ({
-      ...item,
-      topic: String(item.topic || '').trim(),
-    }))
-    .filter(item => item.topic)
-    .slice(0, 5);
-  if(!items.length) return;
-
-  const labels = items.map(item => item.topic);
-  const scores = items.map(item => item.score != null ? Number(item.score) : 0);
-
-  _charts.techHeatmap = new Chart(el, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'Score',
-          data: scores,
-          backgroundColor: 'rgba(99,179,255,0.7)',
-          borderColor: '#63b3ff',
-          borderWidth: 1,
-          borderRadius: 4,
-        },
-      ]
-    },
-    options: {
-      ...chartDefaults,
-      indexAxis: 'y',
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => {
-              const raw = ctx.raw != null ? Number(ctx.raw).toFixed(0) : 'N/A';
-              return `${ctx.dataset.label}: ${raw}`;
-            }
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks:{color:'#7a8ba8',font:{size:10}},
-          grid:{color:dark},
-          title:{display:true,text:'主題熱度',color:'#7a8ba8',font:{size:10}},
         },
         y: { ticks: { color:'#e2e8f5', font:{ size:11 } }, grid:{ color:'transparent' } }
       },

@@ -8,7 +8,13 @@
   let geminiSettingsSnapshot = null;
 
   function today() {
-    return new Date().toISOString().slice(0, 10);
+    // Taipei's date, not UTC's: toISOString() is UTC, so before 08:00 in
+    // Taiwan it named the previous day.
+    try {
+      return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Taipei' }).format(new Date());
+    } catch (e) {
+      return new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+    }
   }
 
   function resolveTabFromHash(hash) {
@@ -91,9 +97,14 @@
   function buildReportsUrl() {
     const dateInput = document.getElementById('report-date');
     const typeSelect = document.getElementById('report-type');
-    const date = (dateInput && dateInput.value) || today();
-    const type = (typeSelect && typeSelect.value) || 'morning';
-    return REPORTS_BASE + '?date=' + date + '&type=' + type;
+    const params = new URLSearchParams();
+    params.set('date', (dateInput && dateInput.value) || today());
+    // No type means "that day's latest report": the page picks it, so this
+    // tab does not have to guess whether today has a morning or a weekend
+    // morning report (the old default `morning` never exists on a Saturday).
+    const type = typeSelect && typeSelect.value;
+    if (type) params.set('type', type);
+    return REPORTS_BASE + '?' + params.toString();
   }
 
   function updateReportsIframe() {
