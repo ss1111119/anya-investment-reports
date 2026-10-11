@@ -20,6 +20,18 @@
     return Number(n) >= 0 ? 'pt-pos' : 'pt-neg';
   }
 
+  // Money is whole NT dollars: the API carries float noise
+  // (35264.95000000001) that means nothing to a reader.
+  function fmtMoney(n, signed) {
+    if (n == null) return '-';
+    var v = Math.round(Number(n));
+    return (signed && v > 0 ? '+' : '') + v.toLocaleString('zh-TW') + ' 元';
+  }
+
+  // What the page knows from the summary, positions and performance calls;
+  // the account-level views need two or three of them at once.
+  var _state = { summary: null, positions: null, startCapital: null };
+
   function renderHealthBar(h) {
     var bar = document.getElementById('pt-health-bar');
     var badges = document.getElementById('pt-health-badges');
@@ -28,33 +40,26 @@
     var items = [];
     var hasAlert = false;
 
-    // Circuit Breaker
     if (h.circuit_breaker) {
       hasAlert = true;
       var since = h.circuit_breaker_since ? h.circuit_breaker_since.slice(0, 10) : '';
-      items.push('<span class="pt-hbadge pt-hbadge--crit">⛔ Circuit Breaker ON' + (since ? ' (' + since + ')' : '') + '</span>');
-    } else {
-      items.push('<span class="pt-hbadge pt-hbadge--ok">✓ 交易正常</span>');
+      items.push('<span class="pt-hbadge pt-hbadge--crit">⛔ 熔斷中：系統已停止下單' + (since ? '（' + since + ' 起）' : '') + '</span>');
     }
 
-    // 回撤
     if (h.drawdown_pct < -5) {
       hasAlert = true;
-      items.push('<span class="pt-hbadge pt-hbadge--warn">回撤 ' + h.drawdown_pct + '%</span>');
+      items.push('<span class="pt-hbadge pt-hbadge--warn">帳戶從高點回落 ' + h.drawdown_pct + '%</span>');
     }
 
-    // 閒置天數
-    if (h.days_since_last_trade >= 7) {
-      hasAlert = true;
-      items.push('<span class="pt-hbadge pt-hbadge--warn">⏸ ' + h.days_since_last_trade + ' 天無交易</span>');
-    } else if (h.days_since_last_trade >= 0) {
-      items.push('<span class="pt-hbadge pt-hbadge--muted">距上次交易 ' + h.days_since_last_trade + ' 天</span>');
-    }
-
-    // 貸款逾期
+    // The loan's monthly repayment was paused on purpose (loan_months_paid
+    // set to the end), so next_payment_date stops moving and loan_overdue
+    // turns true. That is not something to act on.
     if (h.loan_overdue) {
-      hasAlert = true;
-      items.push('<span class="pt-hbadge pt-hbadge--crit">💳 貸款逾期 (' + (h.next_payment_date || '').slice(0, 10) + ')</span>');
+      items.push('<span class="pt-hbadge pt-hbadge--muted">信貸還款已暫停（刻意設定，非逾期）</span>');
+    }
+
+    if (!hasAlert) {
+      items.unshift('<span class="pt-hbadge pt-hbadge--ok">✓ 目前沒有需要你處理的事</span>');
     }
 
     badges.innerHTML = items.join('');
@@ -62,33 +67,65 @@
     bar.className = 'pt-health-bar' + (hasAlert ? ' pt-health-bar--alert' : '');
   }
 
+  function renderTotalReturn() {
+    var el = document.getElementById('pt-total-return');
+    var s = _state.summary;
+    if (!el || !s || !_state.startCapital) return;
+    var ret = (s.total_assets / _state.startCapital - 1) * 100;
+    el.innerHTML = '相對起始資金 ' + fmtMoney(_state.startCapital) + '：<span class="' + colorClass(ret) + '">' +
+      fmtPct(ret) + '</span>';
+  }
+
+  function renderMode() {
+    var el = document.getElementById('pt-mode');
+    var s = _state.summary, positions = _state.positions;
+    if (!el || !s || !positions) return;
+    var total = Number(s.total_assets) || 0;
+    var parts = positions.map(function (p) {
+      var w = total > 0 ? p.market_value / total * 100 : 0;
+      return (p.stock_name || p.stock_code) + '（' + p.stock_code + '）' + w.toFixed(0) + '%';
+    });
+    parts.push('現金 ' + (total > 0 ? (s.balance / total * 100).toFixed(0) : '0') + '%');
+    var days = s.health ? s.health.days_since_last_trade : null;
+    el.innerHTML =
+      '<div class="pt-mode-row"><span class="pt-mode-label">資金配置</span><span>' + parts.join('、') + '</span></div>' +
+      (days != null && days >= 0
+        ? '<div class="pt-mode-row"><span class="pt-mode-label">上次成交</span><span>' + days + ' 天前</span></div>'
+        : '') +
+      '<p class="pt-mode-note">0050 是基準部位，由再平衡程式維持在約 80%。系統每天幫觀察名單裡的股票打分數，' +
+      '但個股要真的買進，量化模型對那檔股票的歷史驗證分數（AUC）必須達到 0.6。' +
+      '沒有個股達標時就不買，資金留在 0050 與現金——這是刻意的設計，不是故障。</p>';
+  }
+
   function loadSummary() {
-    fetch('/api/paper-trading/summary')
+    return fetch('/api/paper-trading/summary')
       .then(function (r) { return r.json(); })
       .then(function (d) {
         if (d.error) return;
+        _state.summary = d;
         var el = function (id) { return document.getElementById(id); };
-        el('pt-balance') && (el('pt-balance').textContent = '$' + fmt(d.balance));
-        el('pt-total-assets') && (el('pt-total-assets').textContent = '$' + fmt(d.total_assets));
-        el('pt-stock-value') && (el('pt-stock-value').textContent = '$' + fmt(d.stock_value));
-        el('pt-position-count') && (el('pt-position-count').textContent = d.position_count);
-        el('pt-position-count-hero') && (el('pt-position-count-hero').textContent = d.position_count);
+        el('pt-balance') && (el('pt-balance').textContent = fmtMoney(d.balance));
+        el('pt-total-assets') && (el('pt-total-assets').textContent = fmtMoney(d.total_assets));
+        el('pt-stock-value') && (el('pt-stock-value').textContent = fmtMoney(d.stock_value));
         if (d.health) renderHealthBar(d.health);
+        renderTotalReturn();
       })
       .catch(function () {});
   }
 
   function loadPositions() {
-    fetch('/api/paper-trading/positions')
+    return fetch('/api/paper-trading/positions')
       .then(function (r) { return r.json(); })
       .then(function (d) {
         var tbody = document.getElementById('pt-positions-body');
-        if (!tbody) return;
         var rows = d.positions || [];
+        _state.positions = rows;
+        if (!tbody) return;
         if (rows.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="9" class="pt-placeholder">目前無持倉</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="10" class="pt-placeholder">目前沒有持股</td></tr>';
           return;
         }
+        var total = _state.summary ? Number(_state.summary.total_assets) : 0;
         tbody.innerHTML = rows.map(function (p) {
           var plClass = colorClass(p.profit_loss);
           return '<tr>' +
@@ -97,8 +134,9 @@
             '<td>' + fmt(p.quantity) + '</td>' +
             '<td>' + fmt(p.avg_cost) + '</td>' +
             '<td>' + fmt(p.current_price) + '</td>' +
-            '<td>' + fmt(p.market_value) + '</td>' +
-            '<td class="' + plClass + '">' + fmt(p.profit_loss) + '</td>' +
+            '<td>' + fmtMoney(p.market_value) + '</td>' +
+            '<td>' + (total > 0 ? (p.market_value / total * 100).toFixed(1) + '%' : '-') + '</td>' +
+            '<td class="' + plClass + '">' + fmtMoney(p.profit_loss, true) + '</td>' +
             '<td class="' + plClass + '">' + fmtPct(p.profit_loss_pct) + '</td>' +
             '<td>' + (p.updated_at ? p.updated_at.slice(0, 16) : '-') + '</td>' +
             '</tr>';
@@ -106,7 +144,7 @@
       })
       .catch(function () {
         var tbody = document.getElementById('pt-positions-body');
-        if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="pt-placeholder">載入失敗</td></tr>';
+        if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="pt-placeholder">載入失敗</td></tr>';
       });
   }
 
@@ -130,10 +168,10 @@
             '<td>' + (t.stock_code || '-') + '</td>' +
             '<td>' + fmt(t.price) + '</td>' +
             '<td>' + fmt(t.quantity) + '</td>' +
-            '<td class="' + amtClass + '">' + (t.amount >= 0 ? '+' : '') + fmt(t.amount) + '</td>' +
-            '<td>' + fmt(t.fee) + '</td>' +
-            '<td>' + fmt(t.tax) + '</td>' +
-            '<td>' + fmt(t.balance_after) + '</td>' +
+            '<td class="' + amtClass + '">' + fmtMoney(t.amount, true) + '</td>' +
+            '<td>' + fmtMoney(t.fee) + '</td>' +
+            '<td>' + fmtMoney(t.tax) + '</td>' +
+            '<td>' + fmtMoney(t.balance_after) + '</td>' +
             '<td>' + (t.note || '-') + '</td>' +
             '</tr>';
         }).join('');
@@ -182,7 +220,7 @@
               tooltip: {
                 callbacks: {
                   label: function (ctx) {
-                    return '$' + Number(ctx.raw).toLocaleString('zh-TW');
+                    return fmtMoney(ctx.raw);
                   },
                 },
               },
@@ -196,7 +234,7 @@
                 ticks: {
                   color: '#8da1bf',
                   font: { size: 11 },
-                  callback: function (v) { return '$' + Number(v).toLocaleString('zh-TW'); },
+                  callback: function (v) { return Number(v).toLocaleString('zh-TW'); },
                 },
                 grid: { color: 'rgba(148,163,184,0.08)' },
               },
@@ -237,8 +275,8 @@
   }
 
   function loadAll() {
-    loadSummary();
-    loadPositions();
+    // Positions need the summary's total to show each holding's weight.
+    loadSummary().then(loadPositions).then(renderMode);
     loadTransactions();
     loadBalanceChart();
     loadRecaps();
@@ -259,6 +297,13 @@
       }
     });
 
+    // Charts drawn inside a closed <details> have no size; redraw on open.
+    document.addEventListener('toggle', function (e) {
+      if (!e.target || !e.target.classList || !e.target.classList.contains('pt-fold') || !e.target.open) return;
+      [balanceChart, accuracyChart].concat(Object.keys(_perfCharts).map(function (k) { return _perfCharts[k]; }))
+        .forEach(function (c) { if (c) c.resize(); });
+    }, true);
+
     loadAll();
   });
 
@@ -275,7 +320,7 @@
     var wr = item.trades > 0 ? Math.round(item.wins / item.trades * 100) : 0;
     return '<div class="pt-perf-stock-row">' +
       '<span class="pt-perf-stock-code">' + item.code + '</span>' +
-      '<span class="' + sign + '">' + (item.pnl >= 0 ? '+' : '') + item.pnl.toLocaleString() + '</span>' +
+      '<span class="' + sign + '">' + fmtMoney(item.pnl, true) + '</span>' +
       '<span class="pt-perf-stock-wr">' + item.trades + '筆 ' + wr + '%</span>' +
       '</div>';
   }
@@ -286,16 +331,20 @@
       .then(function (d) {
         if (d.error) return;
         var s = d.summary || {};
+        if (s.start_capital) {
+          _state.startCapital = Number(s.start_capital);
+          renderTotalReturn();
+        }
 
         // Summary bar
         var sumEl = document.getElementById('pt-perf-summary');
         if (sumEl) {
           var pnlClass = (s.total_realized_pnl || 0) >= 0 ? 'pt-pos' : 'pt-neg';
           sumEl.innerHTML =
-            '<span class="pt-perf-stat">總交易 <b>' + (s.total_trades || 0) + '</b> 筆</span>' +
-            '<span class="pt-perf-stat">整體勝率 <b>' + (s.overall_win_rate || 0) + '%</b></span>' +
-            '<span class="pt-perf-stat">已實現損益 <b class="' + pnlClass + '">' +
-              ((s.total_realized_pnl || 0) >= 0 ? '+' : '') + (s.total_realized_pnl || 0).toLocaleString() + '</b></span>';
+            '<span class="pt-perf-stat">已賣出的交易 <b>' + (s.total_trades || 0) + '</b> 筆</span>' +
+            '<span class="pt-perf-stat">其中賺錢的比例 <b>' + (s.overall_win_rate || 0) + '%</b></span>' +
+            '<span class="pt-perf-stat">合計損益 <b class="' + pnlClass + '">' +
+              fmtMoney(s.total_realized_pnl || 0, true) + '</b></span>';
         }
 
         // Cumulative PnL
@@ -325,6 +374,17 @@
 
         // Monthly PnL
         var mon = d.monthly || [];
+        var noteEl = document.getElementById('pt-monthly-note');
+        if (noteEl) {
+          var now = new Date();
+          var thisMonth = now.getFullYear() + '-' + ('0' + (now.getMonth() + 1)).slice(-2);
+          var last = mon.length ? mon[mon.length - 1].month : null;
+          // A month appears only when something was sold; an empty stretch
+          // reads as a stalled page unless it says why.
+          noteEl.textContent = last && last < thisMonth
+            ? last + ' 之後沒有賣出任何股票，所以沒有新的月份損益；持股的帳面損益看最上面的「持股帳面損益」。'
+            : '';
+        }
         destroyChart('monthly');
         var monCtx = document.getElementById('pt-monthly-chart');
         if (monCtx && mon.length) {
@@ -348,8 +408,11 @@
           });
         }
 
-        // Rolling win rate
-        var roll = d.rolling_win_rate || [];
+        // Rolling win rate: one point per day (the API gives one per trade,
+        // and a day of many sells stacked a dozen points on one date).
+        var byDate = {};
+        (d.rolling_win_rate || []).forEach(function (r) { byDate[r.date] = r; });
+        var roll = Object.keys(byDate).sort().map(function (k) { return byDate[k]; });
         destroyChart('winrate');
         var wrCtx = document.getElementById('pt-winrate-chart');
         if (wrCtx && roll.length) {
@@ -399,8 +462,7 @@
 
   function fmtNTD(v) {
     if (v == null) return '無法取得即時價格';
-    var n = Math.round(Number(v));
-    return (n >= 0 ? '+' : '') + n.toLocaleString('zh-TW') + ' NT$';
+    return fmtMoney(v, true);
   }
 
   function fmtPctSigned(v) {

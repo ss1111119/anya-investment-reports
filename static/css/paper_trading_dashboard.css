@@ -563,3 +563,72 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Plain-language layout (2026-10-11): status first, detail folded ── */
+.pt-card-sub {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #8da1bf;
+  line-height: 1.5;
+}
+
+.pt-mode-row {
+  display: flex;
+  gap: 12px;
+  padding: 6px 0;
+  font-size: 15px;
+  color: #e5eefc;
+}
+
+.pt-mode-label {
+  flex: 0 0 72px;
+  color: #8da1bf;
+}
+
+.pt-mode-note {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #a8bdd4;
+}
+
+.pt-note {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #8da1bf;
+}
+
+.pt-fold {
+  margin-bottom: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.10);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.pt-fold > summary {
+  cursor: pointer;
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #a8bdd4;
+  list-style-position: inside;
+}
+
+.pt-fold[open] > summary {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.10);
+}
+
+.pt-fold-body {
+  padding: 16px 20px 20px;
+}
+
+.pt-fold-body .pt-perf-chart-box + .pt-perf-chart-box {
+  margin-top: 16px;
+}
+
+@media (max-width: 760px) {
+  .pt-mode-row { flex-direction: column; gap: 2px; }
+  .pt-fold > summary { padding: 12px 16px; }
+  .pt-fold-body { padding: 12px 16px 16px; }
+}
