@@ -99,11 +99,11 @@ function collapseAllSections() {
 }
 
 const WEEKLY_TEMPLATE_SECTION_ORDER = {
-  'Pre-open': ['hero', 'observation', 'us_macro', 'sa_consensus', 'social_heatmap', 'taiex', 'market_snapshot', 'tw_internals', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
-  'Close Summary': ['hero', 'observation', 'taiex', 'institutional', 'tw_internals','sector_flow', 'sa_consensus', 'social_heatmap', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
-  'Midweek Risk': ['hero', 'observation', 'interpretation', 'taiex', 'institutional', 'tw_internals','market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
-  'Weekend Macro': ['hero', 'observation', 'us_macro', 'sa_consensus', 'social_heatmap', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'institutional', 'tw_internals','interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
-  'Next Week Preview': ['hero', 'observation', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'institutional', 'tw_internals','market_snapshot', 'kol', 'history_strip', 'ai'],
+  'Pre-open': ['hero', 'observation', 'us_macro', 'sa_consensus', 'social_heatmap', 'taiex', 'etf_0050', 'market_snapshot', 'tw_internals', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
+  'Close Summary': ['hero', 'observation', 'taiex', 'etf_0050', 'institutional', 'tw_internals','sector_flow', 'sa_consensus', 'social_heatmap', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
+  'Midweek Risk': ['hero', 'observation', 'interpretation', 'taiex', 'etf_0050', 'institutional', 'tw_internals','market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
+  'Weekend Macro': ['hero', 'observation', 'us_macro', 'sa_consensus', 'social_heatmap', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'etf_0050', 'institutional', 'tw_internals','interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
+  'Next Week Preview': ['hero', 'observation', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'etf_0050', 'institutional', 'tw_internals','market_snapshot', 'kol', 'history_strip', 'ai'],
 };
 
 // Maps an APPROVED_CHART_LIBRARY chart id to the on-page section anchor that renders it.
@@ -220,6 +220,7 @@ function buildReportSectionMap(d, family) {
   const historyStrip = d.history_7d ? renderHistoryStrip(d.history_7d) : '';
   const freshnessNotice = renderDataFreshnessNotice(d.data_health);
   const observation = d.observation ? renderObservation(d.observation) : '';
+  const etf0050 = d.etf_0050 ? renderEtf0050(d.etf_0050) : '';
 
   return {
     hero: `
@@ -242,6 +243,7 @@ function buildReportSectionMap(d, family) {
       </div>`,
     observation,
     taiex,
+    etf_0050: etf0050,
     market_snapshot: marketSnapshot,
       premarket,
       history,
@@ -889,6 +891,40 @@ function renderHistoryTable(rows) {
   return card('sec-history','📅 近期歷史走勢', `<table><thead>${header}</thead><tbody>${body}</tbody></table>`);
 }
 
+// ── 0050 status: describes, never advises ────────────────────────────────────
+// Timing signals measured no edge (live AUC 0.4951), so this block states
+// where 0050 stands and nothing about what to do. No historical percentiles:
+// they read as entry signals.
+function renderEtf0050(e) {
+  const lag = e.lag_sessions || 0;
+  const lagBadge = lag >= 1
+    ? ` <span style="font-size:11px;color:var(--yellow);font-weight:700;border:1px solid rgba(240,195,74,.25);background:rgba(240,195,74,.08);padding:2px 8px;border-radius:999px;">資料延遲 ${lag} 個交易日</span>`
+    : '';
+  const change = (lag < 3 && e.change_pct != null)
+    ? `<span class="${cls(e.change_pct)}" style="margin-left:8px">${fmtPct(e.change_pct)}</span>`
+    : '';
+  const ret = k => e.returns && e.returns[k] != null ? fmtPct(e.returns[k]) : '—';
+  const muted = 'font-size:12px;color:var(--muted)';
+  const body = `
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end">
+      <div>
+        <div style="${muted}">成交價（資料截至 ${e.price_date || '—'}）</div>
+        <div style="font-size:24px;font-weight:700">${e.close != null ? fmt(e.close) : '—'}${change}</div>
+      </div>
+      <div>
+        <div style="${muted}">距近一年高點（還原價）</div>
+        <div style="font-size:18px;font-weight:600">${e.drawdown_1y_pct != null ? fmtPct(e.drawdown_1y_pct) : '—'}</div>
+        <div style="${muted}">高點 ${e.high_1y_date || '—'}</div>
+      </div>
+    </div>
+    <table style="margin-top:12px">
+      <thead><tr><th>累積含息報酬（還原價，非年化）</th><th>近 1 年</th><th>近 3 年</th><th>近 5 年</th></tr></thead>
+      <tbody><tr><td style="${muted}">截至 ${e.asof || '—'}</td><td>${ret('1y')}</td><td>${ret('3y')}</td><td>${ret('5y')}</td></tr></tbody>
+    </table>
+    <div style="margin-top:8px;${muted}">只描述現況，不構成投資建議；過去報酬不代表未來。</div>`;
+  return card('sec-etf0050', `📌 0050 現況${lagBadge}`, body);
+}
+
 // ── Institutional ─────────────────────────────────────────────────────────────
 function renderInstitutional(inst) {
   const items=[{n:'外資',v:inst.foreign_net},{n:'投信',v:inst.trust_net},{n:'自營商',v:inst.dealer_net}];
@@ -1265,13 +1301,29 @@ function renderHistoryStrip(h) {
     : sig === 'neutral' ? 'hs-pill-neutral'
     : 'hs-pill-empty';
 
+  // Signals before 2026-10-11 were partly driven by keywords in the generated
+  // text; from then on they come from market numbers. Mark where that changes
+  // so the two are not read as one comparable series.
+  const RULE_BOUNDARY_NOTE = '10-11 起改以市場數字判斷';
+  let sawLegacy = false;
+  let boundaryShown = false;
   const signalCells = h.signals.map(s => {
     const dateShort = s.date ? s.date.slice(5) : '—';
-    return `<div class="hs-pill ${signalClass(s.signal)}" title="${escapeHtml(s.date || '')}: ${signalLabel(s.signal)}">
+    let divider = '';
+    if (s.rule_version === 'legacy') sawLegacy = true;
+    if (s.rule_version && s.rule_version !== 'legacy' && sawLegacy && !boundaryShown) {
+      boundaryShown = true;
+      divider = `<div title="${escapeHtml(RULE_BOUNDARY_NOTE)}" style="align-self:stretch;border-left:2px dashed var(--accent);margin:0 2px;"></div>`;
+    }
+    const source = s.source_report_type ? `（${TYPE_LABELS[s.source_report_type] || s.source_report_type}）` : '';
+    return `${divider}<div class="hs-pill ${signalClass(s.signal)}" title="${escapeHtml(s.date || '')}${escapeHtml(source)}: ${signalLabel(s.signal)}">
       <div class="hs-pill-label">${signalLabel(s.signal)}</div>
       <div class="hs-pill-date">${escapeHtml(dateShort)}</div>
     </div>`;
   }).join('');
+  const boundaryNote = boundaryShown
+    ? `<div style="margin-top:6px;font-size:12px;color:var(--muted)">虛線左側為舊規則（會受 AI 文字用詞影響），${RULE_BOUNDARY_NOTE}，兩側不可直接比較。</div>`
+    : '';
 
   const verdictIcon = (v) => v === 'accurate' ? '✅'
     : v === 'partially_accurate' ? '⚡'
@@ -1308,10 +1360,12 @@ function renderHistoryStrip(h) {
     : '';
 
   const body = `
-    <div class="hs-subtitle">訊號連續性</div>
+    <div class="hs-subtitle">方向訊號歷史</div>
     <div class="hs-row">${signalCells}</div>
-    <div class="hs-subtitle" style="margin-top:14px">預測準度</div>
+    ${boundaryNote}
+    <div class="hs-subtitle" style="margin-top:14px">預測驗證</div>
     <div class="hs-row">${predictionCells}</div>
+    <div style="margin-top:6px;font-size:12px;color:var(--muted)">比對早報中的具體預測與台股收盤；— 表示尚無可驗證資料。驗證對象不是上方的方向訊號。</div>
     <div style="margin-top:8px">${accuracyText}</div>
     ${topicsBlock}
   `;
