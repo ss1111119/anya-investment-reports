@@ -99,11 +99,11 @@ function collapseAllSections() {
 }
 
 const WEEKLY_TEMPLATE_SECTION_ORDER = {
-  'Pre-open': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'taiex', 'market_snapshot', 'tw_internals', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
-  'Close Summary': ['hero', 'taiex', 'institutional', 'tw_internals','sector_flow', 'sa_consensus', 'social_heatmap', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
-  'Midweek Risk': ['hero', 'interpretation', 'taiex', 'institutional', 'tw_internals','market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
-  'Weekend Macro': ['hero', 'us_macro', 'sa_consensus', 'social_heatmap', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'institutional', 'tw_internals','interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
-  'Next Week Preview': ['hero', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'institutional', 'tw_internals','market_snapshot', 'kol', 'history_strip', 'ai'],
+  'Pre-open': ['hero', 'observation', 'us_macro', 'sa_consensus', 'social_heatmap', 'taiex', 'market_snapshot', 'tw_internals', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
+  'Close Summary': ['hero', 'observation', 'taiex', 'institutional', 'tw_internals','sector_flow', 'sa_consensus', 'social_heatmap', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
+  'Midweek Risk': ['hero', 'observation', 'interpretation', 'taiex', 'institutional', 'tw_internals','market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
+  'Weekend Macro': ['hero', 'observation', 'us_macro', 'sa_consensus', 'social_heatmap', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'institutional', 'tw_internals','interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
+  'Next Week Preview': ['hero', 'observation', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'institutional', 'tw_internals','market_snapshot', 'kol', 'history_strip', 'ai'],
 };
 
 // Maps an APPROVED_CHART_LIBRARY chart id to the on-page section anchor that renders it.
@@ -219,6 +219,7 @@ function buildReportSectionMap(d, family) {
   const predictionReview = d.prediction_review?.available !== false ? renderPredictionReview(d.prediction_review) : '';
   const historyStrip = d.history_7d ? renderHistoryStrip(d.history_7d) : '';
   const freshnessNotice = renderDataFreshnessNotice(d.data_health);
+  const observation = d.observation ? renderObservation(d.observation) : '';
 
   return {
     hero: `
@@ -239,6 +240,7 @@ function buildReportSectionMap(d, family) {
           </div>
         </div>
       </div>`,
+    observation,
     taiex,
     market_snapshot: marketSnapshot,
       premarket,
@@ -1137,6 +1139,40 @@ function renderChartOrchestration(o) {
 
   html += '</div>';
   return card('sec-chart-orchestration', '🧭 今日圖表重點', html, { collapsible: true });
+}
+
+// ── Next-session observation ─────────────────────────────────────────────────
+// Rule-based: the state, factors and conditions come from market numbers in the
+// payload (ReportGenerator._observe), not from generated text. It is framed as
+// what to watch, not what to do -- the system has no demonstrated edge.
+function renderObservation(o) {
+  if (!o || !o.state) return '';
+  const escapeHtml = (value = '') => String(value)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  const WEEKDAY = ['日', '一', '二', '三', '四', '五', '六'];
+  let sessionText = '';
+  if (o.next_session) {
+    const weekday = new Date(`${o.next_session}T12:00:00Z`).getUTCDay();
+    sessionText = `（${o.next_session.slice(5)} 週${WEEKDAY[weekday]}）`;
+  }
+  const list = (label, items) => (items && items.length)
+    ? `<div class="interpret-note" style="margin-top:6px"><strong>${escapeHtml(label)}</strong>${items.map(escapeHtml).join('；')}</div>`
+    : '';
+  const stateClass = o.state === '偏多觀察' ? 'up' : o.state === '偏空觀察' ? 'dn' : '';
+  const body = `
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">
+      ${o.as_of ? `資料截止 ${escapeHtml(o.as_of)}｜` : ''}${escapeHtml(o.disclaimer || '依目前資料整理的情境，不構成投資建議')}
+    </div>
+    <div class="interpret-summary">基準情境：<span class="${stateClass}" style="font-weight:700">${escapeHtml(o.state)}</span></div>
+    ${list('偏空因素：', o.bear)}
+    ${list('偏多因素：', o.bull)}
+    ${list('未達門檻：', o.below)}
+    ${list(o.state === '偏空觀察' ? '偏空延續的確認：' : o.state === '偏多觀察' ? '偏多延續的確認：' : '觀察：', o.confirm)}
+    ${list(o.state === '偏空觀察' ? '偏空不成立：' : '偏多不成立：', o.invalid)}
+    ${list('⏱ 資料偏舊、未納入判斷：', o.stale)}
+  `;
+  return card('sec-observation', `🔭 下一交易日觀察重點${escapeHtml(sessionText)}`, body);
 }
 
 // ── Data freshness ───────────────────────────────────────────────────────────
