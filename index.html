@@ -50,24 +50,11 @@
   </div>
 </header>
 
-<nav class="anchor-nav">
+<nav class="anchor-nav" aria-label="章節目錄">
   <div class="anchor-nav-inner">
-    <a href="#sec-hero">概覽</a>
-    <a href="#sec-macro">美股指標</a>
-    <a href="#sec-commodity">商品走勢</a>
-    <a href="#sec-sentiment">市場情緒</a>
-    <a href="#sec-tw">台股盤前</a>
-    <a href="#sec-history">歷史走勢</a>
-    <a href="#sec-yield-oil">美債油價</a>
-    <a href="#sec-sa-consensus">分析師共識</a>
-    <a href="#sec-social-heatmap">社群熱度</a>
-    <a href="#sec-inst">三大法人</a>
-    <a href="#sec-sector">板塊流向</a>
-    <a href="#sec-chart-orchestration">圖表編排</a>
-    <a href="#sec-kol">KOL 情緒</a>
-    <a href="#sec-prediction-review">預測驗證</a>
-    <a href="#sec-history-strip">歷史對比</a>
-    <a href="#sec-ai">AI 分析</a>
+    <button type="button" class="anchor-toggle" id="anchor-toggle" aria-expanded="false" aria-controls="anchor-links" onclick="toggleAnchorNav()">☰ 章節目錄 <span id="anchor-count"></span></button>
+    <!-- Links are generated from the sections actually rendered (buildAnchorNav). -->
+    <div class="anchor-links" id="anchor-links"></div>
     <div class="anchor-nav-spacer"></div>
     <div class="anchor-nav-tools">
       <button type="button" class="nav-btn nav-btn-ghost" onclick="expandAllSections()" title="展開所有可折疊章節">全部展開</button>

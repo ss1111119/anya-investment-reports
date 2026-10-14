@@ -10,8 +10,13 @@ let _currentReportIndex = -1;
 let _anchorsObserver = null;
 let _backTopBound = false;
 const SECTION_COLLAPSE_STORAGE_KEY = 'anya.report.section-collapse.v1';
-const DEFAULT_COLLAPSED_SECTIONS = new Set(['sec-chart-orchestration', 'sec-news', 'sec-kol', 'sec-social-heatmap']);
+const DEFAULT_COLLAPSED_SECTIONS = new Set(['sec-news', 'sec-kol', 'sec-social-heatmap']);
 let _sectionCollapseState = loadSectionCollapseState();
+// Set per render: the report's own date and its data_health, so every number
+// can say when it is from and whether it is stale, next to the number itself.
+let _reportDate = '';
+let _dataHealth = {};
+let _usLatestDate = '';
 
 // Type labels
 const TYPE_LABELS = {
@@ -35,6 +40,57 @@ const fgClass = lbl => {
   const l = lbl.toLowerCase();
   return l.includes('greed') ? 'fg-greed' : l.includes('fear') ? 'fg-fear' : 'fg-neutral';
 };
+
+const escHtml = (value = '') => String(value)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+const shortDate = s => {
+  const ds = String(s || '').slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(ds) ? ds.slice(5) : ds;
+};
+
+// Data-date tag shown beside a number. Nothing when the data is from the
+// report's own date and not stale; a muted date when it is from another day
+// (e.g. US close in a Taipei morning report); a yellow flag when stale.
+function dateTag(dataDate, { stale = false } = {}) {
+  const ds = String(dataDate || '').slice(0, 10);
+  if(!ds && !stale) return '';
+  const differs = ds && _reportDate && ds !== _reportDate;
+  if(!differs && !stale) return '';
+  const text = ds ? `${stale ? '⏱ ' : ''}${shortDate(ds)}${stale ? ' 偏舊' : ''}` : '⏱ 偏舊';
+  const title = ds ? `資料日期 ${ds}${stale ? '（偏舊）' : ''}` : '資料偏舊';
+  return `<span class="data-tag${stale ? ' is-stale' : ''}" title="${escHtml(title)}">${escHtml(text)}</span>`;
+}
+
+// Period of a change / return figure: 單日, 夜盤, 近 1 年 ...
+const periodTag = text => `<span class="period-tag">${escHtml(text)}</span>`;
+
+const healthStale = key => _dataHealth?.[key]?.state === 'STALE';
+
+// Last date that actually carries a value in a {dates, series[].values} block.
+function seriesLastDate(series, dates) {
+  const vals = Array.isArray(series?.values) ? series.values : [];
+  for(let i = vals.length - 1; i >= 0; i--) {
+    if(vals[i] && vals[i].raw != null && vals[i].date) return vals[i].date;
+  }
+  return Array.isArray(dates) && dates.length ? dates[dates.length - 1] : '';
+}
+
+// A US-market series is stale when it ends before the newest US session
+// present elsewhere in the same report (us_macro).
+const usSeriesStale = ds => Boolean(ds && _usLatestDate && String(ds).slice(0, 10) < _usLatestDate);
+
+// Date of the TAIEX figure in sentiment.tw_index, which carries none itself:
+// borrow it from a dated row that shows the same close.
+function taiexDate(d) {
+  const idx = d.sentiment?.tw_index;
+  if(!idx || idx.price == null) return '';
+  const t = d.tw_market_internals?.turnover;
+  if(t && t.date && t.price != null && Math.abs(Number(t.price) - Number(idx.price)) < 0.01) return t.date;
+  const hist = Array.isArray(d.taiex_history) ? d.taiex_history : [];
+  const row = hist.slice().reverse().find(r => r && r.close != null && Math.abs(Number(r.close) - Number(idx.price)) < 0.01);
+  return row?.date || '';
+}
 
 function loadSectionCollapseState() {
   try {
@@ -88,6 +144,8 @@ function setAllCollapsibleSections(collapsed) {
       setSectionCollapsed(id, collapsed);
     }
   });
+  document.querySelectorAll('details.sub-fold').forEach(el => { el.open = !collapsed; });
+  closeAnchorNav();
 }
 
 function expandAllSections() {
@@ -98,12 +156,15 @@ function collapseAllSections() {
   setAllCollapsibleSections(true);
 }
 
+// The TAIEX banner now lives inside the hero's key numbers, and 圖表重點 /
+// AI 深度分析 are folded into the 盤勢解讀 card ('interpretation'), so
+// 'taiex', 'chart_orchestration' and 'ai' no longer appear as their own slots.
 const WEEKLY_TEMPLATE_SECTION_ORDER = {
-  'Pre-open': ['hero', 'observation', 'us_macro', 'sa_consensus', 'social_heatmap', 'taiex', 'etf_0050', 'market_snapshot', 'tw_internals', 'premarket', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
-  'Close Summary': ['hero', 'observation', 'taiex', 'etf_0050', 'institutional', 'tw_internals','sector_flow', 'sa_consensus', 'social_heatmap', 'us_sector_history', 'history', 'interpretation', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
-  'Midweek Risk': ['hero', 'observation', 'interpretation', 'taiex', 'etf_0050', 'institutional', 'tw_internals','market_snapshot', 'sector_flow', 'sa_consensus', 'social_heatmap', 'us_sector_history', 'history', 'chart_orchestration', 'news', 'kol', 'prediction_review', 'history_strip', 'ai'],
-  'Weekend Macro': ['hero', 'observation', 'us_macro', 'sa_consensus', 'social_heatmap', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'etf_0050', 'institutional', 'tw_internals','interpretation', 'chart_orchestration', 'news', 'kol', 'history_strip', 'ai'],
-  'Next Week Preview': ['hero', 'observation', 'interpretation', 'chart_orchestration', 'sa_consensus', 'social_heatmap', 'news', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'taiex', 'etf_0050', 'institutional', 'tw_internals','market_snapshot', 'kol', 'history_strip', 'ai'],
+  'Pre-open': ['hero', 'observation', 'etf_0050', 'premarket', 'us_macro', 'interpretation', 'market_snapshot', 'tw_internals', 'history', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'history_strip'],
+  'Close Summary': ['hero', 'observation', 'etf_0050', 'interpretation', 'institutional', 'tw_internals', 'sector_flow', 'us_sector_history', 'history', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'prediction_review', 'history_strip'],
+  'Midweek Risk': ['hero', 'observation', 'etf_0050', 'interpretation', 'premarket', 'institutional', 'tw_internals', 'market_snapshot', 'sector_flow', 'us_macro', 'us_sector_history', 'history', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'prediction_review', 'history_strip'],
+  'Weekend Macro': ['hero', 'observation', 'etf_0050', 'interpretation', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'institutional', 'tw_internals', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'history_strip'],
+  'Next Week Preview': ['hero', 'observation', 'etf_0050', 'interpretation', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'institutional', 'tw_internals', 'market_snapshot', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'history_strip'],
 };
 
 // Maps an APPROVED_CHART_LIBRARY chart id to the on-page section anchor that renders it.
@@ -166,32 +227,60 @@ function buildReportSectionMap(d, family) {
   const emoji = sig==='bullish'?'📈':sig==='bearish'?'📉':'📊';
   const familyClass = familyClassName(family);
   const typeLabel = TYPE_LABELS[d.report_type] || d.report_type || '';
-  const actionBadge = d.headline?.action ? `<span class="action-badge action-${sig}">${d.headline.action}</span>` : '';
-  const taiex = d.sentiment && d.sentiment.tw_index && d.sentiment.tw_index.price ? (() => {
-    const idx = d.sentiment.tw_index;
-    const changeVal = Number(idx.change ?? 0);
+  const actionBadge = d.headline?.action ? `<span class="action-badge action-${sig}">${escHtml(d.headline.action)}</span>` : '';
+
+  // Quick-summary key numbers for the first screen. Each tile names its period
+  // and carries its own data date.
+  const keyTiles = [];
+  const idx = d.sentiment?.tw_index;
+  if(idx && idx.price) {
+    const changeVal = idx.change != null ? Number(idx.change) : null;
     const changePctVal = idx.change_pct != null ? Number(idx.change_pct) : null;
-    const isUp = changeVal >= 0;
-    const arrow = isUp ? '▲' : '▼';
-    const clsName = isUp ? 'up' : 'dn';
-    const pointText = `${arrow} ${Math.abs(changeVal).toFixed(2)} 點`;
-    const pctText = changePctVal != null ? ` (${changePctVal >= 0 ? '+' : '-'}${Math.abs(changePctVal).toFixed(2)}%)` : '';
-    const chgStr = `${pointText}${pctText}`;
-    const formatPrice = new Intl.NumberFormat('en-US').format(idx.price);
-    return `
-      <div class="taiex-banner ${clsName}">
-        <div>
-          <div class="taiex-label">加權指數 TAIEX</div>
-          <div class="taiex-price">${formatPrice}</div>
-        </div>
-        <div class="taiex-chg ${clsName}">${chgStr}</div>
-      </div>
-    `;
-  })() : '';
+    const pts = changeVal != null ? `${arr(changeVal)} ${fmt(Math.abs(changeVal))} 點` : '';
+    const pct = changePctVal != null ? ` (${fmtPct(changePctVal)})` : '';
+    keyTiles.push(`
+      <div class="key-tile">
+        <div class="key-label">加權指數 TAIEX ${dateTag(taiexDate(d))}</div>
+        <div class="key-value">${new Intl.NumberFormat('en-US').format(idx.price)}</div>
+        <div class="key-chg ${cls(changeVal)}">${pts}${pct} ${periodTag('單日')}</div>
+      </div>`);
+  }
+  const rich = d.tw_premarket?.rich_fut;
+  if(rich && rich.value != null) {
+    keyTiles.push(`
+      <div class="key-tile">
+        <div class="key-label">台指期夜盤 ${dateTag(rich.latest_date, { stale: Boolean(rich.stale) })}</div>
+        <div class="key-value ${cls(rich.change_pct)}">${fmtK(rich.value)}</div>
+        <div class="key-chg ${cls(rich.change_pct)}">${rich.change_pct != null ? `${arr(rich.change_pct)} ${fmtPct(rich.change_pct)}` : escHtml(rich.change_note || '漲跌幅暫無')} ${periodTag('夜盤')}</div>
+      </div>`);
+  }
+  const inst = d.institutional;
+  if(inst && inst.foreign_net != null) {
+    keyTiles.push(`
+      <div class="key-tile">
+        <div class="key-label">外資買賣超 ${dateTag(inst.date, { stale: Boolean(inst.stale) })}</div>
+        <div class="key-value ${cls(inst.foreign_net)}">${inst.foreign_net > 0 ? '+' : ''}${fmt(inst.foreign_net, 1)}<span class="key-unit"> 億</span></div>
+        <div class="key-chg flat">${periodTag('單日')}</div>
+      </div>`);
+  } else {
+    const sox = (d.us_macro || []).find(r => r.symbol === 'SOX');
+    if(sox && sox.value != null) {
+      keyTiles.push(`
+        <div class="key-tile">
+          <div class="key-label">${escHtml(sox.name || '費半')} ${dateTag(sox.date, { stale: healthStale('us_macro') })}</div>
+          <div class="key-value">${fmt(sox.value, 0)}</div>
+          <div class="key-chg ${cls(sox.change_pct)}">${arr(sox.change_pct)} ${fmtPct(sox.change_pct)} ${periodTag('單日')}</div>
+        </div>`);
+    }
+  }
+  const keyNumbers = keyTiles.length ? `<div class="hero-keys">${keyTiles.join('')}</div>` : '';
+  const cutoff = d.observation?.as_of || String(d.generated_at || '').replace('T', ' ').slice(0, 16);
+  // Teaser is generated text; it sometimes keeps markdown bold markers.
+  const teaser = String(d.headline?.teaser || '—').replace(/\*\*/g, '');
 
     const marketSnapshot = (d.sentiment || d.tw_premarket)
       ? `<div class="two-col">
-           ${d.sentiment ? renderSentiment(d.sentiment) : ''}
+           ${d.sentiment ? renderSentiment(d.sentiment, d) : ''}
            ${d.tw_premarket ? renderTwHistoryChart(d) : ''}
          </div>`
       : '';
@@ -204,15 +293,13 @@ function buildReportSectionMap(d, family) {
   const institutional = d.institutional ? renderInstitutional(d.institutional) : '';
   const sectorFlow = d.sector_flow ? renderSectorFlow(d.sector_flow) : '';
   const twInternals = d.tw_market_internals ? renderTwMarketInternals(d.tw_market_internals) : '';
-  const interpretation = (d.market_news || d.sentiment || d.tw_premarket || d.social_pulse || d.us_macro || d.ai_analysis)
+  const interpretation = (d.market_news || d.sentiment || d.tw_premarket || d.social_pulse || d.us_macro || d.ai_analysis || d.chart_orchestration)
     ? renderMarketInterpretation(d)
     : '';
-  const chartOrchestration = d.chart_orchestration ? renderChartOrchestration(d.chart_orchestration) : '';
   const news = d.market_news && (d.market_news.source_groups?.length || d.market_news.news_list?.length || d.market_news.themes?.length)
     ? renderMarketNews(d.market_news)
     : '';
   const kol = d.social_pulse ? renderKol(d.social_pulse) : '';
-  const ai = d.ai_analysis ? renderAI(d.ai_analysis) : '';
   const usMacro = d.us_macro?.length ? renderUsMacro(d.us_macro) : '';
   const saConsensus = d.sa_consensus ? renderSeekingAlphaConsensus(d.sa_consensus) : '';
   const socialHeatmap = d.social_topic_heatmap ? renderSocialTopicHeatmap(d.social_topic_heatmap) : '';
@@ -224,25 +311,30 @@ function buildReportSectionMap(d, family) {
 
   return {
     hero: `
-      <div id="sec-hero" class="section-card" style="padding:28px 32px;position:relative;overflow:hidden;margin-bottom:20px">
-        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--purple),var(--teal))"></div>
-        <div style="display:flex;align-items:center;gap:20px">
+      <div id="sec-hero" class="section-card hero-card">
+        <div class="hero-stripe"></div>
+        <div class="hero-top">
           <div class="signal-orb signal-${sig}">${emoji}</div>
-          <div style="flex:1">
+          <div class="hero-main">
             <div class="hero-meta">
-              <span class="hero-date">${d.date||''}</span>
-              <span class="type-badge type-${(d.report_type||'').replace('_','_')}">${typeLabel}</span>
-              <span class="family-badge family-${familyClass}">${family}</span>
+              <span class="hero-date-big">${escHtml(d.date||'')}</span>
+              <span class="type-badge type-${escHtml(d.report_type||'')}">${typeLabel}</span>
               <span class="signal-label label-${sig}">${sig==='bullish'?'偏多':sig==='bearish'?'偏空':'中性'}</span>
               ${actionBadge}
             </div>
-            <div id="hero-teaser">${d.headline?.teaser||'—'}</div>
-            ${freshnessNotice}
+            <div class="hero-cutoff">
+              ${cutoff ? `資料截止 ${escHtml(cutoff)}` : ''}
+              <span class="family-badge family-${familyClass}">${escHtml(family)}</span>
+            </div>
           </div>
         </div>
+        <div id="hero-teaser" class="is-clamped">${escHtml(teaser)}</div>
+        <button type="button" class="teaser-more" onclick="toggleTeaser(this)" aria-expanded="false">展開全文</button>
+        ${keyNumbers}
+        ${freshnessNotice}
       </div>`,
     observation,
-    taiex,
+    taiex: '',
     etf_0050: etf0050,
     market_snapshot: marketSnapshot,
       premarket,
@@ -254,12 +346,12 @@ function buildReportSectionMap(d, family) {
       sector_flow: sectorFlow,
     tw_internals: twInternals,
     interpretation,
-    chart_orchestration: chartOrchestration,
+    chart_orchestration: '',
     news,
     kol,
     prediction_review: predictionReview,
     history_strip: historyStrip,
-    ai,
+    ai: '',
     us_macro: usMacro,
     sa_consensus: saConsensus,
     social_heatmap: socialHeatmap,
@@ -483,12 +575,19 @@ function navigateReport(direction) {
 function render(d) {
   const family = getWeeklyTemplateFamily(d);
   _currentTemplateFamily = family;
+  _reportDate = String(d.date || '').slice(0, 10);
+  _dataHealth = (d.data_health && typeof d.data_health === 'object') ? d.data_health : {};
+  _usLatestDate = (d.us_macro || []).map(r => String(r.date || '').slice(0, 10)).filter(Boolean).sort().pop() || '';
   const sections = buildReportSectionMap(d, family);
   const order = WEEKLY_TEMPLATE_SECTION_ORDER[family] || WEEKLY_TEMPLATE_SECTION_ORDER['Pre-open'];
   const html = order.map(key => sections[key] || '').join('');
 
   document.getElementById('app').innerHTML = html;
   enhanceSectionShortcuts(order);
+  buildAnchorNav();
+  const teaserEl = document.getElementById('hero-teaser');
+  const moreBtn = document.querySelector('.teaser-more');
+  if(teaserEl && moreBtn && teaserEl.scrollHeight <= teaserEl.clientHeight + 2) moreBtn.hidden = true;
 
   // post-render: charts & markdown
     requestAnimationFrame(() => {
@@ -506,17 +605,68 @@ function render(d) {
     });
   }
 
+function toggleTeaser(btn) {
+  const el = document.getElementById('hero-teaser');
+  if(!el) return;
+  const clamped = el.classList.toggle('is-clamped');
+  btn.textContent = clamped ? '展開全文' : '收合';
+  btn.setAttribute('aria-expanded', String(!clamped));
+}
+
+// ── Section navigation (built from what was actually rendered) ──────────────
+const SECTION_NAV_LABELS = {
+  'sec-hero': '概覽', 'sec-observation': '觀察重點', 'sec-interpret': '盤勢解讀',
+  'sec-tw': '台股盤前', 'sec-macro': '美股指標', 'sec-commodity': '商品走勢',
+  'sec-yield-oil': '美債油價', 'sec-us-sector': '美股類股', 'sec-sentiment': '市場情緒',
+  'sec-etf0050': '0050', 'sec-inst': '三大法人', 'sec-tw-internals': '內部結構',
+  'sec-sector': '板塊流向', 'sec-history': '歷史走勢', 'sec-sa-consensus': '分析師共識',
+  'sec-social-heatmap': '社群熱度', 'sec-news': '新聞', 'sec-kol': 'KOL 情緒',
+  'sec-prediction-review': '預測驗證', 'sec-history-strip': '歷史對比', 'sec-ai': 'AI 分析',
+};
+
+function buildAnchorNav() {
+  const host = document.getElementById('anchor-links');
+  if(!host) return;
+  const ids = Array.from(document.querySelectorAll('#app [id^="sec-"]'))
+    .map(el => el.id)
+    .filter((id, i, all) => SECTION_NAV_LABELS[id] && all.indexOf(id) === i);
+  host.innerHTML = ids.map(id =>
+    `<a href="#${id}" data-target="${id}">${escHtml(SECTION_NAV_LABELS[id])}</a>`).join('');
+  host.querySelectorAll('a').forEach(a => a.addEventListener('click', ev => {
+    ev.preventDefault();
+    closeAnchorNav();
+    jumpToSection(a.dataset.target);
+  }));
+  const count = document.getElementById('anchor-count');
+  if(count) count.textContent = `${ids.length} 節`;
+}
+
+function toggleAnchorNav() {
+  const nav = document.querySelector('.anchor-nav');
+  if(!nav) return;
+  const open = nav.classList.toggle('is-open');
+  document.getElementById('anchor-toggle')?.setAttribute('aria-expanded', String(open));
+}
+
+function closeAnchorNav() {
+  document.querySelector('.anchor-nav')?.classList.remove('is-open');
+  document.getElementById('anchor-toggle')?.setAttribute('aria-expanded', 'false');
+}
+
 // ── US Macro ─────────────────────────────────────────────────────────────────
 function renderUsMacro(rows) {
+  const stale = healthStale('us_macro');
   const chips = rows.map(r => `
     <div class="macro-chip">
-      <div class="chip-name">${r.name}</div>
+      <div class="chip-name">${escHtml(r.name)}</div>
       <div class="chip-value">${fmt(r.value, r.value>1000?0:2)}</div>
       <div class="chip-chg ${cls(r.change_pct)}">
-        ${arr(r.change_pct)} ${fmtPct(r.change_pct)}
+        ${arr(r.change_pct)} ${fmtPct(r.change_pct)} ${periodTag('單日')} ${dateTag(r.date, { stale })}
       </div>
     </div>`).join('');
-  return card('sec-macro','🌐 美股宏觀指標', `<div class="macro-grid">${chips}</div>`);
+  return card('sec-macro','🌐 美股宏觀指標', `
+    <div class="card-note">漲跌皆為該資料日的單日變動；資料日與報告日不同時，日期標在漲跌旁。</div>
+    <div class="macro-grid">${chips}</div>`);
 }
 
 function renderSeekingAlphaConsensus(sa) {
@@ -640,11 +790,14 @@ function renderSocialTopicHeatmap(heatmap) {
       暫無可顯示的熱門社群討論。
     </div>
   `;
-  return card('sec-social-heatmap', `📡 市場注意力雷達${asOf ? ` <span style="font-size:11px;color:var(--muted);font-weight:400">(${escapeHtml(asOf)})</span>` : ''}`, body, { collapsible: true });
+  const peekTopics = topics.slice(0, 3).map(t => t.topic).filter(Boolean);
+  return card('sec-social-heatmap', `📡 市場注意力雷達${asOf ? ` <span style="font-size:11px;color:var(--muted);font-weight:400">(${escapeHtml(String(asOf).replace('T', ' ').slice(0, 16))})</span>` : ''}`, body, { collapsible: true, peek: peekTopics.length ? `熱門：${peekTopics.join('、')}` : '' });
 }
 
 // ── Sentiment ─────────────────────────────────────────────────────────────────
-function renderSentiment(s) {
+function renderSentiment(s, d = {}) {
+  const t = d.tw_market_internals?.turnover;
+  const breadthDate = (t && t.up_count != null && t.up_count === s.tw_market?.gainers) ? t.date : '';
   const cnn    = s.cnn    || {};
   const crypto = s.crypto || {};
   const tw_g   = s.tw_greed || {};
@@ -682,7 +835,7 @@ function renderSentiment(s) {
         </div>
       </div>
       <div class="fg-card" style="justify-content:center">
-        <div class="fg-label">台股市場廣度</div>
+        <div class="fg-label">台股市場廣度 ${dateTag(breadthDate)}</div>
         <div style="font-size:32px; font-weight:800; margin:10px 0; line-height:1;">
           <span class="up">${tw.gainers??'—'}</span>
           <span style="color:var(--muted); font-size:18px; font-weight:400; margin:0 4px;">/</span>
@@ -725,14 +878,17 @@ function renderSentiment(s) {
     };
     const title = titleMap[_currentTemplateFamily || 'Weekend Macro'] || '📦 關鍵商品價格走勢';
     const series = Array.isArray(c.series) ? c.series : [];
+    const dates = Array.isArray(c.dates) ? c.dates : [];
     const chips = series.map(s => `
       <div class="macro-chip">
-        <div class="chip-name">${s.name}</div>
-        <div class="chip-value">${s.latest != null ? fmt(s.latest, s.symbol === 'DXY' ? 2 : 2) : '資料待補'}</div>
-        <div class="chip-chg ${cls(s.change_pct)}">${arr(s.change_pct)} ${fmtPct(s.change_pct)}</div>
+        <div class="chip-name">${escHtml(s.name)}</div>
+        <div class="chip-value">${s.latest != null ? fmt(s.latest, 2) : '資料待補'}</div>
+        <div class="chip-chg ${cls(s.change_pct)}">${arr(s.change_pct)} ${fmtPct(s.change_pct)} ${periodTag('單日')} ${(() => { const ds = seriesLastDate(s, c.dates); return dateTag(ds, { stale: usSeriesStale(ds) }); })()}</div>
       </div>
     `).join('');
+    const lastC = dates.length ? dates[dates.length - 1] : '';
     return card('sec-commodity', title, `
+      <div class="card-note">卡片數字為最新資料日的單日漲跌；下方走勢圖為${dates.length ? ` ${shortDate(dates[0])} ~ ${shortDate(lastC)} ` : '區間'}累積變化（起點=100）。</div>
       <div class="macro-grid">${chips}</div>
       <div style="margin-top:14px;height:260px;"><canvas id="commodity-chart"></canvas></div>
     `);
@@ -750,14 +906,14 @@ function renderSentiment(s) {
     const dateRange = dates.length ? `資料區間：${dates[0]} ~ ${dates[dates.length - 1]}` : '';
     const chips = series.map(s => `
       <div class="macro-chip">
-        <div class="chip-name">${s.name}</div>
+        <div class="chip-name">${escHtml(s.name)}</div>
         <div class="chip-value">${s.latest != null ? fmt(s.latest, 2) : '資料待補'}</div>
-        <div class="chip-chg ${cls(s.change_pct)}">${arr(s.change_pct)} ${fmtPct(s.change_pct)}</div>
+        <div class="chip-chg ${cls(s.change_pct)}">${arr(s.change_pct)} ${fmtPct(s.change_pct)} ${periodTag('單日')} ${(() => { const ds = seriesLastDate(s, c.dates); return dateTag(ds, { stale: usSeriesStale(ds) }); })()}</div>
       </div>
     `).join('');
     return card('sec-yield-oil', title, `
+      <div class="card-note">卡片數字為最新資料日的單日變動；走勢圖為區間累積變化（起點=100）。${dateRange ? `${dateRange}。` : ''}</div>
       <div class="macro-grid">${chips}</div>
-      ${dateRange ? `<div style="margin-top:8px;font-size:11px;color:var(--muted);">${dateRange}</div>` : ''}
       <div style="margin-top:14px;height:260px;"><canvas id="yield-oil-chart"></canvas></div>
     `);
   }
@@ -821,14 +977,14 @@ function renderSentiment(s) {
       : '最新交易日｜—';
     const chips = series.map(s => `
       <div class="macro-chip">
-        <div class="chip-name">${s.name}</div>
+        <div class="chip-name">${escHtml(s.name)}</div>
         <div class="chip-value">${s.latest != null ? fmt(s.latest, 2) : '資料待補'}</div>
-        <div class="chip-chg ${cls(s.change_pct)}">${arr(s.change_pct)} ${fmtPct(s.change_pct)}</div>
+        <div class="chip-chg ${cls(s.change_pct)}">${arr(s.change_pct)} ${fmtPct(s.change_pct)} ${periodTag('單日')} ${(() => { const ds = seriesLastDate(s, c.dates); return dateTag(ds, { stale: usSeriesStale(ds) }); })()}</div>
       </div>
     `).join('');
     return card('sec-us-sector', title, `
+      <div class="card-note">類股卡片為最新交易日${lastDay ? `（${lastDay}）` : ''}的<strong>單日</strong>漲跌；下方「累積」一行與走勢圖是${dates.length ? ` ${shortDate(dates[0])} 以來的` : '區間'}<strong>累積</strong>表現，兩者不可混讀。</div>
       <div class="macro-grid">${chips}</div>
-      ${dateRange ? `<div style="margin-top:8px;font-size:11px;color:var(--muted);">${dateRange}</div>` : ''}
       <div class="interpret-panel" style="margin-top:12px;padding:12px 14px;">
         <div class="interpret-summary">${escapeHtml(biasText)}</div>
         <div class="interpret-note" style="margin-top:6px">${escapeHtml(leaderText)}</div>
@@ -848,14 +1004,14 @@ function renderTwPremarket(p) {
   return card('sec-tw','🇹🇼 台股盤前', `
     <div class="premarket-grid">
       <div class="pm-chip">
-        <div class="pm-label">富台 SGX 夜盤</div>
+        <div class="pm-label">富台 SGX 夜盤 ${dateTag(p.sgx_fut?.latest_date, { stale: Boolean(p.sgx_fut?.stale) })}</div>
         <div class="pm-value ${cls(p.sgx_fut?.change_pct)}">${p.sgx_fut?.value!=null?fmtK(p.sgx_fut.value):'資料待補'}</div>
-        <div class="chip-chg ${cls(p.sgx_fut?.change_pct)}">${arr(p.sgx_fut?.change_pct)} ${fmtPct(p.sgx_fut?.change_pct)}</div>
+        <div class="chip-chg ${cls(p.sgx_fut?.change_pct)}">${p.sgx_fut?.change_pct != null ? `${arr(p.sgx_fut.change_pct)} ${fmtPct(p.sgx_fut.change_pct)} ${periodTag('夜盤')}` : `<span class="flat">${escHtml(p.sgx_fut?.change_note || '漲跌幅暫無')}</span>`}</div>
       </div>
       <div class="pm-chip">
-        <div class="pm-label">台指期夜盤</div>
+        <div class="pm-label">台指期夜盤 ${dateTag(p.rich_fut?.latest_date, { stale: Boolean(p.rich_fut?.stale) })}</div>
         <div class="pm-value ${cls(p.rich_fut?.change_pct)}">${p.rich_fut?.value!=null?fmtK(p.rich_fut.value):'資料待補'}</div>
-        <div class="chip-chg ${cls(p.rich_fut?.change_pct)}">${arr(p.rich_fut?.change_pct)} ${fmtPct(p.rich_fut?.change_pct)}</div>
+        <div class="chip-chg ${cls(p.rich_fut?.change_pct)}">${p.rich_fut?.change_pct != null ? `${arr(p.rich_fut.change_pct)} ${fmtPct(p.rich_fut.change_pct)} ${periodTag('夜盤')}` : `<span class="flat">${escHtml(p.rich_fut?.change_note || '漲跌幅暫無')}</span>`}</div>
       </div>
       <div class="pm-chip">
         <div class="pm-label">市場趨勢</div>
@@ -864,11 +1020,11 @@ function renderTwPremarket(p) {
         </div>
       </div>
       <div class="pm-chip">
-        <div class="pm-label">PC Ratio</div>
+        <div class="pm-label">PC Ratio ${dateTag(p.pc_ratio_date)}</div>
         <div class="pm-value">${p.pc_ratio!=null?fmt(p.pc_ratio):'資料待補'}</div>
       </div>
       <div class="pm-chip">
-        <div class="pm-label">融資維持率</div>
+        <div class="pm-label">融資維持率 ${dateTag(p.margin_date)}</div>
         <div class="pm-value ${maintClass}">${maint!=null?fmt(maint)+'%':'資料待補'}</div>
       </div>
       ${p.vol_state ? `<div class="pm-chip"><div class="pm-label">波動狀態</div><div class="pm-value" style="font-size:13px;margin-top:4px">${p.vol_state}</div></div>` : ''}
@@ -877,7 +1033,7 @@ function renderTwPremarket(p) {
 
 // ── TAIEX History Table ───────────────────────────────────────────────────────
 function renderHistoryTable(rows) {
-  const header = `<tr><th>日期</th><th>收盤點數</th><th>漲跌</th><th>漲跌幅</th><th>外資(億)</th><th>投信(億)</th><th>自營(億)</th></tr>`;
+  const header = `<tr><th>日期</th><th>收盤點數</th><th>單日漲跌</th><th>漲跌幅</th><th>外資(億)</th><th>投信(億)</th><th>自營(億)</th></tr>`;
   const body = rows.map(r => `
     <tr>
       <td>${r.date||'—'}</td>
@@ -901,25 +1057,25 @@ function renderEtf0050(e) {
     ? ` <span style="font-size:11px;color:var(--yellow);font-weight:700;border:1px solid rgba(240,195,74,.25);background:rgba(240,195,74,.08);padding:2px 8px;border-radius:999px;">資料延遲 ${lag} 個交易日</span>`
     : '';
   const change = (lag < 3 && e.change_pct != null)
-    ? `<span class="${cls(e.change_pct)}" style="margin-left:8px">${fmtPct(e.change_pct)}</span>`
+    ? `<span class="${cls(e.change_pct)}" style="margin-left:8px;font-size:16px">${fmtPct(e.change_pct)}</span> ${periodTag('單日')}`
     : '';
   const ret = k => e.returns && e.returns[k] != null ? fmtPct(e.returns[k]) : '—';
   const muted = 'font-size:12px;color:var(--muted)';
   const body = `
     <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end">
       <div>
-        <div style="${muted}">成交價（資料截至 ${e.price_date || '—'}）</div>
+        <div style="${muted}">成交價（資料截至 ${escHtml(e.price_date || '—')}）${lag >= 1 ? ' ' + dateTag(e.price_date, { stale: true }) : ''}</div>
         <div style="font-size:24px;font-weight:700">${e.close != null ? fmt(e.close) : '—'}${change}</div>
       </div>
       <div>
-        <div style="${muted}">距近一年高點（還原價）</div>
+        <div style="${muted}">距近 1 年高點（還原價）${periodTag('1Y')}</div>
         <div style="font-size:18px;font-weight:600">${e.drawdown_1y_pct != null ? fmtPct(e.drawdown_1y_pct) : '—'}</div>
         <div style="${muted}">高點 ${e.high_1y_date || '—'}</div>
       </div>
     </div>
     <table style="margin-top:12px">
-      <thead><tr><th>累積含息報酬（還原價，非年化）</th><th>近 1 年</th><th>近 3 年</th><th>近 5 年</th></tr></thead>
-      <tbody><tr><td style="${muted}">截至 ${e.asof || '—'}</td><td>${ret('1y')}</td><td>${ret('3y')}</td><td>${ret('5y')}</td></tr></tbody>
+      <thead><tr><th>累積含息報酬（還原價，非年化）</th><th>近 1 年 (1Y)</th><th>近 3 年 (3Y)</th><th>近 5 年 (5Y)</th></tr></thead>
+      <tbody><tr><td style="${muted}">截至 ${escHtml(e.asof || '—')}</td><td>${ret('1y')}</td><td>${ret('3y')}</td><td>${ret('5y')}</td></tr></tbody>
     </table>
     <div style="margin-top:8px;${muted}">只描述現況，不構成投資建議；過去報酬不代表未來。</div>`;
   return card('sec-etf0050', `📌 0050 現況${lagBadge}`, body);
@@ -930,13 +1086,13 @@ function renderInstitutional(inst) {
   const items=[{n:'外資',v:inst.foreign_net},{n:'投信',v:inst.trust_net},{n:'自營商',v:inst.dealer_net}];
   const staleBadge = inst.stale ? `<span style="font-size:11px;color:var(--yellow);font-weight:700;border:1px solid rgba(240,195,74,.25);background:rgba(240,195,74,.08);padding:2px 8px;border-radius:999px;">資料偏舊${inst.age_days!=null?` ${inst.age_days} 天`:''}</span>` : '';
   const sourceBadge = inst.source ? `<span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:6px;">來源：${inst.source}</span>` : '';
-  return card('sec-inst',`🏛️ 三大法人 ${inst.date?`<span style="font-size:11px;color:var(--muted);font-weight:400">(${inst.date})</span>`:''} ${sourceBadge} ${staleBadge}`, `
+  return card('sec-inst',`🏛️ 三大法人 ${dateTag(inst.date)} ${sourceBadge} ${staleBadge}`, `
     <div class="inst-row">
       ${items.map(i=>`
         <div class="inst-card">
           <div class="inst-name">${i.n}</div>
           <div class="inst-value ${cls(i.v)}">${i.v==null?'資料待補':(i.v>0?'+':'')+fmt(i.v)}</div>
-          <div class="inst-unit">億元</div>
+          <div class="inst-unit">億元 · 單日</div>
         </div>`).join('')}
     </div>
     ${inst.note ? `<div style="margin-top:6px;font-size:12px;color:var(--muted);">${inst.note}</div>` : ''}
@@ -952,26 +1108,26 @@ function renderTwMarketInternals(m) {
 
   const turnoverHtml = t ? `
     <div class="inst-card">
-      <div class="inst-name">成交值</div>
+      <div class="inst-name">成交值 ${dateTag(t.date)}</div>
       <div class="inst-value">${money(t.trade_value)}</div>
       <div class="inst-unit">量 ${t.trade_volume!=null?(t.trade_volume/1e8).toFixed(1)+' 億股':'—'}</div>
     </div>
     <div class="inst-card">
-      <div class="inst-name">漲跌停</div>
+      <div class="inst-name">漲跌停 ${dateTag(t.date)}</div>
       <div class="inst-value"><span class="up">▲${t.limit_up_count??'—'}</span> / <span class="down">▼${t.limit_down_count??'—'}</span></div>
       <div class="inst-unit">漲 ${t.up_count??'—'} / 跌 ${t.down_count??'—'}</div>
     </div>` : `<div class="inst-card"><div class="inst-name">成交/廣度</div><div class="inst-value">資料暫無</div></div>`;
 
   const otcHtml = o ? `
     <div class="inst-card">
-      <div class="inst-name">櫃買指數</div>
+      <div class="inst-name">櫃買指數 ${dateTag(o.date)}</div>
       <div class="inst-value ${cls(o.change)}">${fmt(o.price)}</div>
-      <div class="inst-unit">${o.change!=null?(o.change>0?'+':'')+fmt(o.change):'—'} · 量 ${money(o.trade_value)}</div>
+      <div class="inst-unit">單日 ${o.change!=null?(o.change>0?'+':'')+fmt(o.change):'—'} 點 · 量 ${money(o.trade_value)}</div>
     </div>` : `<div class="inst-card"><div class="inst-name">櫃買指數</div><div class="inst-value">資料暫無</div></div>`;
 
   const futHtml = f ? `
     <div class="inst-card">
-      <div class="inst-name">外資期貨淨未平倉</div>
+      <div class="inst-name">外資期貨淨未平倉 ${dateTag(f.date)}</div>
       <div class="inst-value ${cls(f.net_oi_vol)}">${f.net_oi_vol!=null?(f.net_oi_vol>0?'+':'')+fmtK(f.net_oi_vol):'—'}</div>
       <div class="inst-unit">口 · ${f.contract||'TX'}</div>
     </div>` : `<div class="inst-card"><div class="inst-name">外資期貨淨未平倉</div><div class="inst-value">資料暫無</div></div>`;
@@ -979,14 +1135,13 @@ function renderTwMarketInternals(m) {
   const v = m.valuation;
   const valHtml = v ? `
     <div class="inst-card">
-      <div class="inst-name">大盤估值${v.stale?` <span style="font-size:10px;color:var(--yellow)">(${v.date} 偏舊)</span>`:''}</div>
+      <div class="inst-name">大盤估值 ${dateTag(v.date, { stale: Boolean(v.stale) })}</div>
       <div class="inst-value">PER ${fmt(v.market_per)} · PBR ${fmt(v.market_pbr)}</div>
       <div class="inst-unit">殖利率 ${fmt(v.market_yield)}%</div>
     </div>` : `<div class="inst-card"><div class="inst-name">大盤估值</div><div class="inst-value">資料暫無</div></div>`;
 
-  const dt = (t&&t.date) || (o&&o.date) || (f&&f.date) || (v&&v.date) || '';
   return card('sec-tw-internals',
-    `📊 台股內部結構 ${dt?`<span style="font-size:11px;color:var(--muted);font-weight:400">(${dt})</span>`:''}`,
+    `📊 台股內部結構`,
     `<div class="inst-row">${turnoverHtml}${otcHtml}${futHtml}${valHtml}</div>`);
 }
 
@@ -1006,7 +1161,8 @@ function renderSectorFlow(sf) {
       <div class="bar-wrap"><div class="bar bar-wk" style="width:${Math.min(100,abs(s.avg_change)/maxW*100)}%"></div></div>
       <div class="sector-pct dn">${fmt(s.avg_change)}%</div>
     </div>`).join('');
-  return card('sec-sector','📊 板塊資金流向', `
+  return card('sec-sector', `📊 板塊資金流向 ${dateTag(sf.date)}`, `
+    <div class="card-note">板塊漲跌為${sf.date ? ` ${escHtml(shortDate(sf.date))} ` : ''}<strong>單日</strong>平均漲跌。</div>
     <div class="sector-cols">
       <div>
         <div class="sector-col-title" style="color:var(--green)">▲ 強勢板塊 Top 5</div>
@@ -1054,11 +1210,14 @@ function renderMarketInterpretation(d) {
   if (bullPct != null || bearPct != null) evidence.push('KOL 觀點可比對');
   if (macroRows.length) evidence.push('國際市場可交叉驗證');
 
+  // 圖表重點 and AI 深度分析 used to be separate cards restating the same
+  // read of the day; they are now folds inside this one card.
+  const folds = renderInterpretFolds(d);
   if (!evidence.length) {
-    return card('sec-interpret', '🧭 今日盤勢解讀', `
+    return card('sec-interpret', '🧭 盤勢解讀', `
       <div class="interpret-panel">
         <div class="interpret-summary">目前可用資料不足，暫時無法生成今日盤勢解讀。</div>
-      </div>`);
+      </div>${folds}`);
   }
 
   const themeNames = themes.slice(0, 3).map(t => t.name).filter(Boolean);
@@ -1114,7 +1273,15 @@ function renderMarketInterpretation(d) {
       <div class="interpret-summary">${escapeHtml(summary)}</div>
       <div class="interpret-note">${escapeHtml(`判讀：${direction} / ${confidenceText}`)}</div>
       <div class="interpret-note">${escapeHtml(actionText)}</div>
-    </div>`);
+    </div>${folds}`);
+}
+
+function renderInterpretFolds(d) {
+  let html = '';
+  const charts = d.chart_orchestration ? renderChartOrchestration(d.chart_orchestration) : '';
+  if (charts) html += charts;
+  if (d.ai_analysis) html += renderAI(d.ai_analysis);
+  return html;
 }
 
 // ── Gemini chart orchestration ───────────────────────────────────────────────
@@ -1128,7 +1295,7 @@ function renderChartOrchestration(o) {
   const selected = Array.isArray(o.selected_charts) ? o.selected_charts : [];
   // A fallback orchestration carries only a maintainer message ("圖表編排目前
   // 不可用…") -- nothing for a reader -- so the card is left out entirely.
-  if (o.source === 'fallback' && !selected.length) return '';
+  if (!selected.length) return '';
   const summary = String(o.overall_summary || '');
   const chartCards = selected.map(chart => {
     const title = chart.title || chart.id || '未命名圖表';
@@ -1140,7 +1307,7 @@ function renderChartOrchestration(o) {
       ? ` role="link" tabindex="0" style="cursor:pointer;" onclick="jumpToSection('${sectionId}')" onkeydown="if(event.key==='Enter'){jumpToSection('${sectionId}')}"`
       : '';
     const jumpHint = sectionId
-      ? `<span style="font-size:12px;color:var(--accent);font-weight:600;">前往章節 →</span>`
+      ? `<span style="font-size:12px;color:var(--accent);font-weight:600;">看數據 →</span>`
       : '';
     return `
       <div class="news-theme-card"${clickAttrs}>
@@ -1174,7 +1341,10 @@ function renderChartOrchestration(o) {
   // not for readers of a public report; they stay in the payload only.
 
   html += '</div>';
-  return card('sec-chart-orchestration', '🧭 今日圖表重點', html, { collapsible: true });
+  return `<details class="sub-fold" id="sec-chart-orchestration">
+    <summary>📊 圖表重點 <span class="sub-fold-meta">${selected.length} 張 · AI 挑選</span></summary>
+    <div class="sub-fold-body">${html}</div>
+  </details>`;
 }
 
 // ── Next-session observation ─────────────────────────────────────────────────
@@ -1281,7 +1451,7 @@ function renderKol(sp) {
         <span class="dn" style="font-weight:600">${bear}% 空</span>
         <span style="color:var(--muted);font-size:12px">${neutral}% 中性 / ${sp.total_kols||0} 位 KOL 統計${(sp.total_kols||0) < 10 ? '（樣本少，僅供參考）' : ''}</span>
       </div>
-    </div>`, { collapsible: true });
+    </div>`, { collapsible: true, peek: `${sp.total_kols||0} 位 KOL：多 ${bull}%／空 ${bear}%${keyTopics.length ? `；${keyTopics[0]}` : ''}` });
 }
 
 // ── History strip (7-day signal / accuracy / recurring topics) ──────────────
@@ -1420,10 +1590,13 @@ function renderAI(ai) {
     `<div id="panel-${p.id}" class="persona-panel${i===0?' active':''} md-content" data-raw="${encodeURIComponent(p.content||'')}"></div>`
   ).join('');
 
-  return card('sec-ai',
-    `🤖 AI 深度分析 <span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:8px">${ts}</span>`,
-    `<div class="persona-tabs">${tabs}</div>${panels}
-     <div id="ai-full-text" style="display:none">${(ai.full_text||'').replace(/</g,'&lt;')}</div>`, { collapsible: true });
+  return `<details class="sub-fold" id="sec-ai">
+    <summary>🤖 AI 深度分析 <span class="sub-fold-meta">${escHtml(String(ts).replace('T', ' ').slice(0, 16))} 生成</span></summary>
+    <div class="sub-fold-body">
+      <div class="persona-tabs">${tabs}</div>${panels}
+      <div id="ai-full-text" style="display:none">${(ai.full_text||'').replace(/</g,'&lt;')}</div>
+    </div>
+  </details>`;
 }
 
 function switchTab(id) {
@@ -1487,7 +1660,8 @@ function renderMarketNews(n) {
     'Next Week Preview': '📰 下週題材整合',
   };
   const title = titleMap[_currentTemplateFamily || 'Pre-open'] || '📰 多來源新聞整合';
-  return card('sec-news', title, html, { collapsible: true });
+  const peek = themes.length ? `${themes.length} 個主題：${themes.slice(0, 3).map(t => t.name).join('、')}` : '';
+  return card('sec-news', title, html, { collapsible: true, peek });
 }
 
 // ── Chart helpers ─────────────────────────────────────────────────────────────
@@ -1916,6 +2090,7 @@ function jumpToSection(id) {
   if(el.classList.contains('is-collapsible') && isSectionCollapsed(id)) {
     setSectionCollapsed(id, false);
   }
+  if(el.tagName === 'DETAILS') el.open = true;
   scrollToSection(id);
 }
 
@@ -1953,7 +2128,7 @@ function card(id, title, body, options = {}) {
       ${collapsible ? `<button type="button" class="section-toggle" data-section-toggle="${id || ''}" ${expandedAttr} onclick="toggleSectionCollapsed('${id || ''}')">${collapsed ? '展開' : '收合'}</button>` : ''}
     </div>
     <div class="section-body">${body}</div>
-    ${collapsible ? `<div class="section-collapsed-hint">此區塊目前收合，點擊可查看完整內容。</div>` : ''}
+    ${collapsible ? `<button type="button" class="section-collapsed-hint" onclick="toggleSectionCollapsed('${id || ''}')">${options.peek ? `${escHtml(options.peek)} · ` : ''}<span class="hint-open">點此展開</span></button>` : ''}
   </div>`;
 }
 
