@@ -1213,10 +1213,11 @@ function renderMarketInterpretation(d) {
   // 圖表重點 and AI 深度分析 used to be separate cards restating the same
   // read of the day; they are now folds inside this one card.
   const folds = renderInterpretFolds(d);
+  const aiLead = renderAILead(d.ai_analysis);
   if (!evidence.length) {
     return card('sec-interpret', '🧭 盤勢解讀', `
       <div class="interpret-panel">
-        <div class="interpret-summary">目前可用資料不足，暫時無法生成今日盤勢解讀。</div>
+        <div class="interpret-summary">目前可用資料不足，暫時無法生成今日盤勢解讀。</div>${aiLead}
       </div>${folds}`);
   }
 
@@ -1270,10 +1271,62 @@ function renderMarketInterpretation(d) {
 
   return card('sec-interpret', isWeekendMorning ? '🧭 週末盤勢解讀' : '🧭 今日盤勢解讀', `
     <div class="interpret-panel">
-      <div class="interpret-summary">${escapeHtml(summary)}</div>
+      <div class="interpret-summary">${escapeHtml(summary)}</div>${aiLead}
       <div class="interpret-note">${escapeHtml(`判讀：${direction} / ${confidenceText}`)}</div>
       <div class="interpret-note">${escapeHtml(actionText)}</div>
     </div>${folds}`);
+}
+
+// The AI analysis carries a conclusion section (【收盤結論】, 「今日結論：」,
+// ### **今日結論**, 【下一交易日觀察】 …). That section stays on screen; the whole
+// analysis is still in the AI 深度分析 fold below. Without a conclusion-like
+// heading, the first section is shown under its own heading.
+const AI_LEAD_TITLE = /結論|展望|判斷|觀察/;
+
+function aiSections(text) {
+  const heading = line => {
+    const t = line.trim().replace(/^#{1,6}\s*/, '').replace(/^\*\*(.+?)\*\*/, '$1');
+    const m = t.match(/^【([^】]{1,20})】\s*(.*)$/)
+      || t.match(/^([\u4e00-\u9fffA-Za-z]{2,10})[：:]\s*(.*)$/)
+      || (/^#{1,6}\s/.test(line.trim()) ? t.match(/^([^\s：:]{2,20})\s*$/) : null);
+    return m ? { title: m[1], rest: (m[2] || '').trim() } : null;
+  };
+  const sections = [];
+  let current = null;
+  for (const raw of String(text || '').split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line || /^[-*_]{3,}$/.test(line) || /^(日期|報表類型)\s*[:：]/.test(line)) continue;
+    const h = heading(line);
+    if (h) {
+      current = { title: h.title, lines: h.rest ? [h.rest] : [] };
+      sections.push(current);
+    } else if (current) {
+      current.lines.push(line);
+    } else {
+      sections.push(current = { title: '', lines: [line] });
+    }
+  }
+  return sections
+    .map(s => ({ title: s.title, body: s.lines.join(' ').trim() }))
+    .filter(s => s.body && !/關鍵數據/.test(s.title));
+}
+
+function aiLeadSection(text) {
+  const sections = aiSections(text);
+  const titled = sections.filter(s => s.title);
+  return titled.find(s => AI_LEAD_TITLE.test(s.title)) || titled[0] || null;
+}
+
+function renderAILead(ai) {
+  const lead = ai ? aiLeadSection(ai.full_text) : null;
+  if (!lead) return '';
+  const ts = escHtml(String(ai.generated_at || '').replace('T', ' ').slice(11, 16));
+  return `
+      <div class="interpret-ai-lead">
+        <div class="interpret-ai-lead-title">🤖 ${escHtml(lead.title)} <span class="sub-fold-meta">AI 模型觀點${ts ? ` · ${ts}` : ''}</span></div>
+        <div class="interpret-ai-lead-body">${escHtml(lead.body)}</div>
+        <div class="interpret-ai-lead-note">由 AI 依當日資料撰寫，與下方「判讀」（資料門檻規則）分開產生，方向可能不同。</div>
+      </div>`;
 }
 
 function renderInterpretFolds(d) {
