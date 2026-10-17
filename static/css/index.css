@@ -1,6 +1,27 @@
 /* ── Design Tokens ─────────────────────────────────────────── */
     @import url("./tokens.css");
 
+    /* Market direction follows the Taiwan convention: red rises, green falls.
+       The readers are Taiwanese retail investors who read colour before any
+       legend (2026-10-17). Kept apart from status colours (--red/--green for
+       error/ok) and from sentiment, so that swapping one never repaints the
+       others. Scoped to the report page: tokens.css is shared by other pages. */
+    :root {
+      --market-rise: #f25e5e;
+      --market-fall: #34d058;
+      --market-rise-bg: rgba(242,94,94,.12);
+      --market-fall-bg: rgba(52,208,88,.12);
+      --market-rise-border: rgba(242,94,94,.3);
+      --market-fall-border: rgba(52,208,88,.3);
+      --up: var(--market-rise);
+      --down: var(--market-fall);
+      /* Sentiment is a contrarian reading (greed = caution, fear = possible
+         opportunity), so it gets hues that are neither rise nor fall. */
+      --sentiment-greed: #ff9f43;
+      --sentiment-fear: #38d9c0;
+      --sentiment-neutral: #8da1bf;  /* gray midpoint: a neutral reading is "nothing", not a hue */
+    }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
@@ -142,6 +163,13 @@
       gap: 8px;
       padding-left: 8px;
       flex-shrink: 0;
+      /* Sixteen section links outgrow a 1440px screen; the expand/collapse
+         buttons sat past the right edge, half cut off. Keep them pinned and
+         let only the links scroll underneath. */
+      position: sticky;
+      right: 0;
+      background: rgba(26,33,51,.98);
+      box-shadow: -16px 0 12px -8px rgba(26,33,51,.98);
     }
     .nav-btn-ghost {
       background: transparent;
@@ -174,8 +202,8 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 22px; flex-shrink: 0;
     }
-    .signal-bullish { background: rgba(52,208,88,.15); box-shadow: var(--glow-green); }
-    .signal-bearish { background: rgba(242,94,94,.15); box-shadow: var(--glow-red); }
+    .signal-bullish { background: rgba(242,94,94,.15); box-shadow: var(--glow-red); }
+    .signal-bearish { background: rgba(52,208,88,.15); box-shadow: var(--glow-green); }
     .signal-neutral  { background: rgba(240,195,74,.12); }
     .hero-content { flex: 1; }
     .hero-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
@@ -202,16 +230,16 @@
     .signal-label {
       padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
     }
-    .label-bullish { background:rgba(52,208,88,.12); color:var(--green); }
-    .label-bearish { background:rgba(242,94,94,.12); color:var(--red); }
+    .label-bullish { background:var(--market-rise-bg); color:var(--market-rise); }
+    .label-bearish { background:var(--market-fall-bg); color:var(--market-fall); }
     .label-neutral  { background:rgba(240,195,74,.12); color:var(--yellow); }
     .action-badge {
       padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 700;
       letter-spacing: 1px; text-transform: uppercase; margin-left: auto;
       border: 1px solid transparent;
     }
-    .action-bullish { background: rgba(52,208,88,.15); color: var(--green); border-color: rgba(52,208,88,.3); }
-    .action-bearish { background: rgba(242,94,94,.15); color: var(--red); border-color: rgba(242,94,94,.3); }
+    .action-bullish { background: var(--market-rise-bg); color: var(--market-rise); border-color: var(--market-rise-border); }
+    .action-bearish { background: var(--market-fall-bg); color: var(--market-fall); border-color: var(--market-fall-border); }
     .action-neutral { background: rgba(240,195,74,.15); color: var(--yellow); border-color: rgba(240,195,74,.3); }
     #hero-teaser { font-size: 15px; color: var(--text); line-height: 1.7; font-weight: 500; }
 
@@ -475,8 +503,8 @@
     .taiex-banner::after {
       content: ""; position: absolute; top: 0; left: 0; bottom: 0; width: 6px;
     }
-    .taiex-banner.up::after { background: var(--green); }
-    .taiex-banner.dn::after { background: var(--red); }
+    .taiex-banner.up::after { background: var(--market-rise); }
+    .taiex-banner.dn::after { background: var(--market-fall); }
     .taiex-label { font-size: 13px; color: var(--muted); margin-bottom: 8px; font-weight: 600; letter-spacing: 1.5px; }
     .taiex-price { font-size: 44px; font-weight: 900; color: var(--text); line-height: 1; font-family: 'Outfit', sans-serif; }
     .taiex-chg   { font-size: 28px; font-weight: 800; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 8px; }
@@ -497,8 +525,13 @@
     .chip-name  { font-size: 10px; color: var(--muted); margin-bottom: 4px; letter-spacing: .5px; }
     .chip-value { font-size: 19px; font-weight: 700; letter-spacing: -.5px; }
     .chip-chg   { font-size: 12px; margin-top: 3px; display: flex; align-items: center; gap: 3px; }
-    .up   { color: var(--green); }
-    .dn   { color: var(--red); }
+    .up   { color: var(--market-rise); }
+    .dn   { color: var(--market-fall); }
+    /* Risk status (e.g. margin maintenance below 150%) is not a direction. */
+    .st-risk { color: var(--red); }
+    .convention-note { font-size: 11px; color: var(--muted); margin: 0 6px; white-space: nowrap; }
+    .convention-note .up, .convention-note .dn { font-weight: 700; margin-left: 2px; }
+    .st-safe { color: var(--green); }
     .flat { color: var(--muted); }
 
     /* ── Two-col layout for charts ───────────────────────────────── */
@@ -524,14 +557,15 @@
     .fg-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; font-weight: 500; letter-spacing: 0.5px; }
     .fg-value { font-size: 42px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; }
     .fg-text  { font-size: 12px; margin-top: 8px; font-weight: 700; }
-    .fg-fear   { color: var(--green); } /* Contra-indicator: Fear is Green/Buy */
-    .fg-neutral{ color: var(--yellow); }
-    .fg-greed  { color: var(--red); }   /* Contra-indicator: Greed is Red/Sell */
+    .fg-fear   { color: var(--sentiment-fear); }    /* contrarian: fear may be an opportunity */
+    .fg-neutral{ color: var(--sentiment-neutral); }
+    .fg-greed  { color: var(--sentiment-greed); }   /* contrarian: greed calls for caution */
+    .fg-note   { font-size: 11px; color: var(--muted); margin: -4px 0 12px; }
     
     .linear-gauge-wrap { margin-top: 14px; position: relative; height: 18px; }
     .linear-gauge-bg {
       height: 6px; border-radius: 3px; width: 100%; position: absolute; top: 6px;
-      background: linear-gradient(90deg, var(--green) 0%, var(--yellow) 50%, var(--red) 100%);
+      background: linear-gradient(90deg, var(--sentiment-fear) 0%, var(--sentiment-neutral) 50%, var(--sentiment-greed) 100%);
       opacity: 0.8;
     }
     .linear-gauge-marker {
@@ -545,7 +579,7 @@
       background: var(--surface-3); border-radius: 6px; height: 8px;
       overflow: hidden; margin: 10px 0 6px;
     }
-    .breadth-bar-bull { height: 100%; background: var(--green); border-radius: 6px 0 0 6px; transition: width .5s; }
+    .breadth-bar-bull { height: 100%; background: var(--market-rise); border-radius: 6px 0 0 6px; transition: width .5s; }
     .breadth-nums { display: flex; justify-content: space-between; font-size: 12px; }
 
     @media (max-width: 960px) {
@@ -599,8 +633,8 @@
       display: inline-block; padding: 4px 12px; border-radius: 20px;
       font-size: 12px; font-weight: 600; margin-top: 4px;
     }
-    .rp-bullish { background: rgba(52,208,88,.12); color: var(--green); }
-    .rp-bearish { background: rgba(242,94,94,.12); color: var(--red); }
+    .rp-bullish { background: var(--market-rise-bg); color: var(--market-rise); }
+    .rp-bearish { background: var(--market-fall-bg); color: var(--market-fall); }
     .rp-neutral  { background: rgba(240,195,74,.1); color: var(--yellow); }
 
     /* ── TAIEX History Table ─────────────────────────────────────── */
@@ -637,16 +671,16 @@
     .sector-name { font-size: 13px; min-width: 72px; }
     .bar-wrap { flex:1; background: var(--surface-3); border-radius: 4px; height: 6px; overflow: hidden; }
     .bar { height: 100%; border-radius: 4px; transition: width .6s cubic-bezier(.2,1,.2,1); }
-    .bar-str { background: var(--green); }
-    .bar-wk  { background: var(--red); }
+    .bar-str { background: var(--market-rise); }
+    .bar-wk  { background: var(--market-fall); }
     .sector-pct { font-size: 12px; min-width: 48px; text-align: right; }
 
     /* ── Social pulse ────────────────────────────────────────────── */
     .kol-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
     .kol-bar-bg { flex:1; height: 14px; background: var(--surface-3); border-radius: 7px; overflow: hidden; min-width: 200px; display: flex; }
-    .kol-bar-bull { height: 100%; background: var(--green); border-radius: 7px 0 0 7px; transition: width .5s; }
+    .kol-bar-bull { height: 100%; background: var(--market-rise); border-radius: 7px 0 0 7px; transition: width .5s; }
     .kol-bar-neutral { height: 100%; background: var(--yellow); transition: width .5s; }
-    .kol-bar-bear { height: 100%; background: var(--red); border-radius: 0 7px 7px 0; transition: width .5s; }
+    .kol-bar-bear { height: 100%; background: var(--market-fall); border-radius: 0 7px 7px 0; transition: width .5s; }
     .theme-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
     .theme-pill {
       background: var(--surface-2); border: 1px solid var(--border);
@@ -769,8 +803,8 @@
       color: var(--muted);
       letter-spacing: 0.02em;
     }
-    .hs-pill-bullish { background: rgba(22, 163, 74, 0.18); border-color: rgba(22, 163, 74, 0.4); color: var(--up); }
-    .hs-pill-bearish { background: rgba(220, 38, 38, 0.18); border-color: rgba(220, 38, 38, 0.4); color: var(--down); }
+    .hs-pill-bullish { background: var(--market-rise-bg); border-color: var(--market-rise-border); color: var(--up); }
+    .hs-pill-bearish { background: var(--market-fall-bg); border-color: var(--market-fall-border); color: var(--down); }
     .hs-pill-neutral { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
     .hs-pill-empty   { background: transparent; border-style: dashed; color: var(--muted); opacity: 0.7; }
     .hs-accuracy {
@@ -801,6 +835,13 @@
       main { padding: 16px 14px 60px; }
       .macro-grid { grid-template-columns: repeat(2,1fr); }
       .inst-row { grid-template-columns: repeat(3,1fr); }
+      /* Three columns of ~95px could not hold "-334.xx" at 24px: the third
+         tile was cut off. On a phone the three institutions read as rows. */
+      #sec-inst .inst-row { grid-template-columns: 1fr; gap: 8px; }
+      #sec-inst .inst-card { display: flex; align-items: baseline; text-align: left; padding: 12px 14px; }
+      #sec-inst .inst-name { flex: 1; margin: 0; font-size: 13px; }
+      #sec-inst .inst-value { font-size: 22px; }
+      #sec-inst .inst-unit { margin: 0 0 0 6px; }
       #hero { flex-direction: column; align-items: flex-start; }
       .hs-pill { padding: 8px 2px; min-height: 48px; }
       .hs-pill-label { font-size: 13px; }

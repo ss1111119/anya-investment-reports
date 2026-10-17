@@ -324,6 +324,7 @@ function buildReportSectionMap(d, family) {
             </div>
             <div class="hero-cutoff">
               ${cutoff ? `資料截止 ${escHtml(cutoff)}` : ''}
+              <span class="convention-note">台灣慣例：<span class="up">紅漲</span><span class="dn">綠跌</span></span>
               <span class="family-badge family-${familyClass}">${escHtml(family)}</span>
             </div>
           </div>
@@ -621,7 +622,7 @@ const SECTION_NAV_LABELS = {
   'sec-etf0050': '0050', 'sec-inst': '三大法人', 'sec-tw-internals': '內部結構',
   'sec-sector': '板塊流向', 'sec-history': '歷史走勢', 'sec-sa-consensus': '分析師共識',
   'sec-social-heatmap': '社群熱度', 'sec-news': '新聞', 'sec-kol': 'KOL 情緒',
-  'sec-prediction-review': '預測驗證', 'sec-history-strip': '歷史對比', 'sec-ai': 'AI 分析',
+  'sec-prediction-review': '預測驗證', 'sec-history-strip': '歷史對比', 'sec-ai': '深度分析',
 };
 
 function buildAnchorNav() {
@@ -805,6 +806,7 @@ function renderSentiment(s, d = {}) {
   const tot    = tw.total || 0;
   const bullPct= tot ? Math.round((tw.gainers||0)/tot*100) : 50;
   return card('sec-sentiment','😨 市場情緒', `
+    <div class="fg-note">情緒指標為反向參考：<span class="fg-greed">貪婪</span>代表需留意過熱，<span class="fg-fear">恐懼</span>可能是逢低機會；顏色與漲跌無關。</div>
     <div class="sentiment-grid">
       <div class="fg-card">
         <div class="fg-label">台灣市場情緒</div>
@@ -1000,7 +1002,7 @@ function renderTwPremarket(p) {
   const regClass = regime.includes('bull')||regime.includes('上漲')?'bullish':
                    regime.includes('bear')||regime.includes('下跌')?'bearish':'neutral';
   const maint = p.maintenance_ratio;
-  const maintClass = maint!=null ? (maint<150?'dn':maint<160?'flat':'up') : 'flat';
+  const maintClass = maint!=null ? (maint<150?'st-risk':maint<160?'flat':'st-safe') : 'flat';
   return card('sec-tw','🇹🇼 台股盤前', `
     <div class="premarket-grid">
       <div class="pm-chip">
@@ -1095,8 +1097,7 @@ function renderInstitutional(inst) {
           <div class="inst-unit">億元 · 單日</div>
         </div>`).join('')}
     </div>
-    ${inst.note ? `<div style="margin-top:6px;font-size:12px;color:var(--muted);">${inst.note}</div>` : ''}
-    <div style="margin-top:4px"><canvas id="inst-chart" height="70"></canvas></div>`);
+    ${inst.note ? `<div style="margin-top:6px;font-size:12px;color:var(--muted);">${inst.note}</div>` : ''}`);
 }
 
 // ── TW Market Internals (turnover / OTC index / foreign futures OI) ───────────
@@ -1114,7 +1115,7 @@ function renderTwMarketInternals(m) {
     </div>
     <div class="inst-card">
       <div class="inst-name">漲跌停 ${dateTag(t.date)}</div>
-      <div class="inst-value"><span class="up">▲${t.limit_up_count??'—'}</span> / <span class="down">▼${t.limit_down_count??'—'}</span></div>
+      <div class="inst-value"><span class="up">▲${t.limit_up_count??'—'}</span> / <span class="dn">▼${t.limit_down_count??'—'}</span></div>
       <div class="inst-unit">漲 ${t.up_count??'—'} / 跌 ${t.down_count??'—'}</div>
     </div>` : `<div class="inst-card"><div class="inst-name">成交/廣度</div><div class="inst-value">資料暫無</div></div>`;
 
@@ -1165,11 +1166,11 @@ function renderSectorFlow(sf) {
     <div class="card-note">板塊漲跌為${sf.date ? ` ${escHtml(shortDate(sf.date))} ` : ''}<strong>單日</strong>平均漲跌。</div>
     <div class="sector-cols">
       <div>
-        <div class="sector-col-title" style="color:var(--green)">▲ 強勢板塊 Top 5</div>
+        <div class="sector-col-title" style="color:var(--market-rise)">▲ 強勢板塊 Top 5</div>
         ${strList||'<span style="color:var(--muted)">無資料</span>'}
       </div>
       <div>
-        <div class="sector-col-title" style="color:var(--red)">▼ 弱勢板塊 Top 5</div>
+        <div class="sector-col-title" style="color:var(--market-fall)">▼ 弱勢板塊 Top 5</div>
         ${wkList||'<span style="color:var(--muted)">無資料</span>'}
       </div>
     </div>
@@ -1317,15 +1318,37 @@ function aiLeadSection(text) {
   return titled.find(s => AI_LEAD_TITLE.test(s.title)) || titled[0] || null;
 }
 
+// Who wrote the analysis (the-page-says-who-wrote-it). When the model's text
+// fails the fact checks the backend publishes a fixed template instead; in
+// October 2026, 10 of 26 reports did. `ai.source` says which. Payloads from
+// before the field existed are labelled neutrally: a tenth of them are the
+// template, so claiming AI would be wrong and claiming template would too.
+const AI_MODEL_SOURCES = ['model', 'model_retry', 'model_unverified', 'cached_summary', 'post_text'];
+
+function aiAuthorLabel(ai) {
+  const source = ai && ai.source;
+  if (source === 'template') {
+    return { lead: '系統依資料整理', fold: '系統依資料整理', icon: '📋',
+             note: '由系統依資料與固定句整理，非 AI 撰寫；與下方「判讀」（資料門檻規則）分開產生。' };
+  }
+  if (AI_MODEL_SOURCES.includes(source)) {
+    return { lead: 'AI 模型觀點', fold: 'AI 深度分析', icon: '🤖',
+             note: '由 AI 依當日資料撰寫，與下方「判讀」（資料門檻規則）分開產生，方向可能不同。' };
+  }
+  return { lead: '分析摘要', fold: '分析摘要', icon: '📝',
+           note: '與下方「判讀」（資料門檻規則）分開產生，方向可能不同。' };
+}
+
 function renderAILead(ai) {
   const lead = ai ? aiLeadSection(ai.full_text) : null;
   if (!lead) return '';
+  const who = aiAuthorLabel(ai);
   const ts = escHtml(String(ai.generated_at || '').replace('T', ' ').slice(11, 16));
   return `
       <div class="interpret-ai-lead">
-        <div class="interpret-ai-lead-title">🤖 ${escHtml(lead.title)} <span class="sub-fold-meta">AI 模型觀點${ts ? ` · ${ts}` : ''}</span></div>
+        <div class="interpret-ai-lead-title">${who.icon} ${escHtml(lead.title)} <span class="sub-fold-meta">${who.lead}${ts ? ` · ${ts}` : ''}</span></div>
         <div class="interpret-ai-lead-body">${escHtml(lead.body)}</div>
-        <div class="interpret-ai-lead-note">由 AI 依當日資料撰寫，與下方「判讀」（資料門檻規則）分開產生，方向可能不同。</div>
+        <div class="interpret-ai-lead-note">${who.note}</div>
       </div>`;
 }
 
@@ -1440,9 +1463,18 @@ function renderObservation(o) {
 // way as today's. Only sections that are not current are listed.
 const DATA_HEALTH_LABELS = {
   us_macro: '美股宏觀', asia_market: '亞洲市場', sentiment: '市場情緒',
-  market_news: '新聞', ai_analysis: 'AI 分析', tw_premarket: '台股盤前',
+  market_news: '新聞', ai_analysis: '深度分析', tw_premarket: '台股盤前',
   tw_market_internals: '台股內部結構', institutional: '三大法人',
   sector_flow: '類股排行', social_pulse: 'KOL 情緒', prediction_review: '預測驗證',
+};
+
+// A section can be missing for different reasons, and "暫無資料" read as
+// "nothing recorded" even when generation failed: the 2026-10-16 evening
+// prediction review was a model error, shown as "暫無資料". The generator
+// already records why; say it.
+const DATA_HEALTH_MISSING_REASONS = {
+  gemini_error: '產生失敗',
+  market_data_missing: '無當日收盤可比對',
 };
 
 function renderDataFreshnessNotice(health) {
@@ -1452,16 +1484,22 @@ function renderDataFreshnessNotice(health) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   const stale = [];
   const missing = [];
+  const explained = [];
   Object.entries(health).forEach(([key, h]) => {
     if (!h || typeof h !== 'object' || h.state === 'OK') return;
     const label = DATA_HEALTH_LABELS[key] || key;
-    if (h.state === 'MISSING' || !h.updated_at) missing.push(label);
+    if (h.state === 'MISSING' || !h.updated_at) {
+      const why = DATA_HEALTH_MISSING_REASONS[h.reason];
+      if (why) explained.push(`${label}${why}`);
+      else missing.push(label);
+    }
     else stale.push(`${label}截至 ${String(h.updated_at).slice(5, 10)}`);
   });
-  if (!stale.length && !missing.length) return '';
+  if (!stale.length && !missing.length && !explained.length) return '';
   const parts = [];
   if (stale.length) parts.push(stale.join('、'));
   if (missing.length) parts.push(`${missing.join('、')}暫無資料`);
+  if (explained.length) parts.push(explained.join('、'));
   return `<div class="interpret-note" style="margin-top:10px;font-size:12px;">⏱ 資料時間：${escapeHtml(parts.join('；'))}</div>`;
 }
 
@@ -1624,6 +1662,7 @@ function renderPredictionReview(pr) {
 
 function renderAI(ai) {
   const ts = ai.generated_at||'';
+  const who = aiAuthorLabel(ai);
   // Detect if we have persona-based content or single full_text
   const hasPersonas = ai.macro || ai.fundamental || ai.technical || ai.flow;
   const personas = hasPersonas ? [
@@ -1633,7 +1672,7 @@ function renderAI(ai) {
     {id:'flow',      label:'🌊 Crow   籌碼情緒', content: ai.flow},
     {id:'summary',   label:'🎯 綜合結論',        content: ai.summary || ai.full_text},
   ].filter(p=>p.content) : [
-    {id:'full', label:'🤖 AI 深度分析', content: ai.full_text}
+    {id:'full', label:`${who.icon} ${who.fold}`, content: ai.full_text}
   ];
 
   const tabs = personas.map((p,i)=>
@@ -1644,7 +1683,7 @@ function renderAI(ai) {
   ).join('');
 
   return `<details class="sub-fold" id="sec-ai">
-    <summary>🤖 AI 深度分析 <span class="sub-fold-meta">${escHtml(String(ts).replace('T', ' ').slice(0, 16))} 生成</span></summary>
+    <summary>${who.icon} ${who.fold} <span class="sub-fold-meta">${escHtml(String(ts).replace('T', ' ').slice(0, 16))} 生成</span></summary>
     <div class="sub-fold-body">
       <div class="persona-tabs">${tabs}</div>${panels}
       <div id="ai-full-text" style="display:none">${(ai.full_text||'').replace(/</g,'&lt;')}</div>
@@ -1719,6 +1758,20 @@ function renderMarketNews(n) {
 
 // ── Chart helpers ─────────────────────────────────────────────────────────────
 const dark = 'rgba(42,52,72,0.5)';
+// One colour per entity, the same in every chart, and never the rise/fall
+// red or green (2026-10-17 review: gold meant 黃金 in one chart and the US
+// 10-year in the next; green meant the dollar index and also "rise"). Steps
+// from the dataviz reference palette, dark mode, validated on the card
+// surface #141922 for the line charts' adjacent pairs.
+const SERIES_COLORS = {
+  'Brent 原油': '#3987e5',
+  '黃金': '#c98500',
+  '美元指數': '#199e70',
+  '美國10年期公債殖利率': '#d95926',
+};
+const SERIES_UNKNOWN = '#7a8ba8';
+const seriesColor = name => SERIES_COLORS[name] || SERIES_UNKNOWN;
+
 const chartDefaults = {
   plugins:{ legend:{ display:false }, tooltip:{ bodyFont:{ size:11 } } },
   scales:{ x:{ ticks:{ color:'#7a8ba8', font:{size:11} }, grid:{color:dark} },
@@ -1803,9 +1856,8 @@ const chartDefaults = {
     }
     const dates = Array.isArray(c.dates) ? c.dates : [];
     if(!dates.length) return;
-    const datasets = c.series.map((series, idx) => {
-      const colors = ['#63b3ff', '#f0c34a', '#34d058', '#a37cff'];
-      const color = colors[idx % colors.length];
+    const datasets = c.series.map(series => {
+      const color = seriesColor(series.name);
       const values = (series.values || []).map(v => v?.normalized ?? null);
       return {
         label: series.name,
@@ -1814,8 +1866,9 @@ const chartDefaults = {
         backgroundColor: color,
         fill: false,
         tension: 0.26,
-        pointRadius: 1.5,
+        pointRadius: 0,
         pointHoverRadius: 4,
+        pointHitRadius: 8,
         borderWidth: 2,
       };
     });
@@ -1856,9 +1909,8 @@ const chartDefaults = {
     }
     const dates = Array.isArray(c.dates) ? c.dates : [];
     if(!dates.length) return;
-    const datasets = c.series.map((series, idx) => {
-      const colors = ['#f0c34a', '#63b3ff'];
-      const color = colors[idx % colors.length];
+    const datasets = c.series.map(series => {
+      const color = seriesColor(series.name);
       const values = (series.values || []).map(v => v?.normalized ?? null);
       return {
         label: series.name,
@@ -1867,8 +1919,9 @@ const chartDefaults = {
         backgroundColor: color,
         fill: false,
         tension: 0.24,
-        pointRadius: 1.5,
+        pointRadius: 0,
         pointHoverRadius: 4,
+        pointHitRadius: 8,
         borderWidth: 2,
       };
     });
@@ -1909,20 +1962,37 @@ const chartDefaults = {
     }
     const dates = Array.isArray(c.dates) ? c.dates : [];
     if(!dates.length) return;
-    const colors = ['#63b3ff', '#f0c34a', '#34d058', '#a37cff', '#f25e5e', '#47c6b8', '#ff9f43', '#8ea6ff', '#ff6fb1', '#70d6ff', '#ffd166'];
+    // Eleven coloured lines in a 328px phone chart were unreadable, and past
+    // eight hues the colours repeated. The card's question is who led and who
+    // lagged since the base date: those two carry colour and a role in their
+    // label; the other nine are thin gray context, still in the tooltip.
+    const lastOf = s => {
+      const vals = (s.values || []).map(v => v?.normalized).filter(v => v != null);
+      return vals.length ? vals[vals.length - 1] : null;
+    };
+    const ranked = c.series.map((s, i) => ({ i, last: lastOf(s) })).filter(r => r.last != null)
+      .sort((a, b) => b.last - a.last);
+    const leader = ranked.length ? ranked[0].i : -1;
+    const laggard = ranked.length > 1 ? ranked[ranked.length - 1].i : -1;
+    const roleOf = idx => idx === leader ? 'leader' : idx === laggard ? 'laggard' : '';
+    const ROLE = { leader: { color: '#3987e5', tag: '領先' }, laggard: { color: '#d95926', tag: '落後' } };
     const datasets = c.series.map((series, idx) => {
-      const color = colors[idx % colors.length];
+      const role = roleOf(idx);
+      const color = role ? ROLE[role].color : 'rgba(122,139,168,0.45)';
       const values = (series.values || []).map(v => v?.normalized ?? null);
       return {
-        label: series.name,
+        label: role ? `${series.name}（${ROLE[role].tag}）` : series.name,
         data: values,
         borderColor: color,
         backgroundColor: color,
         fill: false,
         tension: 0.24,
-        pointRadius: 1.5,
+        pointRadius: 0,
         pointHoverRadius: 4,
-        borderWidth: 2,
+        pointHitRadius: 8,
+        borderWidth: role ? 2.5 : 1,
+        order: role ? 0 : 1,
+        _role: role,
       };
     });
     _charts.usSectorHistory = new Chart(el, {
@@ -1931,7 +2001,8 @@ const chartDefaults = {
       options: {
         ...chartDefaults,
         plugins: {
-          legend: { display: true, labels: { color: '#c7d4ea', font: { size: 11 }, usePointStyle: true, pointStyle: 'line' } },
+          legend: { display: true, labels: { color: '#c7d4ea', font: { size: 11 }, usePointStyle: true, pointStyle: 'line',
+            filter: (item, data) => !!data.datasets[item.datasetIndex]?._role } },
           tooltip: {
             callbacks: {
               label: ctx => {
@@ -1977,8 +2048,10 @@ function buildSentimentCharts(s) {
       }
     });
   };
-  const cnnColor = (s.cnn?.value||50)<40?'#f25e5e':(s.cnn?.value||50)>60?'#34d058':'#f0c34a';
-  const crColor  = (s.crypto?.value||50)<40?'#f25e5e':(s.crypto?.value||50)>60?'#34d058':'#f0c34a';
+  // Sentiment hues (fear teal / greed orange), never the rise/fall colours.
+  const sentimentColor = v => (v??50)<40?'#38d9c0':(v??50)>60?'#ff9f43':'#8da1bf';
+  const cnnColor = sentimentColor(s.cnn?.value);
+  const crColor  = sentimentColor(s.crypto?.value);
   drawGauge('cnn-gauge',    s.cnn?.value,    cnnColor);
   drawGauge('crypto-gauge', s.crypto?.value, crColor);
 }
@@ -1990,7 +2063,8 @@ function buildSectorChart(sf) {
   const weak   = (sf.top5_weak  ||[]).slice(0,5);
   const labels  = [...strong.map(s=>s.sector), ...weak.map(s=>s.sector)];
   const values  = [...strong.map(s=>s.avg_change||0), ...weak.map(s=>s.avg_change||0)];
-  const colors  = values.map(v=>v>=0?'rgba(52,208,88,0.7)':'rgba(242,94,94,0.7)');
+  // Taiwan convention: red rises, green falls.
+  const colors  = values.map(v=>v>=0?'rgba(242,94,94,0.7)':'rgba(52,208,88,0.7)');
   _charts['sector'] = new Chart(el, {
     type:'bar',
     data:{ labels, datasets:[{ data:values, backgroundColor:colors, borderRadius:4 }] },
@@ -2037,24 +2111,24 @@ function buildSaConsensusChart(sa) {
         {
           label: 'Quant',
           data: quant,
-          backgroundColor: 'rgba(99,179,255,0.7)',
-          borderColor: '#63b3ff',
+          backgroundColor: 'rgba(57,135,229,0.75)',
+          borderColor: '#3987e5',
           borderWidth: 1,
           borderRadius: 4,
         },
         {
           label: 'Wall Street',
           data: wall,
-          backgroundColor: 'rgba(52,208,88,0.7)',
-          borderColor: '#34d058',
+          backgroundColor: 'rgba(217,89,38,0.75)',
+          borderColor: '#d95926',
           borderWidth: 1,
           borderRadius: 4,
         },
         {
           label: 'Authors',
           data: authors,
-          backgroundColor: 'rgba(163,124,255,0.7)',
-          borderColor: '#a37cff',
+          backgroundColor: 'rgba(25,158,112,0.75)',
+          borderColor: '#199e70',
           borderWidth: 1,
           borderRadius: 4,
         },
