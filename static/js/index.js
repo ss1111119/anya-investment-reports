@@ -707,13 +707,13 @@ function renderSeekingAlphaConsensus(sa) {
     return `
       <div class="news-theme-card">
         <div class="news-theme-name">
-          <strong style="color:var(--text);font-size:15px;">${escapeHtml(item.symbol)}</strong>
+          <strong style="color:var(--text);font-size:var(--fs-title);">${escapeHtml(item.symbol)}</strong>
           <span class="news-theme-score">${escapeHtml(item.consensus_score != null ? item.consensus_score.toFixed(2) : '—')}</span>
         </div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:8px;">
+        <div style="font-size:var(--fs-caption);color:var(--muted);line-height:1.55;margin-bottom:8px;">
           ${ratingChips.map(([label, value]) => `<span style="display:inline-block;margin-right:8px;margin-bottom:6px;">${escapeHtml(label)}：${escapeHtml(value != null ? Number(value).toFixed(2) : '—')}</span>`).join('')}
         </div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.55;">
+        <div style="font-size:var(--fs-caption);color:var(--muted);line-height:1.55;">
           <span style="display:inline-block;margin-right:8px;">V ${escapeHtml(factor.value || '—')}</span>
           <span style="display:inline-block;margin-right:8px;">G ${escapeHtml(factor.growth || '—')}</span>
           <span style="display:inline-block;margin-right:8px;">P ${escapeHtml(factor.profitability || '—')}</span>
@@ -724,7 +724,7 @@ function renderSeekingAlphaConsensus(sa) {
     `;
   }).join('');
 
-  return card('sec-sa-consensus', `📌 美股分析師共識圖${asOf ? ` <span style="font-size:11px;color:var(--muted);font-weight:400">(${escapeHtml(asOf)})</span>` : ''}`, `
+  return card('sec-sa-consensus', `📌 美股分析師共識圖${asOf ? ` <span style="font-size:var(--fs-micro);color:var(--muted);font-weight:400">(${escapeHtml(asOf)})</span>` : ''}`, `
     <div class="interpret-summary">${escapeHtml(summary)}</div>
     <div class="interpret-meta">
       ${overviewChips.map(chip => `<span class="interpret-chip">${escapeHtml(chip.label)}：${escapeHtml(chip.value)}</span>`).join('')}
@@ -733,7 +733,7 @@ function renderSeekingAlphaConsensus(sa) {
       ${itemCards}
     </div>
     <div style="margin-top:14px;height:280px;"><canvas id="sa-consensus-chart"></canvas></div>
-    <div style="margin-top:8px;font-size:11px;color:var(--muted);">圖上的評級數值越低，代表 Seeking Alpha 的共識越強。</div>
+    <div style="margin-top:8px;font-size:var(--fs-micro);color:var(--muted);">圖上的評級數值越低，代表 Seeking Alpha 的共識越強。</div>
   `);
 }
 
@@ -769,10 +769,10 @@ function renderSocialTopicHeatmap(heatmap) {
         return `
           <div class="news-theme-card">
             <div class="news-theme-name">
-              <strong style="color:var(--text);font-size:14px;">${escapeHtml(item.topic || '')}</strong>
+              <strong style="color:var(--text);font-size:var(--fs-body);">${escapeHtml(item.topic || '')}</strong>
               ${label ? `<span class="news-theme-score">${escapeHtml(label)}</span>` : ''}
             </div>
-            ${score ? `<div style="font-size:12px;color:var(--muted);">${escapeHtml(score)}</div>` : ''}
+            ${score ? `<div style="font-size:var(--fs-caption);color:var(--muted);">${escapeHtml(score)}</div>` : ''}
           </div>`;
       }).join('');
       return `
@@ -792,7 +792,7 @@ function renderSocialTopicHeatmap(heatmap) {
     </div>
   `;
   const peekTopics = topics.slice(0, 3).map(t => t.topic).filter(Boolean);
-  return card('sec-social-heatmap', `📡 市場注意力雷達${asOf ? ` <span style="font-size:11px;color:var(--muted);font-weight:400">(${escapeHtml(String(asOf).replace('T', ' ').slice(0, 16))})</span>` : ''}`, body, { collapsible: true, peek: peekTopics.length ? `熱門：${peekTopics.join('、')}` : '' });
+  return card('sec-social-heatmap', `📡 市場注意力雷達${asOf ? ` <span style="font-size:var(--fs-micro);color:var(--muted);font-weight:400">(${escapeHtml(String(asOf).replace('T', ' ').slice(0, 16))})</span>` : ''}`, body, { collapsible: true, peek: peekTopics.length ? `熱門：${peekTopics.join('、')}` : '' });
 }
 
 // ── Sentiment ─────────────────────────────────────────────────────────────────
@@ -816,7 +816,7 @@ function renderSentiment(s, d = {}) {
           <div class="linear-gauge-bg"></div>
           <div class="linear-gauge-marker" style="left:${tw_g.value!=null?tw_g.value:50}%"></div>
         </div>
-        <div style="margin-top:8px;font-size:12px;color:var(--muted);text-align:center;">台灣籌碼情緒 / 貪婪恐懼</div>
+        <div style="margin-top:8px;font-size:var(--fs-caption);color:var(--muted);text-align:center;">台灣籌碼情緒 / 貪婪恐懼</div>
       </div>
       <div class="fg-card">
         <div class="fg-label">CNN 恐懼貪婪</div>
@@ -838,9 +838,9 @@ function renderSentiment(s, d = {}) {
       </div>
       <div class="fg-card" style="justify-content:center">
         <div class="fg-label">台股市場廣度 ${dateTag(breadthDate)}</div>
-        <div style="font-size:32px; font-weight:800; margin:10px 0; line-height:1;">
+        <div style="font-size:var(--fs-num-lg); font-weight:800; margin:10px 0; line-height:1;">
           <span class="up">${tw.gainers??'—'}</span>
-          <span style="color:var(--muted); font-size:18px; font-weight:400; margin:0 4px;">/</span>
+          <span style="color:var(--muted); font-size:var(--fs-heading); font-weight:400; margin:0 4px;">/</span>
           <span class="dn">${tw.losers??'—'}</span>
         </div>
         <div class="breadth-bar-wrap" style="margin:12px 0 8px;">
@@ -865,7 +865,7 @@ function renderSentiment(s, d = {}) {
     };
     const title = titleMap[_currentTemplateFamily || 'Pre-open'] || '📈 指數走勢';
     const hasHistory = Array.isArray(d.taiex_history) && d.taiex_history.length > 0;
-    const emptyState = hasHistory ? '' : `<div style="height:180px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;">目前沒有可繪製的歷史資料。</div>`;
+    const emptyState = hasHistory ? '' : `<div style="height:180px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:var(--fs-ui);">目前沒有可繪製的歷史資料。</div>`;
     return card('',''+title, `
       <div class="chart-wrap" style="height:240px;">
         ${hasHistory ? '<canvas id="taiex-chart"></canvas>' : emptyState}
@@ -1006,9 +1006,9 @@ function renderTwPremarket(p) {
   return card('sec-tw','🇹🇼 台股盤前', `
     <div class="premarket-grid">
       <div class="pm-chip">
-        <div class="pm-label">富台 SGX 夜盤 ${dateTag(p.sgx_fut?.latest_date, { stale: Boolean(p.sgx_fut?.stale) })}</div>
+        <div class="pm-label">富台指期 ${dateTag(p.sgx_fut?.latest_date, { stale: Boolean(p.sgx_fut?.stale) })}</div>
         <div class="pm-value ${cls(p.sgx_fut?.change_pct)}">${p.sgx_fut?.value!=null?fmtK(p.sgx_fut.value):'資料待補'}</div>
-        <div class="chip-chg ${cls(p.sgx_fut?.change_pct)}">${p.sgx_fut?.change_pct != null ? `${arr(p.sgx_fut.change_pct)} ${fmtPct(p.sgx_fut.change_pct)} ${periodTag('夜盤')}` : `<span class="flat">${escHtml(p.sgx_fut?.change_note || '漲跌幅暫無')}</span>`}</div>
+        <div class="chip-chg ${cls(p.sgx_fut?.change_pct)}">${p.sgx_fut?.change_pct != null ? `${arr(p.sgx_fut.change_pct)} ${fmtPct(p.sgx_fut.change_pct)} ${periodTag('結算')}` : `<span class="flat">${escHtml(p.sgx_fut?.change_note || '漲跌幅暫無')}</span>`}</div>
       </div>
       <div class="pm-chip">
         <div class="pm-label">台指期夜盤 ${dateTag(p.rich_fut?.latest_date, { stale: Boolean(p.rich_fut?.stale) })}</div>
@@ -1017,7 +1017,7 @@ function renderTwPremarket(p) {
       </div>
       <div class="pm-chip">
         <div class="pm-label">市場趨勢</div>
-        <div class="pm-value" style="font-size:14px;margin-top:4px">
+        <div class="pm-value" style="font-size:var(--fs-body);margin-top:4px">
           <span class="regime-pill rp-${regClass}">${regime}</span>
         </div>
       </div>
@@ -1029,7 +1029,7 @@ function renderTwPremarket(p) {
         <div class="pm-label">融資維持率 ${dateTag(p.margin_date)}</div>
         <div class="pm-value ${maintClass}">${maint!=null?fmt(maint)+'%':'資料待補'}</div>
       </div>
-      ${p.vol_state ? `<div class="pm-chip"><div class="pm-label">波動狀態</div><div class="pm-value" style="font-size:13px;margin-top:4px">${p.vol_state}</div></div>` : ''}
+      ${p.vol_state ? `<div class="pm-chip"><div class="pm-label">波動狀態</div><div class="pm-value" style="font-size:var(--fs-ui);margin-top:4px">${p.vol_state}</div></div>` : ''}
     </div>`);
 }
 
@@ -1056,22 +1056,22 @@ function renderHistoryTable(rows) {
 function renderEtf0050(e) {
   const lag = e.lag_sessions || 0;
   const lagBadge = lag >= 1
-    ? ` <span style="font-size:11px;color:var(--yellow);font-weight:700;border:1px solid rgba(240,195,74,.25);background:rgba(240,195,74,.08);padding:2px 8px;border-radius:999px;">資料延遲 ${lag} 個交易日</span>`
+    ? ` <span style="font-size:var(--fs-micro);color:var(--yellow);font-weight:700;border:1px solid rgba(240,195,74,.25);background:rgba(240,195,74,.08);padding:2px 8px;border-radius:999px;">資料延遲 ${lag} 個交易日</span>`
     : '';
   const change = (lag < 3 && e.change_pct != null)
-    ? `<span class="${cls(e.change_pct)}" style="margin-left:8px;font-size:16px">${fmtPct(e.change_pct)}</span> ${periodTag('單日')}`
+    ? `<span class="${cls(e.change_pct)}" style="margin-left:8px;font-size:var(--fs-lead)">${fmtPct(e.change_pct)}</span> ${periodTag('單日')}`
     : '';
   const ret = k => e.returns && e.returns[k] != null ? fmtPct(e.returns[k]) : '—';
-  const muted = 'font-size:12px;color:var(--muted)';
+  const muted = 'font-size:var(--fs-caption);color:var(--muted)';
   const body = `
     <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end">
       <div>
         <div style="${muted}">成交價（資料截至 ${escHtml(e.price_date || '—')}）${lag >= 1 ? ' ' + dateTag(e.price_date, { stale: true }) : ''}</div>
-        <div style="font-size:24px;font-weight:700">${e.close != null ? fmt(e.close) : '—'}${change}</div>
+        <div style="font-size:var(--fs-num);font-weight:700">${e.close != null ? fmt(e.close) : '—'}${change}</div>
       </div>
       <div>
         <div style="${muted}">距近 1 年高點（還原價）${periodTag('1Y')}</div>
-        <div style="font-size:18px;font-weight:600">${e.drawdown_1y_pct != null ? fmtPct(e.drawdown_1y_pct) : '—'}</div>
+        <div style="font-size:var(--fs-heading);font-weight:600">${e.drawdown_1y_pct != null ? fmtPct(e.drawdown_1y_pct) : '—'}</div>
         <div style="${muted}">高點 ${e.high_1y_date || '—'}</div>
       </div>
     </div>
@@ -1086,8 +1086,8 @@ function renderEtf0050(e) {
 // ── Institutional ─────────────────────────────────────────────────────────────
 function renderInstitutional(inst) {
   const items=[{n:'外資',v:inst.foreign_net},{n:'投信',v:inst.trust_net},{n:'自營商',v:inst.dealer_net}];
-  const staleBadge = inst.stale ? `<span style="font-size:11px;color:var(--yellow);font-weight:700;border:1px solid rgba(240,195,74,.25);background:rgba(240,195,74,.08);padding:2px 8px;border-radius:999px;">資料偏舊${inst.age_days!=null?` ${inst.age_days} 天`:''}</span>` : '';
-  const sourceBadge = inst.source ? `<span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:6px;">來源：${inst.source}</span>` : '';
+  const staleBadge = inst.stale ? `<span style="font-size:var(--fs-micro);color:var(--yellow);font-weight:700;border:1px solid rgba(240,195,74,.25);background:rgba(240,195,74,.08);padding:2px 8px;border-radius:999px;">資料偏舊${inst.age_days!=null?` ${inst.age_days} 天`:''}</span>` : '';
+  const sourceBadge = inst.source ? `<span style="font-size:var(--fs-micro);color:var(--muted);font-weight:400;margin-left:6px;">來源：${inst.source}</span>` : '';
   return card('sec-inst',`🏛️ 三大法人 ${dateTag(inst.date)} ${sourceBadge} ${staleBadge}`, `
     <div class="inst-row">
       ${items.map(i=>`
@@ -1097,7 +1097,7 @@ function renderInstitutional(inst) {
           <div class="inst-unit">億元 · 單日</div>
         </div>`).join('')}
     </div>
-    ${inst.note ? `<div style="margin-top:6px;font-size:12px;color:var(--muted);">${inst.note}</div>` : ''}`);
+    ${inst.note ? `<div style="margin-top:6px;font-size:var(--fs-caption);color:var(--muted);">${inst.note}</div>` : ''}`);
 }
 
 // ── TW Market Internals (turnover / OTC index / foreign futures OI) ───────────
@@ -1383,14 +1383,14 @@ function renderChartOrchestration(o) {
       ? ` role="link" tabindex="0" style="cursor:pointer;" onclick="jumpToSection('${sectionId}')" onkeydown="if(event.key==='Enter'){jumpToSection('${sectionId}')}"`
       : '';
     const jumpHint = sectionId
-      ? `<span style="font-size:12px;color:var(--accent);font-weight:600;">看數據 →</span>`
+      ? `<span style="font-size:var(--fs-caption);color:var(--accent);font-weight:600;">看數據 →</span>`
       : '';
     return `
       <div class="news-theme-card"${clickAttrs}>
         <div class="news-theme-name">
-          <strong style="color:var(--text);font-size:15px;">${escapeHtml(title)}</strong>
+          <strong style="color:var(--text);font-size:var(--fs-title);">${escapeHtml(title)}</strong>
         </div>
-        <div style="font-size:14px;color:var(--text);line-height:1.55;margin-bottom:8px;">${escapeHtml(takeaway)}</div>
+        <div style="font-size:var(--fs-body);color:var(--text);line-height:1.55;margin-bottom:8px;">${escapeHtml(takeaway)}</div>
         ${action ? `<div class="interpret-note" style="margin-top:0;">${escapeHtml(action)}</div>` : ''}
         ${jumpHint}
       </div>
@@ -1443,7 +1443,7 @@ function renderObservation(o) {
     : '';
   const stateClass = o.state === '偏多觀察' ? 'up' : o.state === '偏空觀察' ? 'dn' : '';
   const body = `
-    <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">
+    <div style="font-size:var(--fs-caption);color:var(--muted);margin-bottom:8px;">
       ${o.as_of ? `資料截止 ${escapeHtml(o.as_of)}｜` : ''}${escapeHtml(o.disclaimer || '依目前資料整理的情境，不構成投資建議')}
     </div>
     <div class="interpret-summary">基準情境：<span class="${stateClass}" style="font-weight:700">${escapeHtml(o.state)}</span></div>
@@ -1500,7 +1500,7 @@ function renderDataFreshnessNotice(health) {
   if (stale.length) parts.push(stale.join('、'));
   if (missing.length) parts.push(`${missing.join('、')}暫無資料`);
   if (explained.length) parts.push(explained.join('、'));
-  return `<div class="interpret-note" style="margin-top:10px;font-size:12px;">⏱ 資料時間：${escapeHtml(parts.join('；'))}</div>`;
+  return `<div class="interpret-note" style="margin-top:10px;font-size:var(--fs-caption);">⏱ 資料時間：${escapeHtml(parts.join('；'))}</div>`;
 }
 
 // ── KOL ──────────────────────────────────────────────────────────────────────
@@ -1540,7 +1540,7 @@ function renderKol(sp) {
           <div class="kol-bar-bear" style="width:${bear}%"></div>
         </div>
         <span class="dn" style="font-weight:600">${bear}% 空</span>
-        <span style="color:var(--muted);font-size:12px">${neutral}% 中性 / ${sp.total_kols||0} 位 KOL 統計${(sp.total_kols||0) < 10 ? '（樣本少，僅供參考）' : ''}</span>
+        <span style="color:var(--muted);font-size:var(--fs-caption)">${neutral}% 中性 / ${sp.total_kols||0} 位 KOL 統計${(sp.total_kols||0) < 10 ? '（樣本少，僅供參考）' : ''}</span>
       </div>
     </div>`, { collapsible: true, peek: `${sp.total_kols||0} 位 KOL：多 ${bull}%／空 ${bear}%${keyTopics.length ? `；${keyTopics[0]}` : ''}` });
 }
@@ -1583,7 +1583,7 @@ function renderHistoryStrip(h) {
     </div>`;
   }).join('');
   const boundaryNote = boundaryShown
-    ? `<div style="margin-top:6px;font-size:12px;color:var(--muted)">虛線左側為舊規則（會受 AI 文字用詞影響），${RULE_BOUNDARY_NOTE}，兩側不可直接比較。</div>`
+    ? `<div style="margin-top:6px;font-size:var(--fs-caption);color:var(--muted)">虛線左側為舊規則（會受 AI 文字用詞影響），${RULE_BOUNDARY_NOTE}，兩側不可直接比較。</div>`
     : '';
 
   const verdictIcon = (v) => v === 'accurate' ? '✅'
@@ -1593,7 +1593,7 @@ function renderHistoryStrip(h) {
     const cls = p.verdict ? 'hs-pill-neutral' : 'hs-pill-empty';
     const dateShort = p.date ? p.date.slice(5) : '—';
     return `<div class="hs-pill ${cls}" title="${escapeHtml(p.date || '')}: ${escapeHtml(p.verdict || 'N/A')}">
-      <div class="hs-pill-label" style="font-size:18px">${verdictIcon(p.verdict)}</div>
+      <div class="hs-pill-label" style="font-size:var(--fs-heading)">${verdictIcon(p.verdict)}</div>
       <div class="hs-pill-date">${escapeHtml(dateShort)}</div>
     </div>`;
   }).join('');
@@ -1626,7 +1626,7 @@ function renderHistoryStrip(h) {
     ${boundaryNote}
     <div class="hs-subtitle" style="margin-top:14px">預測驗證</div>
     <div class="hs-row">${predictionCells}</div>
-    <div style="margin-top:6px;font-size:12px;color:var(--muted)">比對早報中的具體預測與台股收盤；— 表示尚無可驗證資料。驗證對象不是上方的方向訊號。</div>
+    <div style="margin-top:6px;font-size:var(--fs-caption);color:var(--muted)">比對早報中的具體預測與台股收盤；— 表示尚無可驗證資料。驗證對象不是上方的方向訊號。</div>
     <div style="margin-top:8px">${accuracyText}</div>
     ${topicsBlock}
   `;
@@ -1646,8 +1646,8 @@ function renderPredictionReview(pr) {
   const color = verdictColor[pr.verdict] || '#6B7280';
   const label = verdictLabel[pr.verdict] || pr.verdict;
   const scorePct = pr.score != null ? Math.round(pr.score * 100) + '%' : '';
-  const badge = `<span style="background:${color};color:#fff;padding:2px 10px;border-radius:12px;font-size:13px;font-weight:600">${label}</span>`;
-  const scoreSpan = scorePct ? `<span style="margin-left:10px;color:var(--muted);font-size:13px">評分 ${scorePct}</span>` : '';
+  const badge = `<span style="background:${color};color:#fff;padding:2px 10px;border-radius:12px;font-size:var(--fs-ui);font-weight:600">${label}</span>`;
+  const scoreSpan = scorePct ? `<span style="margin-left:10px;color:var(--muted);font-size:var(--fs-ui)">評分 ${scorePct}</span>` : '';
   const summary = pr.summary ? `<div style="margin:10px 0 14px;color:var(--text)">${pr.summary}</div>` : '';
   const iconMap = { correct: '✅', incorrect: '❌', partial: '⚡' };
   const rows = (pr.predictions || []).map(p =>
@@ -1729,10 +1729,10 @@ function renderMarketNews(n) {
         ${themes.map(t => `
           <div class="news-theme-card">
             <div class="news-theme-name">
-              <strong style="color:var(--text);font-size:15px;">${escapeHtml(t.name || '')}</strong>
+              <strong style="color:var(--text);font-size:var(--fs-title);">${escapeHtml(t.name || '')}</strong>
               <span class="news-theme-score">熱度 ${escapeHtml(t.score ?? '—')}</span>
             </div>
-            <div style="font-size:14px;color:var(--text);line-height:1.55;">${escapeHtml(t.insight || '')}</div>
+            <div style="font-size:var(--fs-body);color:var(--text);line-height:1.55;">${escapeHtml(t.insight || '')}</div>
           </div>
         `).join('')}
       </div>`;
