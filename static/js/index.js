@@ -1106,6 +1106,8 @@ function renderTwMarketInternals(m) {
     : (Math.abs(v) >= 1e12 ? (v/1e12).toFixed(2)+' 兆'
       : (v/1e8).toFixed(0)+' 億');
   const t = m.turnover, o = m.otc_index, f = m.foreign_futures_oi;
+  // market_stats_tpex.trade_value is in thousands of NT$ (TPEx st41), unlike TWSE's
+  // NT$; it showed 「量 2 億」 for NT$2,120 億 until 2026-10-20.
 
   const turnoverHtml = t ? `
     <div class="inst-card">
@@ -1123,7 +1125,7 @@ function renderTwMarketInternals(m) {
     <div class="inst-card">
       <div class="inst-name">櫃買指數 ${dateTag(o.date)}</div>
       <div class="inst-value ${cls(o.change)}">${fmt(o.price)}</div>
-      <div class="inst-unit">單日 ${o.change!=null?(o.change>0?'+':'')+fmt(o.change):'—'} 點 · 量 ${money(o.trade_value)}</div>
+      <div class="inst-unit">單日 ${o.change!=null?(o.change>0?'+':'')+fmt(o.change):'—'} 點 · 量 ${money(o.trade_value == null ? null : o.trade_value * 1000)}</div>
     </div>` : `<div class="inst-card"><div class="inst-name">櫃買指數</div><div class="inst-value">資料暫無</div></div>`;
 
   const futHtml = f ? `
