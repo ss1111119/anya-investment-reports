@@ -161,8 +161,8 @@ function collapseAllSections() {
 // 'taiex', 'chart_orchestration' and 'ai' no longer appear as their own slots.
 const WEEKLY_TEMPLATE_SECTION_ORDER = {
   'Pre-open': ['hero', 'observation', 'etf_0050', 'premarket', 'us_macro', 'interpretation', 'market_snapshot', 'tw_internals', 'history', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'history_strip'],
-  'Close Summary': ['hero', 'observation', 'etf_0050', 'interpretation', 'institutional', 'tw_internals', 'sector_flow', 'us_sector_history', 'history', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'prediction_review', 'history_strip'],
-  'Midweek Risk': ['hero', 'observation', 'etf_0050', 'interpretation', 'premarket', 'institutional', 'tw_internals', 'market_snapshot', 'sector_flow', 'us_macro', 'us_sector_history', 'history', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'prediction_review', 'history_strip'],
+  'Close Summary': ['hero', 'observation', 'etf_0050', 'interpretation', 'institutional', 'tw_internals', 'sector_flow', 'us_sector_history', 'history', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'history_strip'],
+  'Midweek Risk': ['hero', 'observation', 'etf_0050', 'interpretation', 'premarket', 'institutional', 'tw_internals', 'market_snapshot', 'sector_flow', 'us_macro', 'us_sector_history', 'history', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'history_strip'],
   'Weekend Macro': ['hero', 'observation', 'etf_0050', 'interpretation', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'institutional', 'tw_internals', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'history_strip'],
   'Next Week Preview': ['hero', 'observation', 'etf_0050', 'interpretation', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'institutional', 'tw_internals', 'market_snapshot', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'history_strip'],
 };
@@ -223,8 +223,9 @@ function familyClassName(family) {
 }
 
 function buildReportSectionMap(d, family) {
-  const sig   = d.headline?.signal || 'neutral';
-  const emoji = sig==='bullish'?'📈':sig==='bearish'?'📉':'📊';
+  // The hero shows no direction (the-report-watches-and-does-not-advise).
+  const sig   = 'neutral';
+  const emoji = '📊';
   const familyClass = familyClassName(family);
   const typeLabel = TYPE_LABELS[d.report_type] || d.report_type || '';
   const actionBadge = d.headline?.action ? `<span class="action-badge action-${sig}">${escHtml(d.headline.action)}</span>` : '';
@@ -319,7 +320,6 @@ function buildReportSectionMap(d, family) {
             <div class="hero-meta">
               <span class="hero-date-big">${escHtml(d.date||'')}</span>
               <span class="type-badge type-${escHtml(d.report_type||'')}">${typeLabel}</span>
-              <span class="signal-label label-${sig}">${sig==='bullish'?'偏多':sig==='bearish'?'偏空':'中性'}</span>
               ${actionBadge}
             </div>
             <div class="hero-cutoff">
@@ -1224,59 +1224,30 @@ function renderMarketInterpretation(d) {
       </div>${folds}`);
   }
 
-  const themeNames = themes.slice(0, 3).map(t => t.name).filter(Boolean);
-
-  const greed = sentiment.tw_greed?.value != null ? Number(sentiment.tw_greed.value) : null;
-  const regime = (tw.regime || tw.trend_state || '').toString();
-
-  // 方向統一採用後端 headline.signal（已納入隔夜美股/VIX 等即時訊號），
-  // 與 Hero 大圖、深度分析同一事實來源，避免本卡片自算 regime 計分造成方向打架。
-  const sig = d.headline?.signal || 'neutral';
-  const direction = sig === 'bullish' ? '偏多' : sig === 'bearish' ? '偏空' : '中性';
-
-  // 訊號強度：計算與 headline.signal「同向」的佐證因子數（不決定方向，只表強弱）。
-  let support = 0;
-  if (regime.includes('BULL') && sig === 'bullish') support += 1;
-  if (regime.includes('BEAR') && sig === 'bearish') support += 1;
-  if (bullPct != null && bearPct != null) {
-    if (sig === 'bullish' && bullPct >= bearPct) support += 1;
-    if (sig === 'bearish' && bearPct > bullPct) support += 1;
-  }
-  if (greed != null) {
-    if (sig === 'bearish' && greed >= 70) support += 1; // 過熱 → 偏空佐證
-    if (sig === 'bullish' && greed <= 35) support += 1; // 過冷 → 偏多佐證
-  }
-  if (sig === 'bullish' && themeNames.some(t => /AI|半導體|成長|軟體/.test(t))) support += 1;
-  if (sig === 'bearish' && themeNames.some(t => /地緣|通膨|風險|疲弱/.test(t))) support += 1;
-
-  const confidence = Math.min(3, Math.max(1, support));
-  const confidenceText = confidence >= 3
-    ? '訊號偏強'
-    : confidence === 2
-      ? '訊號中等'
-      : '訊號偏弱';
-
+  // No direction call and no fixed advice sentences
+  // (the-report-watches-and-does-not-advise): the panel states the rule
+  // result and the factors behind it. The old 「訊號強度」 was a count of theme
+  // names matching words like AI or 半導體, not a measured strength.
+  const obs = d.observation || {};
+  const stateText = obs.state || d.headline?.action || '資料不足';
   const summary = isWeekendMorning
-    ? `週末資料顯示盤勢仍以整理為主，方向先看下週開盤與國際盤是否同向。`
-    : direction === '偏多'
-      ? `今日盤勢偏多，但屬於輪動式上漲，不是全面失速型大噴出。`
-      : direction === '偏空'
-        ? `今日盤勢偏空，賣壓與風險偏好下降已開始主導盤面。`
-        : `今日盤勢偏震盪，雖然有方向，但還不到可以放心追價的程度。`;
-
-  const actionText = isWeekendMorning
-    ? `操作含意：先不要用週末消息硬猜方向，等週一開盤後再看資金是否延續。`
-    : direction === '偏多'
-      ? `操作含意：偏多看待，回檔找點比追高更重要；若量能擴大且法人續買，趨勢才算站穩。`
-      : direction === '偏空'
-        ? `操作含意：以防守為主，反彈先看壓力；若外部風險沒有降溫，不急著進場。`
-        : `操作含意：區間思維，先看突破或跌破再站隊，不用把今天解讀成一定要立刻出手。`;
+    ? `週末版：依固定門檻規則，目前狀態為「${stateText}」，以下是最近一個交易日與國際盤的數字。`
+    : `依固定門檻規則，目前狀態為「${stateText}」。`;
+  const crossed = [
+    ...(obs.bull || []).map(item => `偏多因素：${item}`),
+    ...(obs.bear || []).map(item => `偏空因素：${item}`),
+  ];
+  const notes = crossed.length
+    ? crossed
+    : [obs.nearest ? `最接近門檻：${obs.nearest}` : ((obs.confirm || [])[0] || '')];
+  const absorbedNotes = (obs.absorbed || []).map(item => `不計入：${item}`);
+  const noteHtml = [...notes, ...absorbedNotes].filter(Boolean)
+    .map(text => `<div class="interpret-note">${escapeHtml(text)}</div>`).join('');
 
   return card('sec-interpret', isWeekendMorning ? '🧭 週末盤勢解讀' : '🧭 今日盤勢解讀', `
     <div class="interpret-panel">
       <div class="interpret-summary">${escapeHtml(summary)}</div>${aiLead}
-      <div class="interpret-note">${escapeHtml(`判讀：${direction} / ${confidenceText}`)}</div>
-      <div class="interpret-note">${escapeHtml(actionText)}</div>
+      ${noteHtml}
     </div>${folds}`);
 }
 
@@ -1443,17 +1414,17 @@ function renderObservation(o) {
   const list = (label, items) => (items && items.length)
     ? `<div class="interpret-note" style="margin-top:6px"><strong>${escapeHtml(label)}</strong>${items.map(escapeHtml).join('；')}</div>`
     : '';
-  const stateClass = o.state === '偏多觀察' ? 'up' : o.state === '偏空觀察' ? 'dn' : '';
   const body = `
     <div style="font-size:var(--fs-caption);color:var(--muted);margin-bottom:8px;">
       ${o.as_of ? `資料截止 ${escapeHtml(o.as_of)}｜` : ''}${escapeHtml(o.disclaimer || '依目前資料整理的情境，不構成投資建議')}
     </div>
-    <div class="interpret-summary">基準情境：<span class="${stateClass}" style="font-weight:700">${escapeHtml(o.state)}</span></div>
+    <div class="interpret-summary">門檻規則：<span style="font-weight:700">${escapeHtml(o.state)}</span></div>
     ${list('偏空因素：', o.bear)}
     ${list('偏多因素：', o.bull)}
     ${list('未達門檻：', o.below)}
-    ${list(o.state === '偏空觀察' ? '偏空延續的確認：' : o.state === '偏多觀察' ? '偏多延續的確認：' : '觀察：', o.confirm)}
-    ${list(o.state === '偏空觀察' ? '偏空不成立：' : '偏多不成立：', o.invalid)}
+    ${list('已反映於台股、不計入：', o.absorbed)}
+    ${list(o.state === '條件達標' ? '若延續，會看到：' : '觀察：', o.confirm)}
+    ${list('若不成立，會看到：', o.invalid)}
     ${list('⏱ 資料偏舊、未納入判斷：', o.stale)}
   `;
   return card('sec-observation', `🔭 交易日觀察重點${escapeHtml(sessionText)}`, body);
@@ -1467,7 +1438,7 @@ const DATA_HEALTH_LABELS = {
   us_macro: '美股宏觀', asia_market: '亞洲市場', sentiment: '市場情緒',
   market_news: '新聞', ai_analysis: '深度分析', tw_premarket: '台股盤前',
   tw_market_internals: '台股內部結構', institutional: '三大法人',
-  sector_flow: '類股排行', social_pulse: 'KOL 情緒', prediction_review: '預測驗證',
+  sector_flow: '類股排行', social_pulse: 'KOL 情緒',
 };
 
 // A section can be missing for different reasons, and "暫無資料" read as
@@ -1489,6 +1460,9 @@ function renderDataFreshnessNotice(health) {
   const explained = [];
   Object.entries(health).forEach(([key, h]) => {
     if (!h || typeof h !== 'object' || h.state === 'OK') return;
+    // Not shown on the page, so not reported missing either
+    // (the-page-shows-no-grade-of-another-report).
+    if (key === 'prediction_review') return;
     const label = DATA_HEALTH_LABELS[key] || key;
     if (h.state === 'MISSING' || !h.updated_at) {
       const why = DATA_HEALTH_MISSING_REASONS[h.reason];
@@ -1547,7 +1521,7 @@ function renderKol(sp) {
     </div>`, { collapsible: true, peek: `${sp.total_kols||0} 位 KOL：多 ${bull}%／空 ${bear}%${keyTopics.length ? `；${keyTopics[0]}` : ''}` });
 }
 
-// ── History strip (7-day signal / accuracy / recurring topics) ──────────────
+// ── History strip (7-day signal / recurring topics) ─────────────────────────
 function renderHistoryStrip(h) {
   if (!h || !Array.isArray(h.signals)) return '';
   if (!h.signals.some(s => s && s.signal != null)) return '';
@@ -1556,13 +1530,12 @@ function renderHistoryStrip(h) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-  const signalLabel = (sig) => sig === 'bullish' ? '多'
-    : sig === 'bearish' ? '空'
-    : sig === 'neutral' ? '平' : '—';
-  const signalClass = (sig) => sig === 'bullish' ? 'hs-pill-bullish'
-    : sig === 'bearish' ? 'hs-pill-bearish'
-    : sig === 'neutral' ? 'hs-pill-neutral'
-    : 'hs-pill-empty';
+  // Whether a threshold was crossed, not which side
+  // (the-report-watches-and-does-not-advise).
+  const signalLabel = (sig) => (sig === 'bullish' || sig === 'bearish') ? '達'
+    : sig === 'neutral' ? '未' : '—';
+  const signalClass = (sig) => (sig === 'bullish' || sig === 'bearish' || sig === 'neutral')
+    ? 'hs-pill-neutral' : 'hs-pill-empty';
 
   // Signals before 2026-10-11 were partly driven by keywords in the generated
   // text; from then on they come from market numbers. Mark where that changes
@@ -1588,27 +1561,8 @@ function renderHistoryStrip(h) {
     ? `<div style="margin-top:6px;font-size:var(--fs-caption);color:var(--muted)">虛線左側為舊規則（會受 AI 文字用詞影響），${RULE_BOUNDARY_NOTE}，兩側不可直接比較。</div>`
     : '';
 
-  const verdictIcon = (v) => v === 'accurate' ? '✅'
-    : v === 'partially_accurate' ? '⚡'
-    : v === 'inaccurate' ? '❌' : '—';
-  const predictionCells = (h.predictions || []).map(p => {
-    const cls = p.verdict ? 'hs-pill-neutral' : 'hs-pill-empty';
-    const dateShort = p.date ? p.date.slice(5) : '—';
-    return `<div class="hs-pill ${cls}" title="${escapeHtml(p.date || '')}: ${escapeHtml(p.verdict || 'N/A')}">
-      <div class="hs-pill-label" style="font-size:var(--fs-heading)">${verdictIcon(p.verdict)}</div>
-      <div class="hs-pill-date">${escapeHtml(dateShort)}</div>
-    </div>`;
-  }).join('');
-
-  // A rate without its count overstated four verdicts as "75% over 7 days".
-  const verdicts = (h.predictions || []).filter(p => p && p.verdict);
-  const hits = verdicts.filter(p => p.verdict === 'accurate').length;
-  const partial = verdicts.filter(p => p.verdict === 'partially_accurate').length;
-  const misses = verdicts.filter(p => p.verdict === 'inaccurate').length;
-  const fewText = verdicts.length < 10 ? '，樣本少，僅供參考' : '';
-  const accuracyText = verdicts.length
-    ? `<span class="hs-accuracy">已驗證 ${verdicts.length} 筆：命中 ${hits}${partial ? `、部分 ${partial}` : ''}、未中 ${misses}${h.accuracy_rate != null ? `（命中率 ${Math.round(h.accuracy_rate * 100)}%${fewText}）` : ''}</span>`
-    : `<span class="hs-accuracy" style="color:var(--muted)">尚無預測驗證紀錄</span>`;
+  // No prediction row: the verdicts grade morning_briefs/<date>_brief.txt, not
+  // the morning report on this page (the-page-shows-no-grade-of-another-report).
 
   const topicsList = (h.recurring_topics || []).map(t =>
     `<div class="hs-topic-row">
@@ -1626,10 +1580,6 @@ function renderHistoryStrip(h) {
     <div class="hs-subtitle">方向訊號歷史</div>
     <div class="hs-row">${signalCells}</div>
     ${boundaryNote}
-    <div class="hs-subtitle" style="margin-top:14px">預測驗證</div>
-    <div class="hs-row">${predictionCells}</div>
-    <div style="margin-top:6px;font-size:var(--fs-caption);color:var(--muted)">比對早報中的具體預測與台股收盤；— 表示尚無可驗證資料。驗證對象不是上方的方向訊號。</div>
-    <div style="margin-top:8px">${accuracyText}</div>
     ${topicsBlock}
   `;
 
