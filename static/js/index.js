@@ -1456,7 +1456,7 @@ function renderObservation(o) {
     ${list(o.state === '偏空觀察' ? '偏空不成立：' : '偏多不成立：', o.invalid)}
     ${list('⏱ 資料偏舊、未納入判斷：', o.stale)}
   `;
-  return card('sec-observation', `🔭 下一交易日觀察重點${escapeHtml(sessionText)}`, body);
+  return card('sec-observation', `🔭 交易日觀察重點${escapeHtml(sessionText)}`, body);
 }
 
 // ── Data freshness ───────────────────────────────────────────────────────────
