@@ -218,6 +218,20 @@ function getWeeklyTemplateFamily(d) {
   return 'Pre-open';
 }
 
+// Reader-facing names for the layout keys above; the keys themselves stay as
+// they are because they pick the layout and the CSS class.
+const TEMPLATE_FAMILY_LABELS = {
+  'Pre-open': '盤前',
+  'Close Summary': '收盤總結',
+  'Midweek Risk': '週中風險',
+  'Weekend Macro': '週末總經',
+  'Next Week Preview': '下週展望',
+};
+
+function familyBadgeLabel(family) {
+  return TEMPLATE_FAMILY_LABELS[family] || String(family || '');
+}
+
 function familyClassName(family) {
   return String(family || 'Pre-open').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 }
@@ -325,7 +339,7 @@ function buildReportSectionMap(d, family) {
             <div class="hero-cutoff">
               ${cutoff ? `資料截止 ${escHtml(cutoff)}` : ''}
               <span class="convention-note">台灣慣例：<span class="up">紅漲</span><span class="dn">綠跌</span></span>
-              <span class="family-badge family-${familyClass}">${escHtml(family)}</span>
+              <span class="family-badge family-${familyClass}">${escHtml(familyBadgeLabel(family))}</span>
             </div>
           </div>
         </div>
@@ -806,7 +820,7 @@ function renderSentiment(s, d = {}) {
   const tot    = tw.total || 0;
   const bullPct= tot ? Math.round((tw.gainers||0)/tot*100) : 50;
   return card('sec-sentiment','😨 市場情緒', `
-    <div class="fg-note">情緒指標為反向參考：<span class="fg-greed">貪婪</span>代表需留意過熱，<span class="fg-fear">恐懼</span>可能是逢低機會；顏色與漲跌無關。</div>
+    <div class="fg-note">情緒指標量測市場參與者偏向<span class="fg-greed">貪婪</span>或<span class="fg-fear">恐懼</span>的程度，數值愈高愈貪婪、愈低愈恐懼；顏色代表情緒區間，與漲跌無關。</div>
     <div class="sentiment-grid">
       <div class="fg-card">
         <div class="fg-label">台灣市場情緒</div>
