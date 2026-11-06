@@ -161,10 +161,10 @@ function collapseAllSections() {
 // 'taiex', 'chart_orchestration' and 'ai' no longer appear as their own slots.
 const WEEKLY_TEMPLATE_SECTION_ORDER = {
   'Pre-open': ['hero', 'observation', 'etf_0050', 'premarket', 'us_macro', 'interpretation', 'market_snapshot', 'tw_internals', 'history', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'history_strip'],
-  'Close Summary': ['hero', 'observation', 'etf_0050', 'interpretation', 'institutional', 'tw_internals', 'sector_flow', 'us_sector_history', 'history', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'history_strip'],
-  'Midweek Risk': ['hero', 'observation', 'etf_0050', 'interpretation', 'premarket', 'institutional', 'tw_internals', 'market_snapshot', 'sector_flow', 'us_macro', 'us_sector_history', 'history', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'history_strip'],
-  'Weekend Macro': ['hero', 'observation', 'etf_0050', 'interpretation', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'institutional', 'tw_internals', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'history_strip'],
-  'Next Week Preview': ['hero', 'observation', 'etf_0050', 'interpretation', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'institutional', 'tw_internals', 'market_snapshot', 'sa_consensus', 'social_heatmap', 'news', 'kol', 'history_strip'],
+  'Close Summary': ['hero', 'observation', 'etf_0050', 'interpretation', 'institutional', 'tw_internals', 'sector_flow', 'monthly_revenue', 'us_sector_history', 'history', 'sa_consensus', 'external_analyst_views', 'social_heatmap', 'news', 'kol', 'history_strip'],
+  'Midweek Risk': ['hero', 'observation', 'etf_0050', 'interpretation', 'premarket', 'institutional', 'tw_internals', 'market_snapshot', 'sector_flow', 'monthly_revenue', 'us_macro', 'us_sector_history', 'history', 'sa_consensus', 'external_analyst_views', 'social_heatmap', 'news', 'kol', 'history_strip'],
+  'Weekend Macro': ['hero', 'observation', 'etf_0050', 'interpretation', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'market_snapshot', 'institutional', 'tw_internals', 'sa_consensus', 'external_analyst_views', 'social_heatmap', 'news', 'kol', 'history_strip'],
+  'Next Week Preview': ['hero', 'observation', 'etf_0050', 'interpretation', 'us_macro', 'commodity_history', 'yield_oil_history', 'us_sector_history', 'institutional', 'tw_internals', 'market_snapshot', 'monthly_revenue', 'sa_consensus', 'external_analyst_views', 'social_heatmap', 'news', 'kol', 'history_strip'],
 };
 
 // Maps an APPROVED_CHART_LIBRARY chart id to the on-page section anchor that renders it.
@@ -307,6 +307,8 @@ function buildReportSectionMap(d, family) {
   const usSectorHistory = d.us_sector_history?.series?.length ? renderUsSectorHistory(d.us_sector_history) : '';
   const institutional = d.institutional ? renderInstitutional(d.institutional) : '';
   const sectorFlow = d.sector_flow ? renderSectorFlow(d.sector_flow) : '';
+  const monthlyRevenue = d.monthly_revenue_summary ? renderMonthlyRevenue(d.monthly_revenue_summary) : '';
+  const externalAnalystViews = d.external_analyst_views ? renderExternalAnalystViews(d.external_analyst_views) : '';
   const twInternals = d.tw_market_internals ? renderTwMarketInternals(d.tw_market_internals) : '';
   const interpretation = (d.market_news || d.sentiment || d.tw_premarket || d.social_pulse || d.us_macro || d.ai_analysis || d.chart_orchestration)
     ? renderMarketInterpretation(d)
@@ -359,6 +361,8 @@ function buildReportSectionMap(d, family) {
       us_sector_history: usSectorHistory,
       institutional,
       sector_flow: sectorFlow,
+      monthly_revenue: monthlyRevenue,
+      external_analyst_views: externalAnalystViews,
     tw_internals: twInternals,
     interpretation,
     chart_orchestration: '',
@@ -634,8 +638,8 @@ const SECTION_NAV_LABELS = {
   'sec-tw': '台股盤前', 'sec-macro': '美股指標', 'sec-commodity': '商品走勢',
   'sec-yield-oil': '美債油價', 'sec-us-sector': '美股類股', 'sec-sentiment': '市場情緒',
   'sec-etf0050': '0050', 'sec-inst': '三大法人', 'sec-tw-internals': '內部結構',
-  'sec-sector': '板塊流向', 'sec-history': '歷史走勢', 'sec-sa-consensus': '分析師共識',
-  'sec-social-heatmap': '社群熱度', 'sec-news': '新聞', 'sec-kol': 'KOL 情緒',
+  'sec-sector': '板塊流向', 'sec-monthly-revenue': '月營收', 'sec-history': '歷史走勢', 'sec-sa-consensus': '分析師共識',
+  'sec-external-analysts': '外部觀點', 'sec-social-heatmap': '社群熱度', 'sec-news': '新聞', 'sec-kol': 'KOL 情緒',
   'sec-prediction-review': '預測驗證', 'sec-history-strip': '歷史對比', 'sec-ai': '深度分析',
 };
 
@@ -1191,6 +1195,67 @@ function renderSectorFlow(sf) {
       </div>
     </div>
     <div style="margin-top:18px"><canvas id="sector-chart" height="160"></canvas></div>`);
+}
+
+// ── Monthly revenue, market-wide (monthly-revenue-is-reported-market-wide) ────
+// Counts, the share growing year on year and medians only: no stock is named
+// and no mean is shown (a single company reads +3,425,111%). A month still
+// being reported gets one line with its count and no statistic.
+function renderMonthlyRevenue(s) {
+  if(!s || !s.shown) return '';
+  const months = [s.shown, s.comparison].filter(m => m && m.year_month);
+  const share = v => v == null ? '—' : `${(Number(v) * 100).toFixed(1)}%`;
+  const monthCards = months.map(m => `
+    <div class="inst-card">
+      <div class="inst-name">${escHtml(m.year_month)} 月營收</div>
+      <div class="inst-value ${cls(m.median_yoy)}">${fmtPct(m.median_yoy)}</div>
+      <div class="inst-unit">年增率中位數 · 已公布 ${fmt(m.reported, 0)} 家 · 年增為正 ${share(m.positive_share)}</div>
+    </div>`).join('');
+  const hasComparison = months.length > 1;
+  const header = `<tr><th>產業</th><th>家數</th><th>${escHtml(s.shown.year_month)} 中位數</th>${hasComparison ? `<th>${escHtml(s.comparison.year_month)} 中位數</th>` : ''}</tr>`;
+  const rows = list => (list || []).map(x => `
+    <tr>
+      <td>${escHtml(x.industry)}</td>
+      <td>${fmt(x.count, 0)}</td>
+      <td class="${cls(x.median_yoy)}">${fmtPct(x.median_yoy)}</td>
+      ${hasComparison ? `<td class="${cls(x.comparison_median_yoy)}">${x.comparison_median_yoy == null ? '—' : fmtPct(x.comparison_median_yoy)}</td>` : ''}
+    </tr>`).join('');
+  const table = (title, list) => (list && list.length) ? `
+    <div class="sector-col-title" style="margin-top:14px">${title}</div>
+    <table><thead>${header}</thead><tbody>${rows(list)}</tbody></table>` : '';
+  const pending = s.pending && s.pending.year_month
+    ? `<div class="card-note" style="margin-top:12px">${escHtml(s.pending.year_month)} 已公布 ${fmt(s.pending.reported, 0)} 家（尚未完整）</div>`
+    : '';
+  return card('sec-monthly-revenue', '🧾 月營收', `
+    <div class="card-note">上市櫃公司的月營收年增率，只計入已公布且可與去年同月比較的公司；用中位數，不受個別公司極端值影響。</div>
+    <div class="inst-row">${monthCards}</div>
+    ${table(`年增率中位數最高的產業（${fmt(s.min_industry_count ?? 15, 0)} 家以上）`, s.top)}
+    ${table('年增率中位數最低的產業', s.bottom)}
+    ${pending}`);
+}
+
+// ── External analyst views (seeking-alpha-analysis-is-tried-for-four-weeks) ──
+// The newest Seeking Alpha analysis per symbol within 7 days, summarised in
+// Traditional Chinese. These are the authors' views, not this system's.
+function renderExternalAnalystViews(v) {
+  const items = (v && Array.isArray(v.items)) ? v.items : [];
+  if(!items.length) return '';
+  const label = v.label || '外部分析師觀點（Seeking Alpha）— 作者觀點，非本系統判斷';
+  const safeUrl = u => /^https:\/\/seekingalpha\.com\//.test(String(u || '')) ? String(u) : '';
+  const rows = items.map(it => {
+    const url = safeUrl(it.url);
+    const title = escHtml(it.title || '');
+    const meta = [it.author ? escHtml(it.author) : '', it.date ? escHtml(it.date) : ''].filter(Boolean).join(' · ');
+    return `
+    <div class="ext-view" style="margin-top:14px">
+      <div class="sector-col-title">${escHtml(it.symbol || '')}${title ? `：${url ? `<a href="${escHtml(url)}" target="_blank" rel="noopener noreferrer">${title}</a>` : title}` : ''}</div>
+      ${meta ? `<div class="card-note">${meta}${url && !title ? ` · <a href="${escHtml(url)}" target="_blank" rel="noopener noreferrer">原文</a>` : ''}</div>` : ''}
+      <div style="white-space:pre-line;line-height:1.6">${escHtml(it.summary || '')}</div>
+    </div>`;
+  }).join('');
+  return card('sec-external-analysts', '🌐 外部分析師觀點', `
+    <div class="card-note">${escHtml(label)}</div>
+    ${rows}`);
 }
 
 // ── Daily Market Interpretation ───────────────────────────────────────────────
