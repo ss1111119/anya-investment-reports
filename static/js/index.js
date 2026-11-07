@@ -256,7 +256,7 @@ function buildReportSectionMap(d, family) {
     keyTiles.push(`
       <div class="key-tile">
         <div class="key-label">加權指數 TAIEX ${dateTag(taiexDate(d))}</div>
-        <div class="key-value">${new Intl.NumberFormat('en-US').format(idx.price)}</div>
+        <div class="key-value"${countFrom(changeVal != null ? Number(idx.price) - changeVal : null)}>${new Intl.NumberFormat('en-US').format(idx.price)}</div>
         <div class="key-chg ${cls(changeVal)}">${pts}${pct} ${periodTag('單日')}</div>
       </div>`);
   }
@@ -265,7 +265,7 @@ function buildReportSectionMap(d, family) {
     keyTiles.push(`
       <div class="key-tile">
         <div class="key-label">台指期夜盤 ${dateTag(rich.latest_date, { stale: Boolean(rich.stale) })}</div>
-        <div class="key-value ${cls(rich.change_pct)}">${fmtK(rich.value)}</div>
+        <div class="key-value ${cls(rich.change_pct)}"${countFrom(priorFromPct(rich.value, rich.change_pct))}>${fmtK(rich.value)}</div>
         <div class="key-chg ${cls(rich.change_pct)}">${rich.change_pct != null ? `${arr(rich.change_pct)} ${fmtPct(rich.change_pct)}` : escHtml(rich.change_note || '漲跌幅暫無')} ${periodTag('夜盤')}</div>
       </div>`);
   }
@@ -283,7 +283,7 @@ function buildReportSectionMap(d, family) {
       keyTiles.push(`
         <div class="key-tile">
           <div class="key-label">${escHtml(sox.name || '費半')} ${dateTag(sox.date, { stale: healthStale('us_macro') })}</div>
-          <div class="key-value">${fmt(sox.value, 0)}</div>
+          <div class="key-value"${countFrom(priorFromPct(sox.value, sox.change_pct))}>${fmt(sox.value, 0)}</div>
           <div class="key-chg ${cls(sox.change_pct)}">${arr(sox.change_pct)} ${fmtPct(sox.change_pct)} ${periodTag('單日')}</div>
         </div>`);
     }
@@ -415,6 +415,178 @@ function toggleTTS() {
 }
 
 // ── Destroy old charts ───────────────────────────────────────────────────────
+// 量表指針、漲跌家數條、類股與 KOL 長條的 CSS 已寫好 transition，但模板直接把最終
+// 寬度／位置寫進 style，瀏覽器沒有起點，所以從來沒有動過。這裡先把它們放回起點
+// （長條 0%、指針 50%），強制排版一次，下一格畫面再還原成目標值，transition 才會跑。
+// 使用者設定「減少動態效果」時不做，直接顯示最終值。
+const BAR_TRANSITIONS = [
+  { selector: '.bar, .breadth-bar-bull, .kol-bar-bull, .kol-bar-neutral', prop: 'width', start: '0%' },
+  { selector: '.linear-gauge-marker', prop: 'left', start: '50%' },
+];
+
+function replayBarTransitions(root) {
+  if(!root || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  const targets = [];
+  BAR_TRANSITIONS.forEach(({ selector, prop, start }) => {
+    root.querySelectorAll(selector).forEach(el => {
+      const target = el.style[prop];
+      if(!target) return;
+      targets.push([el, prop, target]);
+      el.style[prop] = start;
+    });
+  });
+  if(!targets.length) return;
+  void root.offsetWidth;  // 讓起點先排版，否則瀏覽器會把兩次設定合併成一次
+  requestAnimationFrame(() => targets.forEach(([el, prop, target]) => { el.style[prop] = target; }));
+}
+
+function prefersReducedMotion() {
+  return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+
+// ── 首屏數字：從前一日的值滾到今天的值 ─────────────────────────────────────
+// 起點有意義：加權指數從昨收滾到今收，夜盤與費半由漲跌幅回推前值。算不出起點就不動。
+function countFrom(prior) {
+  const n = Number(prior);
+  return prior != null && Number.isFinite(n) ? ` data-count-from="${n}"` : '';
+}
+
+function priorFromPct(value, pct) {
+  const v = Number(value), p = Number(pct);
+  if(value == null || pct == null || !Number.isFinite(v) || !Number.isFinite(p) || p <= -100) return null;
+  return v / (1 + p / 100);
+}
+
+const COUNT_MS = 650;  // agy 審閱：財經數字滾動不超過 0.8 秒、不回彈
+
+function animateKeyValues(root) {
+  if(!root || prefersReducedMotion()) return;
+  root.querySelectorAll('[data-count-from]').forEach(el => {
+    const finalText = el.textContent;
+    const target = Number(finalText.replace(/,/g, ''));
+    const from = Number(el.dataset.countFrom);
+    if(!Number.isFinite(target) || !Number.isFinite(from) || from === target) return;
+    const decimals = (finalText.split('.')[1] || '').length;
+    const format = v => v.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    const start = performance.now();
+    const step = (now) => {
+      if(!el.isConnected) return;
+      const t = Math.min(1, (now - start) / COUNT_MS);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = t < 1 ? format(from + (target - from) * eased) : finalText;
+      if(t < 1) requestAnimationFrame(step);
+    };
+    el.textContent = format(from);
+    requestAnimationFrame(step);
+  });
+}
+
+// ── 捲動時卡片淡入 ───────────────────────────────────────────────────────────
+// 只處理一開始在畫面下方的卡片；已在畫面內的照常顯示。用 CSS 的 translate
+// （不是 transform），才不會和卡片 hover 的 transform 互相覆蓋。
+let _revealObserver = null;
+
+function revealCardsOnScroll(root) {
+  if(_revealObserver) { _revealObserver.disconnect(); _revealObserver = null; }
+  if(!root || prefersReducedMotion() || !('IntersectionObserver' in window)) return;
+  const below = [...root.querySelectorAll('.section-card')]
+    .filter(el => el.getBoundingClientRect().top > window.innerHeight);
+  if(!below.length) return;
+  _revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(!entry.isIntersecting) return;
+      entry.target.classList.add('revealed');
+      _revealObserver && _revealObserver.unobserve(entry.target);
+    });
+  }, { rootMargin: '0px 0px -40px 0px' });
+  below.forEach(el => { el.classList.add('reveal'); _revealObserver.observe(el); });
+}
+
+// ── 有新報告時提示（不自動換頁） ────────────────────────────────────────────
+// agy 審閱：不要全天輪詢、不要在閱讀中途換掉畫面。只在發報時段（台北時間
+// 07:30–09:00、17:15–18:15）每分鐘查一次，或使用者切回這個分頁時查一次；
+// 發現新報告只跳出提示，由讀者決定要不要看。
+const NEW_REPORT_WINDOWS = [[7 * 60 + 30, 9 * 60], [17 * 60 + 15, 18 * 60 + 15]];
+let _newReportNotified = null;
+
+function sortReportIndex(index) {
+  const rank = { evening: 3, morning: 2, weekend_evening: 1, weekend_morning: 0, weekly_review: -1 };
+  return index.slice().sort((a, b) => {
+    const ad = (a.date || '').localeCompare(b.date || '');
+    if (ad !== 0) return -ad;
+    return (rank[b.type] ?? -2) - (rank[a.type] ?? -2);
+  });
+}
+
+function inPublishWindow(now = new Date()) {
+  // hourCycle 'h23'：hour12:false 在部分瀏覽器會把午夜寫成 24
+  const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+    .formatToParts(now);
+  const part = type => Number((parts.find(p => p.type === type) || {}).value);
+  const minutes = part('hour') * 60 + part('minute');
+  if(!Number.isFinite(minutes)) return false;
+  return NEW_REPORT_WINDOWS.some(([a, b]) => minutes >= a && minutes < b);
+}
+
+async function checkForNewReport() {
+  if(!_reportIndex.length || document.visibilityState !== 'visible') return;
+  try {
+    const res = await fetch(`data/index.json?_=${Date.now()}`, { cache: 'no-store' });
+    if(!res.ok) return;
+    const index = sortReportIndex(await res.json());
+    const newest = index[0];
+    if(!newest || newest.file === _reportIndex[0].file || newest.file === _newReportNotified) return;
+    _newReportNotified = newest.file;
+    showNewReportToast(newest, index);
+  } catch(e) { /* 下一輪再試；離線時不打擾讀者 */ }
+}
+
+function fillDateSelect(index) {
+  const sel = document.getElementById('date-select');
+  if(!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '';
+  index.forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = e.file;
+    opt.textContent = `${e.date} ${TYPE_LABELS[e.type]||e.type}`;
+    sel.appendChild(opt);
+  });
+  if(current) sel.value = current;
+}
+
+function showNewReportToast(entry, index) {
+  document.getElementById('new-report-toast')?.remove();
+  const toast = document.createElement('div');
+  toast.id = 'new-report-toast';
+  toast.className = 'new-report-toast';
+  toast.setAttribute('role', 'status');
+  const open = document.createElement('button');
+  open.type = 'button';
+  open.className = 'new-report-open';
+  open.textContent = `有新的${TYPE_LABELS[entry.type] || entry.type}（${entry.date}）· 查看`;
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.className = 'new-report-close';
+  close.setAttribute('aria-label', '關閉');
+  close.textContent = '×';
+  open.addEventListener('click', () => {
+    toast.remove();
+    _reportIndex = index;
+    fillDateSelect(index);
+    loadReport(entry.file);
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+  });
+  close.addEventListener('click', () => toast.remove());
+  toast.append(open, close);
+  document.body.appendChild(toast);
+}
+
+function startNewReportWatch() {
+  setInterval(() => { if(inPublishWindow()) checkForNewReport(); }, 60000);
+  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') checkForNewReport(); });
+}
+
 function destroyCharts() {
   Object.values(_charts).forEach(c => c && c.destroy && c.destroy());
   _charts = {};
@@ -425,21 +597,10 @@ async function loadIndex() {
   try {
     const res = await fetch(`data/index.json?_=${Date.now()}`);
     if(!res.ok) throw new Error('index.json not found');
-    const index = (await res.json()).slice().sort((a, b) => {
-      const rank = { evening: 3, morning: 2, weekend_evening: 1, weekend_morning: 0, weekly_review: -1 };
-      const ad = (a.date || '').localeCompare(b.date || '');
-      if (ad !== 0) return -ad;
-      return (rank[b.type] ?? -2) - (rank[a.type] ?? -2);
-    });
+    const index = sortReportIndex(await res.json());
     _reportIndex = index;
     const sel = document.getElementById('date-select');
-    sel.innerHTML = '';
-    index.forEach(e => {
-      const opt = document.createElement('option');
-      opt.value = e.file;
-      opt.textContent = `${e.date} ${TYPE_LABELS[e.type]||e.type}`;
-      sel.appendChild(opt);
-    });
+    fillDateSelect(index);
     sel.addEventListener('change', () => loadReport(sel.value));
     updateReportNavButtons();
     // The LINE push links to ?date=…&type=…; open that report, not
@@ -531,8 +692,17 @@ let _loadSeq = 0;
 
 // ── Load report JSON ─────────────────────────────────────────────────────────
 async function loadReport(file, { history: historyMode = 'push' } = {}) {
-  document.getElementById('app').innerHTML = '<div class="loader">載入資料中<span class="spinner"></span></div>';
-  destroyCharts();
+  const app = document.getElementById('app');
+  // 換日期時不清空頁面：舊報告淡出留在原處，新報告到了再淡入，避免整頁閃白。
+  // 第一次載入（還沒有報告）才顯示「載入資料中」。
+  const switching = !!_currentData;
+  if(switching) {
+    app.classList.remove('is-entering');
+    app.classList.add('is-switching');
+  } else {
+    app.innerHTML = '<div class="loader">載入資料中<span class="spinner"></span></div>';
+    destroyCharts();
+  }
   const seq = ++_loadSeq;
   try {
     const res = await fetch(`${file}?_=${Date.now()}`);
@@ -545,7 +715,22 @@ async function loadReport(file, { history: historyMode = 'push' } = {}) {
     const sel = document.getElementById('date-select');
     if(sel && sel.value !== file) sel.value = file;
     syncReportUrl(file, historyMode);
+    destroyCharts();
     render(_currentData);
+    if(switching) {
+      app.classList.remove('is-switching');
+      app.classList.add('is-entering');
+      // animationend 會從子元素冒泡上來；只認 #app 自己的淡入，否則淡入會被提早中斷
+      const done = (e) => {
+        if(e.target !== app || e.animationName !== 'report-enter') return;
+        app.classList.remove('is-entering');
+        app.removeEventListener('animationend', done);
+        app.removeEventListener('animationcancel', done);
+      };
+      // 淡入途中又切換日期時動畫被取消、不會有 animationend；一併收掉監聽
+      app.addEventListener('animationend', done);
+      app.addEventListener('animationcancel', done);
+    }
     if(_deepLinkNotice) {
       const notice = document.createElement('div');
       notice.className = 'loader';
@@ -559,7 +744,9 @@ async function loadReport(file, { history: historyMode = 'push' } = {}) {
     if(seq !== _loadSeq) return;
     // The notice belonged to this load; it must not surface on a later one.
     _deepLinkNotice = null;
-    document.getElementById('app').innerHTML =
+    destroyCharts();
+    app.classList.remove('is-switching', 'is-entering');
+    app.innerHTML =
       `<div class="loader" style="color:var(--red)">⚠️ 載入失敗：${e.message}</div>`;
   }
 }
@@ -602,6 +789,9 @@ function render(d) {
   const html = order.map(key => sections[key] || '').join('');
 
   document.getElementById('app').innerHTML = html;
+  replayBarTransitions(document.getElementById('app'));
+  animateKeyValues(document.getElementById('app'));
+  revealCardsOnScroll(document.getElementById('app'));
   enhanceSectionShortcuts(order);
   buildAnchorNav();
   const teaserEl = document.getElementById('hero-teaser');
@@ -2294,3 +2484,4 @@ function card(id, title, body, options = {}) {
 updateMarketStatus();
 setInterval(updateMarketStatus, 60000);
 loadIndex();
+startNewReportWatch();

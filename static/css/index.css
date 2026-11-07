@@ -1000,3 +1000,51 @@
       font-size: var(--fs-caption);
       color: var(--muted);
     }
+
+    /* 換日期：舊報告淡出留在原處，新報告淡入（loadReport） */
+    #app { transition: opacity .18s ease; }
+    #app.is-switching { opacity: .35; pointer-events: none; }
+    #app.is-entering { animation: report-enter .28s ease-out; }
+    @keyframes report-enter {
+      from { opacity: .35; }
+      to   { opacity: 1; }
+    }
+
+    /* 使用者設定「減少動態效果」：過場與動畫一律關閉 */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+
+    /* 首屏數字滾動時寬度不跳（animateKeyValues） */
+    .key-value { font-variant-numeric: tabular-nums; }
+
+    /* 捲動時卡片淡入（revealCardsOnScroll）；用 translate，不和 hover 的 transform 衝突 */
+    .section-card.reveal { opacity: 0; translate: 0 8px; transition: opacity .35s ease, translate .35s ease, transform .2s, box-shadow .2s; }
+    .section-card.reveal.revealed { opacity: 1; translate: 0 0; }
+    /* 列印時還沒捲到的卡片也要印出來 */
+    @media print { .section-card.reveal { opacity: 1; translate: 0 0; } .new-report-toast { display: none; } }
+
+    /* 有新報告時的提示（showNewReportToast） */
+    .new-report-toast {
+      /* left:50% + translateX 會把寬度限制在半個螢幕，手機上斷成三行；改用左右 0 置中 */
+      position: fixed; left: 0; right: 0; bottom: 20px; margin: 0 auto; width: max-content;
+      z-index: 300; display: flex; align-items: center; gap: 4px;
+      background: var(--surface-2, #1e2638); border: 1px solid var(--accent, #63b3ff);
+      border-radius: 999px; box-shadow: 0 6px 20px rgba(0,0,0,.4);
+      padding: 4px 6px 4px 4px; max-width: calc(100vw - 32px);
+      animation: toast-in .25s ease-out;
+    }
+    .new-report-open {
+      background: none; border: 0; color: var(--text, #e6edf7); cursor: pointer;
+      font-size: var(--fs-body, 14px); padding: 8px 12px; border-radius: 999px;
+    }
+    .new-report-open:hover { color: var(--accent, #63b3ff); }
+    .new-report-close {
+      background: none; border: 0; color: var(--muted, #7a8ba8); cursor: pointer;
+      font-size: 18px; line-height: 1; padding: 6px 10px; border-radius: 999px;
+    }
+    @keyframes toast-in { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
