@@ -62,6 +62,19 @@ function dateTag(dataDate, { stale = false } = {}) {
   return `<span class="data-tag${stale ? ' is-stale' : ''}" title="${escHtml(title)}">${escHtml(text)}</span>`;
 }
 
+// The night session is dated by the evening it traded, not by TAIFEX's filing
+// date: a Saturday report reads Friday evening's session, filed under Monday
+// (a-weekend-report-shows-the-latest-session). Reports built before
+// session_evening existed fall back to the filing date.
+function nightSessionTag(rich) {
+  const evening = String(rich?.session_evening || '').slice(0, 10);
+  if(!evening) return dateTag(rich?.latest_date, { stale: Boolean(rich?.stale) });
+  const stale = Boolean(rich?.stale);
+  const text = `${stale ? '⏱ ' : ''}${shortDate(evening)} 晚${stale ? ' 偏舊' : ''}`;
+  const title = `${evening} 晚間開盤的夜盤（期交所歸屬日 ${rich?.latest_date || '—'}）${stale ? '（偏舊）' : ''}`;
+  return `<span class="data-tag${stale ? ' is-stale' : ''}" title="${escHtml(title)}">${escHtml(text)}</span>`;
+}
+
 // Period of a change / return figure: 單日, 夜盤, 近 1 年 ...
 const periodTag = text => `<span class="period-tag">${escHtml(text)}</span>`;
 
@@ -264,7 +277,7 @@ function buildReportSectionMap(d, family) {
   if(rich && rich.value != null) {
     keyTiles.push(`
       <div class="key-tile">
-        <div class="key-label">台指期夜盤 ${dateTag(rich.latest_date, { stale: Boolean(rich.stale) })}</div>
+        <div class="key-label">台指期夜盤 ${nightSessionTag(rich)}</div>
         <div class="key-value ${cls(rich.change_pct)}"${countFrom(priorFromPct(rich.value, rich.change_pct))}>${fmtK(rich.value)}</div>
         <div class="key-chg ${cls(rich.change_pct)}">${rich.change_pct != null ? `${arr(rich.change_pct)} ${fmtPct(rich.change_pct)}` : escHtml(rich.change_note || '漲跌幅暫無')} ${periodTag('夜盤')}</div>
       </div>`);
@@ -1219,7 +1232,7 @@ function renderTwPremarket(p) {
         <div class="chip-chg ${cls(p.sgx_fut?.change_pct)}">${p.sgx_fut?.change_pct != null ? `${arr(p.sgx_fut.change_pct)} ${fmtPct(p.sgx_fut.change_pct)} ${periodTag('結算')}` : `<span class="flat">${escHtml(p.sgx_fut?.change_note || '漲跌幅暫無')}</span>`}</div>
       </div>
       <div class="pm-chip">
-        <div class="pm-label">台指期夜盤 ${dateTag(p.rich_fut?.latest_date, { stale: Boolean(p.rich_fut?.stale) })}</div>
+        <div class="pm-label">台指期夜盤 ${nightSessionTag(p.rich_fut)}</div>
         <div class="pm-value ${cls(p.rich_fut?.change_pct)}">${p.rich_fut?.value!=null?fmtK(p.rich_fut.value):'資料待補'}</div>
         <div class="chip-chg ${cls(p.rich_fut?.change_pct)}">${p.rich_fut?.change_pct != null ? `${arr(p.rich_fut.change_pct)} ${fmtPct(p.rich_fut.change_pct)} ${periodTag('夜盤')}` : `<span class="flat">${escHtml(p.rich_fut?.change_note || '漲跌幅暫無')}</span>`}</div>
       </div>
