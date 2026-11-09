@@ -1858,8 +1858,13 @@ function renderHistoryStrip(h) {
     ? `<div style="margin-top:14px"><div class="hs-subtitle">持續發酵主題</div>${topicsList}</div>`
     : '';
 
+  // the-history-strip-shows-trading-days: cells are trading days, so two
+  // neighbours may be a weekend or holiday apart. Older reports have no
+  // window_basis and were built on calendar days.
+  const windowNote = h.window_basis === 'trading_days' ? '最近 7 個交易日' : '最近 7 天';
   const body = `
     <div class="hs-subtitle">方向訊號歷史</div>
+    <div style="margin:-2px 0 6px;font-size:var(--fs-caption);color:var(--muted)">${windowNote}</div>
     <div class="hs-row">${signalCells}</div>
     ${boundaryNote}
     ${topicsBlock}
